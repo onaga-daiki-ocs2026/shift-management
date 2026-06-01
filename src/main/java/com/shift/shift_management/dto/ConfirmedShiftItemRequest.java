@@ -5,7 +5,7 @@ import java.time.LocalTime;
 
 public record ConfirmedShiftItemRequest(
     Long userId,
-    LocalDate date,
+    LocalDate workDate,
     LocalTime startTime,
     LocalTime endTime
 ) {

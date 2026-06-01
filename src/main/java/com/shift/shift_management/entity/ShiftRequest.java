@@ -22,7 +22,7 @@ public class ShiftRequest {
 
     private Long periodId;
 
-    private LocalDate date;
+    private LocalDate workDate;
 
     private LocalTime startTime;
 
