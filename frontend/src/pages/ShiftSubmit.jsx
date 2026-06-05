@@ -57,6 +57,41 @@ function ShiftSubmit() {
         return list;
     }
 
+    function updateShift(index, field, value) {
+
+        const newShifts = [...shifts];
+
+        newShifts[index] = {
+            ...newShifts[index],
+            [field]: value,
+        };
+
+        setShifts(newShifts);
+    }
+
+    function submitShift() {
+
+        const request = {
+            periodId: period.id,
+            requests: shifts,
+        };
+
+        console.log(request);
+
+        api.post(
+            "/api/shift-requests",
+            request
+        )
+        .then(() => {
+            alert("提出しました！");
+        })
+        .catch((error) => {
+            console.log(error);
+            alert("提出失敗");
+        });
+
+    }
+
     return (
         <Layout title="シフト提出">
         {period ? (
@@ -67,24 +102,56 @@ function ShiftSubmit() {
 
             <p>生成数：{shifts.length}日分</p>
 
-            {shifts.map((shift) => (
+            {shifts.map((shift,index) => (
                 <div className="shift-card" key={shift.workDate}>
                 <h3>{shift.workDate}</h3>
 
                 <label>
-                    <input type="checkbox" />
+                    <input
+                        type="checkbox"
+                        checked={shift.available}
+                        onChange={(e) =>
+                            updateShift(
+                            index,
+                            "available",
+                            e.target.checked
+                            )
+                        }
+                    />
                     出勤可能
                 </label>
 
                 <br />
 
-                <input type="time" />
+                <input
+                    type="time"
+                    value={shift.startTime}
+                    onChange={(e) =>
+                        updateShift(
+                        index,
+                        "startTime",
+                        e.target.value
+                        )
+                    }
+                />
                 〜
-                <input type="time" />
+                <input
+                    type="time"
+                    value={shift.endTime}
+                    onChange={(e) =>
+                        updateShift(
+                        index,
+                        "endTime",
+                        e.target.value
+                        )
+                    }
+                />
                 </div>
             ))}
 
-            <button>提出</button>
+            <button onClick={submitShift}>
+                提出
+            </button>
             </>
         ) : (
             <p>読み込み中...</p>

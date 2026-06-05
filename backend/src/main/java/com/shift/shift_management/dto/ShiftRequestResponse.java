@@ -5,7 +5,7 @@ import java.time.LocalTime;
 
 public record ShiftRequestResponse(
     LocalDate workDate,
-    LocalTime starTime,
+    LocalTime startTime,
     LocalTime endTime,
     boolean available
 ) {
