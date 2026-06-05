@@ -1,0 +1,42 @@
+body {
+  margin: 0;
+  font-family: sans-serif;
+}
+
+.app {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.app-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.menu {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.menu-button {
+  display: block;
+  padding: 20px;
+  text-align: center;
+  text-decoration: none;
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  color: #000;
+  font-size: 18px;
+}
+
+.submit-button {
+  width: 100%;
+  padding: 16px;
+  font-size: 18px;
+}
+
+.shift-list {
+  margin: 24px 0;
+}

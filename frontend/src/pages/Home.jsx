@@ -1,38 +1,23 @@
-import { useEffect, useState } from "react";
-import api from "../api/api";
+import Layout from "../components/Layout";
 
 function Home() {
-    const [period, setPeriod] = useState(null);
-    const [error, setError] = useState("");
+  return (
+    <Layout title="シフト管理アプリ">
+      <div className="menu">
+        <a href="/submit" className="menu-button">
+          シフト提出
+        </a>
 
-    useEffect(() => {
-        api.get("/api/submission-periods/current")
-            .then(response => {
-                console.log(response.data);
-                setPeriod(response.data);
-            })
-            .catch(error => {
-                console.log(error);
-                setError("API取得に失敗しました");
-            });
-    }, []);
+        <a href="/my-submissions" className="menu-button">
+          提出済み確認
+        </a>
 
-    return (
-        <div>
-            <h1>シフト管理アプリ</h1>
-
-            {error && <p>{error}</p>}
-
-            {period ? (
-                <>
-                    <p>{period.startDate}〜{period.endDate}</p>
-                    <p>締切：{period.deadline}</p>
-                </>
-            ) : (
-                !error && <p>読み込み中...</p>
-            )}
-        </div>
-    );
+        <a href="/confirmed-shifts" className="menu-button">
+          確定シフト確認
+        </a>
+      </div>
+    </Layout>
+  );
 }
 
 export default Home;

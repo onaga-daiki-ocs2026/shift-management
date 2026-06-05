@@ -4,7 +4,7 @@ import java.time.LocalDate;
 
 public record SubmissionPeriodResponse(
     Long id,
-    LocalDate starDate,
+    LocalDate startDate,
     LocalDate endDate,
     LocalDate deadline,
     boolean status
