@@ -1,20 +1,31 @@
+import { Link } from "react-router-dom";
 import Layout from "../components/Layout";
 
 function Home() {
   return (
     <Layout title="シフト管理アプリ">
       <div className="menu">
-        <a href="/submit" className="menu-button">
+        <Link to="/submit" className="menu-button">
           シフト提出
-        </a>
+        </Link>
 
-        <a href="/my-submissions" className="menu-button">
+        <Link to="/my-submissions" className="menu-button">
           提出済み確認
-        </a>
+        </Link>
 
-        <a href="/confirmed-shifts" className="menu-button">
+        <Link to="/confirmed-shifts" className="menu-button">
           確定シフト確認
-        </a>
+        </Link>
+
+        <hr />
+
+        <Link to="/admin/shift-requests" className="menu-button">
+          管理者：希望シフト一覧
+        </Link>
+
+        <Link to="/admin/confirmed-shifts/create" className="menu-button">
+          管理者：確定シフト作成
+        </Link>
       </div>
     </Layout>
   );
