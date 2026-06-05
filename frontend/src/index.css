@@ -40,3 +40,37 @@ body {
 .shift-list {
   margin: 24px 0;
 }
+
+.shift-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 24px 0;
+}
+
+.timeline-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.timeline-name {
+  width: 80px;
+  font-weight: bold;
+}
+
+.timeline-area {
+  flex: 1;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 6px;
+}
+
+.timeline-bar {
+  width: 60%;
+  padding: 10px;
+  border-radius: 8px;
+  background-color: #ddd;
+  text-align: center;
+  font-size: 14px;
+}
