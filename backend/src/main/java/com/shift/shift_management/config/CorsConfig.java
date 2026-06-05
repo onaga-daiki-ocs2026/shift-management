@@ -16,7 +16,7 @@ public class CorsConfig {
                 registry.addMapping("/**")
                         .allowedOrigins(
                             "http://localhost:5173",
-                            "http://shift-management-navy.vercel.app"
+                            "https://shift-management-navy.vercel.app"
                         )
                         .allowedMethods("*")
                         .allowedHeaders("*");
