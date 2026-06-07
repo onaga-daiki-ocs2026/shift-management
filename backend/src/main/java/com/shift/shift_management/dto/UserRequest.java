@@ -5,13 +5,9 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class UserResponse {
-
-    private Long id;
+public class UserRequest {
 
     private String lineUserId;
 
     private String displayName;
-
-    private String role;
 }

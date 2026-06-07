@@ -16,11 +16,26 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+
+    // LINE固有ID
+    @Column(nullable = false, unique = true)
     private String lineUserId;
 
-    private String name;
 
-    private String role;
+    // LINE表示名
+    private String displayName;
 
+
+    // STAFF / ADMIN
+    private String role = "STAFF";
+
+
+    // 登録日時
     private LocalDateTime createdAt;
+
+
+    @PrePersist
+    public void onCreate() {
+        createdAt = LocalDateTime.now();
+    }
 }
