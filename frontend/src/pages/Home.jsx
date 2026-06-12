@@ -21,6 +21,7 @@ function Home() {
           displayName: lineUser.displayName,
         });
 
+        localStorage.setItem("loginUser", JSON.stringify(response.data));
         setLoginUser(response.data);
       } catch (error) {
         console.error(error);

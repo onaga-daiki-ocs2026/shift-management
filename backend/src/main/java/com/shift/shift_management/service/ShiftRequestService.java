@@ -23,6 +23,7 @@ public class ShiftRequestService {
 
             ShiftRequest shiftRequest = new ShiftRequest();
 
+            shiftRequest.setUserId(request.userId());
             shiftRequest.setPeriodId(request.periodId());
             shiftRequest.setWorkDate(item.workDate());
             shiftRequest.setStartTime(item.startTime());

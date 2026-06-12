@@ -6,6 +6,8 @@ function ShiftSubmit() {
     const [period, setPeriod] = useState(null);
     const [shifts, setShifts] = useState([]);
 
+    const loginUser = JSON.parse(localStorage.getItem("loginUser"));
+
     useEffect(() => {
         api.get("/api/submission-periods/current")
         .then((response) => {
@@ -71,7 +73,13 @@ function ShiftSubmit() {
 
     function submitShift() {
 
+        if (!loginUser) {
+            alert("LINEからログインしてください");
+            return;
+        }
+
         const request = {
+            userId: loginUser.id,
             periodId: period.id,
             requests: shifts,
         };
