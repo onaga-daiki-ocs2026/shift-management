@@ -1,8 +1,7 @@
 package com.shift.shift_management.entity;
 
-import java.time.LocalDate;
-
 import jakarta.persistence.*;
+import java.time.LocalDate;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,17 +10,16 @@ import lombok.Setter;
 @Getter
 @Setter
 public class SubmissonPeriod {
-    
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
-    private LocalDate startDate;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    private LocalDate endDate;
+	private LocalDate startDate;
 
-    private LocalDate deadline;
+	private LocalDate endDate;
 
-    private boolean status;
+	private LocalDate deadline;
 
+	private boolean status;
 }

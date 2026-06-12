@@ -4,9 +4,4 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 public record ShiftRequestItemRequest(
-    LocalDate workDate,
-    LocalTime startTime,
-    LocalTime endTime,
-    boolean  available
-) {
-}
+		LocalDate workDate, LocalTime startTime, LocalTime endTime, boolean available) {}

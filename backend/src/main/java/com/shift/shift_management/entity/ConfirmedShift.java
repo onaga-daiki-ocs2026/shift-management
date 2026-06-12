@@ -1,10 +1,9 @@
 package com.shift.shift_management.entity;
 
+import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-
-import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,25 +12,24 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ConfirmedShift {
-    
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
-    private Long userId;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    private long periodId;
+	private Long userId;
 
-    private LocalDate workDate;
+	private long periodId;
 
-    private LocalTime startTime;
+	private LocalDate workDate;
 
-    private LocalTime endTime;
+	private LocalTime startTime;
 
-    private boolean published;
+	private LocalTime endTime;
 
-    private LocalDateTime createdAt;
+	private boolean published;
 
-    private LocalDateTime updateAt;
+	private LocalDateTime createdAt;
 
+	private LocalDateTime updateAt;
 }

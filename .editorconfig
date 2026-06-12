@@ -1,0 +1,16 @@
+root = true
+
+[*]
+indent_style = tab
+indent_size = 4
+end_of_line = crlf
+insert_final_newline = true
+charset = utf-8
+
+[*.{js,jsx,ts,tsx,json,css,html,md}]
+indent_style = tab
+indent_size = 2
+
+[*.java]
+indent_style = tab
+indent_size = 4

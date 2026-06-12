@@ -3,202 +3,212 @@ import Layout from "../components/Layout";
 import api from "../api/api";
 
 function ShiftSubmit() {
-    const [period, setPeriod] = useState(null);
-    const [shiftBlocks, setShiftBlocks] = useState([]);
+	const [period, setPeriod] = useState(null);
+	const [shiftBlocks, setShiftBlocks] = useState([]);
+	const [openBlockIndex, setOpenBlockIndex] = useState(0);
+	const [loading, setLoading] = useState(true);
 
-    const loginUser = JSON.parse(localStorage.getItem("loginUser"));
+	useEffect(() => {
+		fetchCurrentPeriod();
+	}, []);
 
-    useEffect(() => {
-        api.get("/api/submission-periods/current")
-            .then((response) => {
-                const data = response.data;
-                setPeriod(data);
+	const fetchCurrentPeriod = async () => {
+		try {
+			const response = await api.get("/api/submission-periods/current");
+			const currentPeriod = response.data;
 
-                const blocks = createShiftBlocks(data.startDate);
-                setShiftBlocks(blocks);
-            })
-            .catch((error) => {
-                console.log(error);
-            });
-    }, []);
+			setPeriod(currentPeriod);
 
-    function formatDate(date) {
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, "0");
-        const day = String(date.getDate()).padStart(2, "0");
+			const blocks = createShiftBlocks(currentPeriod.startDate, 5);
+			setShiftBlocks(blocks);
+		} catch (error) {
+			console.error("提出期間の取得に失敗しました", error);
+		} finally {
+			setLoading(false);
+		}
+	};
 
-        return `${year}-${month}-${day}`;
-    }
+	const createShiftBlocks = (startDate, blockCount) => {
+		const blocks = [];
+		const baseDate = new Date(startDate);
 
-    function createShiftBlocks(startDate) {
-        const blocks = [];
+		for (let blockIndex = 0; blockIndex < blockCount; blockIndex++) {
+			const dates = [];
 
-        const [startYear, startMonth, startDay] =
-            startDate.split("-").map(Number);
+			for (let dayIndex = 0; dayIndex < 14; dayIndex++) {
+				const date = new Date(baseDate);
+				date.setDate(baseDate.getDate() + blockIndex * 14 + dayIndex);
 
-        const current =
-            new Date(startYear, startMonth - 1, startDay);
+				dates.push({
+					workDate: formatDate(date),
+					available: false,
+					startTime: "",
+					endTime: "",
+				});
+			}
 
-        for (let blockIndex = 0; blockIndex < 5; blockIndex++) {
-            const blockStart = new Date(current);
-            const shifts = [];
+			blocks.push({
+				title: blockIndex === 0 ? "提出必須期間" : `追加提出期間${blockIndex}`,
+				dates,
+			});
+		}
 
-            for (let i = 0; i < 14; i++) {
-                shifts.push({
-                    workDate: formatDate(current),
-                    available: false,
-                    startTime: "",
-                    endTime: "",
-                });
+		return blocks;
+	};
 
-                current.setDate(current.getDate() + 1);
-            }
+	const formatDate = (date) => {
+		return date.toISOString().split("T")[0];
+	};
 
-            const blockEnd = new Date(current);
-            blockEnd.setDate(blockEnd.getDate() - 1);
+	const formatDisplayDate = (dateString) => {
+		const date = new Date(dateString);
+		return `${date.getMonth() + 1}/${date.getDate()}`;
+	};
 
-            blocks.push({
-                title:
-                    blockIndex === 0
-                        ? "提出必須期間"
-                        : `追加提出期間${blockIndex}`,
-                startDate: formatDate(blockStart),
-                endDate: formatDate(blockEnd),
-                shifts: shifts,
-            });
-        }
+	const handleChange = (blockIndex, dateIndex, field, value) => {
+		const newBlocks = [...shiftBlocks];
 
-        return blocks;
-    }
+		newBlocks[blockIndex].dates[dateIndex] = {
+			...newBlocks[blockIndex].dates[dateIndex],
+			[field]: value,
+		};
 
-    function updateShift(blockIndex, shiftIndex, field, value) {
-        const newBlocks = [...shiftBlocks];
+		if (field === "available" && value === false) {
+			newBlocks[blockIndex].dates[dateIndex].startTime = "";
+			newBlocks[blockIndex].dates[dateIndex].endTime = "";
+		}
 
-        const newShifts = [...newBlocks[blockIndex].shifts];
+		setShiftBlocks(newBlocks);
+	};
 
-        newShifts[shiftIndex] = {
-            ...newShifts[shiftIndex],
-            [field]: value,
-        };
+	const handleSubmit = async () => {
+		const loginUser = JSON.parse(localStorage.getItem("loginUser"));
 
-        newBlocks[blockIndex] = {
-            ...newBlocks[blockIndex],
-            shifts: newShifts,
-        };
+		if (!loginUser) {
+			alert("ログイン情報がありません。もう一度LINEログインしてください。");
+			return;
+		}
 
-        setShiftBlocks(newBlocks);
-    }
+		try {
+			const requests = shiftBlocks.flatMap((block) => block.dates);
 
-    function submitShift() {
-        if (!loginUser) {
-            alert("LINEからログインしてください");
-            return;
-        }
+			await api.post("/api/shift-requests", {
+				userId: loginUser.id,
+				periodId: period.id,
+				requests,
+			});
 
-        const allShifts = shiftBlocks.flatMap((block) => block.shifts);
+			alert("シフトを提出しました！");
+		} catch (error) {
+			console.error("シフト提出に失敗しました", error);
+			alert("シフト提出に失敗しました");
+		}
+	};
 
-        const request = {
-            userId: loginUser.id,
-            periodId: period.id,
-            requests: allShifts,
-        };
+	if (loading) {
+		return (
+			<Layout>
+				<p>読み込み中...</p>
+			</Layout>
+		);
+	}
 
-        console.log("送信データ:", request);
+	if (!period) {
+		return (
+			<Layout>
+				<p>提出期間が設定されていません。</p>
+			</Layout>
+		);
+	}
 
-        api.post("/api/shift-requests", request)
-            .then(() => {
-                alert("提出しました！");
-            })
-            .catch((error) => {
-                console.log(error);
-                alert("提出失敗");
-            });
-    }
+	return (
+		<Layout>
+			<h2>シフト提出</h2>
 
-    return (
-        <Layout title="シフト提出">
-            {period ? (
-                <>
-                    <p>
-                        基準提出期間：{period.startDate}〜{period.endDate}
-                    </p>
+			{shiftBlocks.map((block, blockIndex) => {
+				const start = block.dates[0].workDate;
+				const end = block.dates[block.dates.length - 1].workDate;
+				const isOpen = openBlockIndex === blockIndex;
 
-                    <p>提出可能期間：10週間分</p>
+				return (
+					<div key={blockIndex} className="shift-block">
+						<button
+							type="button"
+							className="accordion-button"
+							onClick={() => setOpenBlockIndex(isOpen ? null : blockIndex)}
+						>
+							{isOpen ? "▼" : "▶"} {block.title}（{formatDisplayDate(start)}〜
+							{formatDisplayDate(end)}）
+						</button>
 
-                    {shiftBlocks.map((block, blockIndex) => (
-                        <div key={block.startDate}>
-                            <h2>
-                                {block.title}
-                            </h2>
+						{isOpen && (
+							<div className="accordion-content">
+								{block.dates.map((shift, dateIndex) => (
+									<div key={shift.workDate} className="shift-row">
+										<div className="shift-date">
+											{formatDisplayDate(shift.workDate)}
+										</div>
 
-                            <p>
-                                {block.startDate}〜{block.endDate}
-                            </p>
+										<label>
+											<input
+												type="checkbox"
+												checked={shift.available}
+												onChange={(e) =>
+													handleChange(
+														blockIndex,
+														dateIndex,
+														"available",
+														e.target.checked,
+													)
+												}
+											/>
+											出勤可能
+										</label>
 
-                            {block.shifts.map((shift, shiftIndex) => (
-                                <div
-                                    className="shift-card"
-                                    key={shift.workDate}
-                                >
-                                    <h3>{shift.workDate}</h3>
+										{shift.available && (
+											<>
+												<input
+													type="time"
+													value={shift.startTime}
+													onChange={(e) =>
+														handleChange(
+															blockIndex,
+															dateIndex,
+															"startTime",
+															e.target.value,
+														)
+													}
+												/>
 
-                                    <label>
-                                        <input
-                                            type="checkbox"
-                                            checked={shift.available}
-                                            onChange={(e) =>
-                                                updateShift(
-                                                    blockIndex,
-                                                    shiftIndex,
-                                                    "available",
-                                                    e.target.checked
-                                                )
-                                            }
-                                        />
-                                        出勤可能
-                                    </label>
+												<span>〜</span>
 
-                                    <br />
+												<input
+													type="time"
+													value={shift.endTime}
+													onChange={(e) =>
+														handleChange(
+															blockIndex,
+															dateIndex,
+															"endTime",
+															e.target.value,
+														)
+													}
+												/>
+											</>
+										)}
+									</div>
+								))}
+							</div>
+						)}
+					</div>
+				);
+			})}
 
-                                    <input
-                                        type="time"
-                                        value={shift.startTime}
-                                        onChange={(e) =>
-                                            updateShift(
-                                                blockIndex,
-                                                shiftIndex,
-                                                "startTime",
-                                                e.target.value
-                                            )
-                                        }
-                                    />
-                                    〜
-                                    <input
-                                        type="time"
-                                        value={shift.endTime}
-                                        onChange={(e) =>
-                                            updateShift(
-                                                blockIndex,
-                                                shiftIndex,
-                                                "endTime",
-                                                e.target.value
-                                            )
-                                        }
-                                    />
-                                </div>
-                            ))}
-                        </div>
-                    ))}
-
-                    <button onClick={submitShift}>
-                        提出
-                    </button>
-                </>
-            ) : (
-                <p>読み込み中...</p>
-            )}
-        </Layout>
-    );
+			<button type="button" onClick={handleSubmit}>
+				提出する
+			</button>
+		</Layout>
+	);
 }
 
 export default ShiftSubmit;

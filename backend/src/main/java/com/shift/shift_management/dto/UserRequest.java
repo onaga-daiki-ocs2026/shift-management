@@ -7,7 +7,7 @@ import lombok.Setter;
 @Setter
 public class UserRequest {
 
-    private String lineUserId;
+	private String lineUserId;
 
-    private String displayName;
+	private String displayName;
 }
