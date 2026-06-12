@@ -71,6 +71,38 @@ function ShiftSubmit() {
         setShifts(newShifts);
     }
 
+    function addNextTwoWeeks() {
+        if (shifts.length === 0) {
+            return;
+        }
+
+        const lastDate = shifts[shifts.length - 1].workDate;
+
+        const [year, month, day] = lastDate.split("-").map(Number);
+        const current = new Date(year, month - 1, day);
+
+        const newDates = [];
+
+        for (let i = 1; i <= 14; i++) {
+            current.setDate(current.getDate() + 1);
+
+            const y = current.getFullYear();
+            const m = String(current.getMonth() + 1).padStart(2, "0");
+            const d = String(current.getDate()).padStart(2, "0");
+
+            newDates.push(`${y}-${m}-${d}`);
+        }
+
+        const newShifts = newDates.map((date) => ({
+            workDate: date,
+            available: false,
+            startTime: "",
+            endTime: "",
+        }));
+
+        setShifts([...shifts, ...newShifts]);
+    }
+
     function submitShift() {
 
         if (!loginUser) {
@@ -109,6 +141,10 @@ function ShiftSubmit() {
             </p>
 
             <p>生成数：{shifts.length}日分</p>
+
+            <button type="button" onClick={addNextTwoWeeks}>
+                次の2週間を追加
+            </button>
 
             {shifts.map((shift,index) => (
                 <div className="shift-card" key={shift.workDate}>
