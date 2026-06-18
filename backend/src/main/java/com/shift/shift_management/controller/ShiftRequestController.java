@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.PathVariable;
 
 @RequiredArgsConstructor
 @RestController
@@ -26,5 +27,10 @@ public class ShiftRequestController {
 	@GetMapping
 	public List<ShiftRequestResponse> getShiftRequests() {
 		return shiftRequestService.findAll();
+	}
+
+	@GetMapping("/user/{userId}")
+	public List<ShiftRequestResponse> getShiftRequestsByUser(@PathVariable Long userId) {
+		return shiftRequestService.findByUserId(userId);
 	}
 }

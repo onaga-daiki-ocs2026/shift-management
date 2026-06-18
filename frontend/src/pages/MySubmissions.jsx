@@ -6,8 +6,11 @@ function MySubmissions() {
 	const [shifts, setShifts] = useState([]);
 
 	useEffect(() => {
+		const loginUser = JSON.parse(localStorage.getItem("loginUser"));
+    	const userId = loginUser?.id;
+
 		api
-			.get("/api/shift-requests")
+			.get("/api/shift-requests/user/${userId}")
 			.then((response) => {
 				console.log(response.data);
 				setShifts(response.data);

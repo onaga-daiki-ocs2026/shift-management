@@ -47,4 +47,15 @@ public class ShiftRequestService {
 										shift.isAvailable()))
 				.toList();
 	}
+
+	public List<ShiftRequestResponse> findByUserId(Long userId) {
+		List<ShiftRequest> shifts = shiftRequestRepository.findByUserId(userId);
+		return shifts.stream()
+				.map(shift -> new ShiftRequestResponse(
+						shift.getWorkDate(),
+						shift.getStartTime(),
+						shift.getEndTime(),
+						shift.isAvailable()))
+				.toList();
+	}
 }
