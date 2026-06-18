@@ -10,7 +10,7 @@ function MySubmissions() {
     	const userId = loginUser?.id;
 
 		api
-			.get("/api/shift-requests/user/${userId}")
+			.get(`/api/shift-requests/user/${userId}`)
 			.then((response) => {
 				console.log(response.data);
 				setShifts(response.data);

@@ -7,6 +7,7 @@ function ShiftSubmit() {
 	const [shiftBlocks, setShiftBlocks] = useState([]);
 	const [openBlockIndex, setOpenBlockIndex] = useState(0);
 	const [loading, setLoading] = useState(true);
+	const [selectedBlocks, setSelectedBlocks] = useState([0]);
 
 	useEffect(() => {
 		fetchCurrentPeriod();
@@ -90,7 +91,9 @@ function ShiftSubmit() {
 		}
 
 		try {
-			const requests = shiftBlocks.flatMap((block) => block.dates);
+			const requests = shiftBlocks
+				.filter((_, index) => selectedBlocks.includes(index))
+				.flatMap((block) => block.dates);
 
 			await api.post("/api/shift-requests", {
 				userId: loginUser.id,
@@ -132,14 +135,27 @@ function ShiftSubmit() {
 
 				return (
 					<div key={blockIndex} className="shift-block">
-						<button
-							type="button"
-							className="accordion-button"
-							onClick={() => setOpenBlockIndex(isOpen ? null : blockIndex)}
-						>
-							{isOpen ? "▼" : "▶"} {block.title}（{formatDisplayDate(start)}〜
-							{formatDisplayDate(end)}）
-						</button>
+						<div className="block-header">
+							<input
+								type="checkbox"
+								checked={selectedBlocks.includes(blockIndex)}
+								onChange={(e) => {
+									if (e.target.checked) {
+										setSelectedBlocks([...selectedBlocks, blockIndex]);
+									} else {
+										setSelectedBlocks(selectedBlocks.filter((i) => i !== blockIndex));
+									}
+								}}
+							/>
+							<button
+								type="button"
+								className="accordion-button"
+								onClick={() => setOpenBlockIndex(isOpen ? null : blockIndex)}
+							>
+								{isOpen ? "▼" : "▶"} {block.title}（{formatDisplayDate(start)}〜
+								{formatDisplayDate(end)}）
+							</button>
+						</div>
 
 						{isOpen && (
 							<div className="accordion-content">
