@@ -6,4 +6,7 @@ import java.util.List;
 
 public interface ShiftRequestRepository extends JpaRepository<ShiftRequest, Long> {
     List<ShiftRequest> findByUserId(Long userId);
+
+    // 追加：同じユーザー・同じ日付のレコードを1件探す
+    Optional<ShiftRequest> findByUserIdAndWorkDate(Long userId, LocalDate workDate);
 }

@@ -90,11 +90,29 @@ function ShiftSubmit() {
 			return;
 		}
 
-		try {
-			const requests = shiftBlocks
-				.filter((_, index) => selectedBlocks.includes(index))
-				.flatMap((block) => block.dates);
+		// 追加：選択ブロックが必須期間のみ（実質ゼロ件）でないかチェック
+		if (selectedBlocks.length === 0) {
+			alert("提出する期間を1つ以上選択してください。");
+			return;
+		}
 
+		const requests = shiftBlocks
+			.filter((_, index) => selectedBlocks.includes(index))
+			.flatMap((block) => block.dates);
+
+		// 追加：出勤可能なのに時間未入力の項目をチェック
+		const invalidShift = requests.find(
+			(shift) => shift.available && (!shift.startTime || !shift.endTime)
+		);
+
+		if (invalidShift) {
+			alert(
+				`${formatDisplayDate(invalidShift.workDate)}の出勤時間が入力されていません。`
+			);
+			return;
+		}
+
+		try {
 			await api.post("/api/shift-requests", {
 				userId: loginUser.id,
 				periodId: period.id,
@@ -139,6 +157,7 @@ function ShiftSubmit() {
 							<input
 								type="checkbox"
 								checked={selectedBlocks.includes(blockIndex)}
+								disabled={blockIndex === 0}
 								onChange={(e) => {
 									if (e.target.checked) {
 										setSelectedBlocks([...selectedBlocks, blockIndex]);
@@ -154,6 +173,7 @@ function ShiftSubmit() {
 							>
 								{isOpen ? "▼" : "▶"} {block.title}（{formatDisplayDate(start)}〜
 								{formatDisplayDate(end)}）
+								{blockIndex === 0 && <span className="required-badge"> 必須</span>}
 							</button>
 						</div>
 
