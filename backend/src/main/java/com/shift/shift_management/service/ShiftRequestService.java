@@ -19,7 +19,9 @@ public class ShiftRequestService {
 	public void submit(ShiftRequestSubmitRequest request) {
 		for (ShiftRequestItemRequest item : request.requests()) {
 
-			ShiftRequest shiftRequest = new ShiftRequest();
+			ShiftRequest shiftRequest = shiftRequestRepository
+				.findByUserIdAndWorkDate(request.userId(), item.workDate())
+				.orElseGet(ShiftRequest::new);
 
 			shiftRequest.setUserId(request.userId());
 			shiftRequest.setPeriodId(request.periodId());
