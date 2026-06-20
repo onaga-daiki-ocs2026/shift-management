@@ -14,4 +14,6 @@ public class UserResponse {
 	private String displayName;
 
 	private String role;
+
+	private String position;
 }

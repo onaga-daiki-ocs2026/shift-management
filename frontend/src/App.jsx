@@ -6,6 +6,7 @@ import MySubmissions from "./pages/MySubmissions";
 import ConfirmedShifts from "./pages/ConfirmedShifts";
 import AdminShiftRequests from "./pages/AdminShiftRequests";
 import AdminConfirmedShiftCreate from "./pages/AdminConfirmedShiftCreate";
+import AdminUserManagement from "./pages/AdminUserManagement";
 
 function App() {
 	return (
@@ -15,10 +16,8 @@ function App() {
 			<Route path="/my-submissions" element={<MySubmissions />} />
 			<Route path="/confirmed-shifts" element={<ConfirmedShifts />} />
 			<Route path="/admin/shift-requests" element={<AdminShiftRequests />} />
-			<Route
-				path="/admin/confirmed-shifts/create"
-				element={<AdminConfirmedShiftCreate />}
-			/>
+			<Route path="/admin/confirmed-shifts/create"element={<AdminConfirmedShiftCreate />}/>
+			<Route path="/admin/users" element={<AdminUserManagement />} />
 		</Routes>
 	);
 }

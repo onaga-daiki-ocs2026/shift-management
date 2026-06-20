@@ -2,8 +2,10 @@ package com.shift.shift_management.service;
 
 import com.shift.shift_management.dto.UserRequest;
 import com.shift.shift_management.dto.UserResponse;
+import com.shift.shift_management.dto.UserUpdateRequest;
 import com.shift.shift_management.entity.User;
 import com.shift.shift_management.repository.UserRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +26,7 @@ public class UserService {
 									newUser.setLineUserId(request.getLineUserId());
 									newUser.setDisplayName(request.getDisplayName());
 									newUser.setRole("STAFF");
+									newUser.setPosition("HALL");
 									return userRepository.save(newUser);
 								});
 
@@ -33,12 +36,30 @@ public class UserService {
 		return toResponse(savedUser);
 	}
 
+	public List<UserResponse> findAll() {
+		return userRepository.findAll().stream().map(this::toResponse).toList();
+	}
+
+	public UserResponse updateUser(Long id, UserUpdateRequest request) {
+		User user =
+				userRepository
+						.findById(id)
+						.orElseThrow(() -> new RuntimeException("ユーザーが見つかりません"));
+
+		user.setPosition(request.position());
+		user.setRole(request.role());
+
+		User savedUser = userRepository.save(user);
+		return toResponse(savedUser);
+	}
+
 	private UserResponse toResponse(User user) {
 		UserResponse response = new UserResponse();
 		response.setId(user.getId());
 		response.setLineUserId(user.getLineUserId());
 		response.setDisplayName(user.getDisplayName());
 		response.setRole(user.getRole());
+		response.setPosition(user.getPosition());
 		return response;
 	}
 }

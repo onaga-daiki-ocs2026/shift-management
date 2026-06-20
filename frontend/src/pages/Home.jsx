@@ -54,8 +54,8 @@ function Home() {
 							管理者：希望シフト一覧
 						</Link>
 
-						<Link to="/admin/confirmed-shifts/create" className="menu-button">
-							管理者：確定シフト作成
+						<Link to="/admin/users" className="menu-button">
+							管理者：ユーザー管理
 						</Link>
 					</>
 				)}

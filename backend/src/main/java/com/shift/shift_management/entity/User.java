@@ -25,6 +25,9 @@ public class User {
 	// STAFF / ADMIN
 	private String role = "STAFF";
 
+	// HALL / KITCHEN
+	private String position = "HALL";
+
 	// 登録日晁E
 	private LocalDateTime createdAt;
 
