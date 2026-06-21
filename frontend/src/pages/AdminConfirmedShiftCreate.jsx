@@ -7,7 +7,7 @@ const RANGE_END = 23;
 const TOTAL_HOURS = RANGE_END - RANGE_START;
 
 function AdminConfirmedShiftCreate() {
-	const [currentDate, setCurrentDate] = useState(getToday());
+	const [currentDate, setCurrentDate] = useState(null);
 	const [periodId, setPeriodId] = useState(null);
 	const [hallStaff, setHallStaff] = useState([]);
 	const [kitchenStaff, setKitchenStaff] = useState([]);
@@ -51,6 +51,7 @@ function AdminConfirmedShiftCreate() {
 		try {
 			const response = await api.get("/api/submission-periods/current");
 			setPeriodId(response.data.id);
+			setCurrentDate(response.data.startDate);
 		} catch (error) {
 			console.error("提出期間の取得に失敗しました", error);
 		}
@@ -213,7 +214,7 @@ function AdminConfirmedShiftCreate() {
 		}
 	};
 
-	if (loading) {
+	if (loading || !currentDate) {
 		return (
 			<Layout title="管理者：確定シフト作成">
 				<p>読み込み中...</p>
