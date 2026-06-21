@@ -11,4 +11,7 @@ public interface ShiftRequestRepository extends JpaRepository<ShiftRequest, Long
 
     // 追加：同じユーザー・同じ日付のレコードを1件探す
     Optional<ShiftRequest> findByUserIdAndWorkDate(Long userId, LocalDate workDate);
+
+    // 追加：特定の日付の全員分を取得
+    List<ShiftRequest> findByWorkDate(LocalDate workDate);
 }
