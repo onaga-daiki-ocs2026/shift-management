@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import Layout from "../components/Layout";
 import api from "../api/api";
 
-const RANGE_START = 9;
-const RANGE_END = 23;
+const RANGE_START = 0;
+const RANGE_END = 24;
 const TOTAL_HOURS = RANGE_END - RANGE_START;
 
 function AdminConfirmedShiftCreate() {
@@ -12,13 +12,8 @@ function AdminConfirmedShiftCreate() {
 	const [hallStaff, setHallStaff] = useState([]);
 	const [kitchenStaff, setKitchenStaff] = useState([]);
 	const [loading, setLoading] = useState(true);
-	const [selected, setSelected] = useState(null); // { position, userId, blockIndex }
+	const [selected, setSelected] = useState(null);
 	const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-
-	function getToday() {
-		const today = new Date();
-		return formatDate(today);
-	}
 
 	function formatDate(date) {
 		const y = date.getFullYear();
@@ -44,7 +39,9 @@ function AdminConfirmedShiftCreate() {
 	}, []);
 
 	useEffect(() => {
-		fetchShiftsForDate(currentDate);
+		if (currentDate) {
+			fetchShiftsForDate(currentDate);
+		}
 	}, [currentDate]);
 
 	const fetchPeriod = async () => {
@@ -153,10 +150,16 @@ function AdminConfirmedShiftCreate() {
 
 	const resetAll = () => {
 		setHallStaff((prev) =>
-			prev.map((s) => ({ ...s, blocks: JSON.parse(JSON.stringify(s.original)) })),
+			prev.map((s) => ({
+				...s,
+				blocks: JSON.parse(JSON.stringify(s.original)),
+			})),
 		);
 		setKitchenStaff((prev) =>
-			prev.map((s) => ({ ...s, blocks: JSON.parse(JSON.stringify(s.original)) })),
+			prev.map((s) => ({
+				...s,
+				blocks: JSON.parse(JSON.stringify(s.original)),
+			})),
 		);
 		setSelected(null);
 	};
@@ -225,13 +228,9 @@ function AdminConfirmedShiftCreate() {
 	return (
 		<Layout title="管理者：確定シフト作成">
 			<div className="date-nav">
-				<button type="button" onClick={goToPrevDay}>
-					←
-				</button>
+				<button type="button" onClick={goToPrevDay}>←</button>
 				<span>{formatDisplayDate(currentDate)}</span>
-				<button type="button" onClick={goToNextDay}>
-					→
-				</button>
+				<button type="button" onClick={goToNextDay}>→</button>
 			</div>
 
 			<button type="button" onClick={resetAll} className="reset-all-button">
@@ -275,8 +274,6 @@ function AdminConfirmedShiftCreate() {
 	);
 }
 
-// ==================== セクション（ホール or キッチン）====================
-
 function ShiftSection({
 	title,
 	position,
@@ -291,9 +288,7 @@ function ShiftSection({
 	deleteBlock,
 	hourToLabel,
 }) {
-	if (staffList.length === 0) {
-		return null;
-	}
+	if (staffList.length === 0) return null;
 
 	return (
 		<div className={`shift-section ${position === "KITCHEN" ? "kitchen" : ""}`}>
@@ -327,11 +322,8 @@ function ShiftSection({
 				/>
 			))}
 		</div>
-		
 	);
 }
-
-// ==================== 1人分の行 ====================
 
 function StaffRow({
 	position,
@@ -430,7 +422,7 @@ function StaffRow({
 		window.addEventListener("touchend", stop);
 	};
 
-	const isRowSelected = (blockIndex) =>
+	const isBarSelected = (blockIndex) =>
 		selected &&
 		selected.position === position &&
 		selected.userId === staff.userId &&
@@ -454,14 +446,11 @@ function StaffRow({
 				</div>
 			</div>
 
-			<div
-				className="timeline-track"
-				ref={(el) => (el ? (staff._trackEl = el) : null)}
-			>
+			<div className="timeline-track">
 				{staff.blocks.map((b, blockIndex) => (
 					<div
 						key={blockIndex}
-						className={`timeline-bar ${isRowSelected(blockIndex) ? "selected" : ""}`}
+						className={`timeline-bar ${isBarSelected(blockIndex) ? "selected" : ""}`}
 						style={{
 							left: `${hourToPct(b.start)}%`,
 							width: `${hourToPct(b.end) - hourToPct(b.start)}%`,
@@ -469,10 +458,20 @@ function StaffRow({
 						onClick={() => handleBarClick(blockIndex)}
 						onDoubleClick={() => handleDoubleClick(blockIndex)}
 						onMouseDown={(e) =>
-							handleDragStart("move", blockIndex, e, e.currentTarget.parentElement)
+							handleDragStart(
+								"move",
+								blockIndex,
+								e,
+								e.currentTarget.parentElement,
+							)
 						}
 						onTouchStart={(e) =>
-							handleDragStart("move", blockIndex, e, e.currentTarget.parentElement)
+							handleDragStart(
+								"move",
+								blockIndex,
+								e,
+								e.currentTarget.parentElement,
+							)
 						}
 					>
 						<span className="bar-label">
@@ -491,26 +490,10 @@ function StaffRow({
 											e.currentTarget.parentElement.parentElement,
 										)
 									}
-									onTouchStart={(e) =>
-										handleDragStart(
-											"left",
-											blockIndex,
-											e,
-											e.currentTarget.parentElement.parentElement,
-										)
-									}
 								/>
 								<div
 									className="resize-handle right"
 									onMouseDown={(e) =>
-										handleDragStart(
-											"right",
-											blockIndex,
-											e,
-											e.currentTarget.parentElement.parentElement,
-										)
-									}
-									onTouchStart={(e) =>
 										handleDragStart(
 											"right",
 											blockIndex,
@@ -550,8 +533,6 @@ function StaffRow({
 	);
 }
 
-// ==================== スマホ用操作パネル ====================
-
 function MobilePanel({
 	position,
 	staff,
@@ -562,7 +543,9 @@ function MobilePanel({
 	deleteBlock,
 }) {
 	const isThisRowSelected =
-		selected && selected.position === position && selected.userId === staff.userId;
+		selected &&
+		selected.position === position &&
+		selected.userId === staff.userId;
 
 	if (!isThisRowSelected) return null;
 
@@ -576,22 +559,30 @@ function MobilePanel({
 
 	const handleStartChange = (value) => {
 		const newBlocks = [...staff.blocks];
-		newBlocks[blockIndex] = { ...newBlocks[blockIndex], start: parseFloat(value) };
+		newBlocks[blockIndex] = {
+			...newBlocks[blockIndex],
+			start: parseFloat(value),
+		};
 		updateBlocks(position, staff.userId, newBlocks);
 	};
 
 	const handleEndChange = (value) => {
 		const newBlocks = [...staff.blocks];
-		newBlocks[blockIndex] = { ...newBlocks[blockIndex], end: parseFloat(value) };
+		newBlocks[blockIndex] = {
+			...newBlocks[blockIndex],
+			end: parseFloat(value),
+		};
 		updateBlocks(position, staff.userId, newBlocks);
 	};
 
 	return (
 		<div className="mobile-panel">
 			<p>{staff.name}のシフト</p>
-
 			<div className="mobile-panel-time">
-				<select value={block.start} onChange={(e) => handleStartChange(e.target.value)}>
+				<select
+					value={block.start}
+					onChange={(e) => handleStartChange(e.target.value)}
+				>
 					{hourOptions.map((h) => (
 						<option key={h} value={h}>
 							{Math.floor(h)}:{h % 1 === 0 ? "00" : "30"}
@@ -599,7 +590,10 @@ function MobilePanel({
 					))}
 				</select>
 				<span>〜</span>
-				<select value={block.end} onChange={(e) => handleEndChange(e.target.value)}>
+				<select
+					value={block.end}
+					onChange={(e) => handleEndChange(e.target.value)}
+				>
 					{hourOptions.map((h) => (
 						<option key={h} value={h}>
 							{Math.floor(h)}:{h % 1 === 0 ? "00" : "30"}
@@ -607,7 +601,6 @@ function MobilePanel({
 					))}
 				</select>
 			</div>
-
 			<div className="mobile-panel-actions">
 				<button
 					type="button"

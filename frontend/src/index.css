@@ -113,7 +113,6 @@ body {
 
 /* ==================== 確定シフト作成画面 ==================== */
 
-/* 日付ナビ */
 .date-nav {
 	display: flex;
 	align-items: center;
@@ -138,7 +137,6 @@ body {
 	cursor: pointer;
 }
 
-/* セクション（ホール・キッチン） */
 .shift-section {
 	margin-bottom: 24px;
 	overflow-x: auto;
@@ -153,12 +151,10 @@ body {
 	border-left: 4px solid #555;
 }
 
-/* 時間軸ヘッダー */
 .timeline-header {
 	display: flex;
 	align-items: center;
-	min-width: 600px;
-	margin-bottom: 0;
+	min-width: 700px;
 }
 
 .timeline-name-spacer {
@@ -169,7 +165,7 @@ body {
 .timeline-hours {
 	flex: 1;
 	display: grid;
-	grid-template-columns: repeat(14, 1fr);
+	grid-template-columns: repeat(24, 1fr);
 	border-bottom: 1px solid #ccc;
 }
 
@@ -180,11 +176,10 @@ body {
 	padding-left: 2px;
 }
 
-/* 行 */
 .timeline-row {
 	display: flex;
 	align-items: center;
-	min-width: 600px;
+	min-width: 700px;
 	min-height: 32px;
 	border-bottom: 1px solid #e0e0e0;
 	gap: 0;
@@ -226,7 +221,6 @@ body {
 	border-color: #c00;
 }
 
-/* タイムライントラック */
 .timeline-track {
 	flex: 1;
 	position: relative;
@@ -237,12 +231,12 @@ body {
 		#ccc 0,
 		#ccc 0.5px,
 		transparent 0.5px,
-		transparent calc(100% / 14)
+		transparent calc(100% / 24)
 	);
 	border: 1px solid #ddd;
+	overflow: hidden;
 }
 
-/* バー（ホール：赤） */
 .timeline-bar {
 	position: absolute;
 	top: 1px;
@@ -262,7 +256,6 @@ body {
 	box-shadow: 0 0 0 2px #e74c3c;
 }
 
-/* キッチンはクラスで色を切り替え */
 .kitchen .timeline-bar {
 	background-color: #1a7a6e;
 }
@@ -280,7 +273,6 @@ body {
 	user-select: none;
 }
 
-/* リサイズハンドル（PC用） */
 .resize-handle {
 	position: absolute;
 	top: 0;
@@ -298,7 +290,6 @@ body {
 	right: -3px;
 }
 
-/* バー削除ボタン（PC用×ボタン） */
 .bar-delete {
 	position: absolute;
 	top: -8px;
@@ -322,9 +313,8 @@ body {
 	display: block;
 }
 
-/* スマホ用操作パネル */
 .mobile-panel {
-	min-width: 600px;
+	min-width: 700px;
 	padding: 10px 12px;
 	background: #f0f0f0;
 	border-top: 1px solid #ccc;
