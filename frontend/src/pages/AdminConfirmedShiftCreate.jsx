@@ -296,7 +296,7 @@ function ShiftSection({
 	}
 
 	return (
-		<div className="shift-section">
+		<div className={`shift-section ${position === "KITCHEN" ? "kitchen" : ""}`}>
 			<h3>{title}</h3>
 
 			<div className="timeline-header">
@@ -327,6 +327,7 @@ function ShiftSection({
 				/>
 			))}
 		</div>
+		
 	);
 }
 

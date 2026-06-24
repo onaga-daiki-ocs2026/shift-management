@@ -110,3 +110,259 @@ body {
 	width: 60px;
 	font-weight: bold;
 }
+
+/* ==================== 確定シフト作成画面 ==================== */
+
+/* 日付ナビ */
+.date-nav {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 16px;
+	margin-bottom: 12px;
+	font-size: 16px;
+	font-weight: bold;
+}
+
+.date-nav button {
+	padding: 4px 12px;
+	font-size: 16px;
+	cursor: pointer;
+}
+
+.reset-all-button {
+	display: block;
+	margin-bottom: 16px;
+	padding: 6px 14px;
+	font-size: 13px;
+	cursor: pointer;
+}
+
+/* セクション（ホール・キッチン） */
+.shift-section {
+	margin-bottom: 24px;
+	overflow-x: auto;
+}
+
+.shift-section h3 {
+	font-size: 13px;
+	font-weight: bold;
+	margin: 0 0 4px 0;
+	padding: 2px 6px;
+	background: #eee;
+	border-left: 4px solid #555;
+}
+
+/* 時間軸ヘッダー */
+.timeline-header {
+	display: flex;
+	align-items: center;
+	min-width: 600px;
+	margin-bottom: 0;
+}
+
+.timeline-name-spacer {
+	width: 72px;
+	flex-shrink: 0;
+}
+
+.timeline-hours {
+	flex: 1;
+	display: grid;
+	grid-template-columns: repeat(14, 1fr);
+	border-bottom: 1px solid #ccc;
+}
+
+.timeline-hours span {
+	font-size: 10px;
+	color: #666;
+	text-align: left;
+	padding-left: 2px;
+}
+
+/* 行 */
+.timeline-row {
+	display: flex;
+	align-items: center;
+	min-width: 600px;
+	min-height: 32px;
+	border-bottom: 1px solid #e0e0e0;
+	gap: 0;
+	flex-wrap: nowrap;
+	margin-bottom: 0;
+}
+
+.timeline-name {
+	width: 72px;
+	flex-shrink: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	padding-right: 4px;
+}
+
+.timeline-name span {
+	font-size: 12px;
+	font-weight: bold;
+	white-space: nowrap;
+}
+
+.row-actions {
+	display: flex;
+	gap: 2px;
+}
+
+.row-actions button {
+	font-size: 9px;
+	padding: 1px 4px;
+	cursor: pointer;
+	border: 1px solid #ccc;
+	background: #f5f5f5;
+	border-radius: 3px;
+}
+
+.row-actions button.danger {
+	color: #c00;
+	border-color: #c00;
+}
+
+/* タイムライントラック */
+.timeline-track {
+	flex: 1;
+	position: relative;
+	height: 22px;
+	background-color: #f9f9f9;
+	background-image: repeating-linear-gradient(
+		to right,
+		#ccc 0,
+		#ccc 0.5px,
+		transparent 0.5px,
+		transparent calc(100% / 14)
+	);
+	border: 1px solid #ddd;
+}
+
+/* バー（ホール：赤） */
+.timeline-bar {
+	position: absolute;
+	top: 1px;
+	height: calc(100% - 2px);
+	background-color: #c0392b;
+	border-radius: 2px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: grab;
+	overflow: visible;
+	z-index: 1;
+}
+
+.timeline-bar.selected {
+	background-color: #922b21;
+	box-shadow: 0 0 0 2px #e74c3c;
+}
+
+/* キッチンはクラスで色を切り替え */
+.kitchen .timeline-bar {
+	background-color: #1a7a6e;
+}
+
+.kitchen .timeline-bar.selected {
+	background-color: #0e5048;
+	box-shadow: 0 0 0 2px #1abc9c;
+}
+
+.bar-label {
+	font-size: 9px;
+	color: #fff;
+	white-space: nowrap;
+	pointer-events: none;
+	user-select: none;
+}
+
+/* リサイズハンドル（PC用） */
+.resize-handle {
+	position: absolute;
+	top: 0;
+	width: 8px;
+	height: 100%;
+	cursor: ew-resize;
+	z-index: 2;
+}
+
+.resize-handle.left {
+	left: -3px;
+}
+
+.resize-handle.right {
+	right: -3px;
+}
+
+/* バー削除ボタン（PC用×ボタン） */
+.bar-delete {
+	position: absolute;
+	top: -8px;
+	right: -4px;
+	width: 14px;
+	height: 14px;
+	font-size: 9px;
+	padding: 0;
+	line-height: 14px;
+	text-align: center;
+	border-radius: 50%;
+	background: #fff;
+	border: 1px solid #999;
+	color: #333;
+	cursor: pointer;
+	z-index: 3;
+	display: none;
+}
+
+.timeline-bar:hover .bar-delete {
+	display: block;
+}
+
+/* スマホ用操作パネル */
+.mobile-panel {
+	min-width: 600px;
+	padding: 10px 12px;
+	background: #f0f0f0;
+	border-top: 1px solid #ccc;
+	border-bottom: 1px solid #ccc;
+}
+
+.mobile-panel p {
+	font-size: 12px;
+	font-weight: bold;
+	margin: 0 0 8px 0;
+}
+
+.mobile-panel-time {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin-bottom: 8px;
+}
+
+.mobile-panel-time select {
+	flex: 1;
+	font-size: 13px;
+	padding: 4px;
+}
+
+.mobile-panel-actions {
+	display: flex;
+	gap: 8px;
+}
+
+.mobile-panel-actions button {
+	flex: 1;
+	font-size: 13px;
+	padding: 6px;
+	cursor: pointer;
+}
+
+.mobile-panel-actions button.danger {
+	color: #c00;
+	border-color: #c00;
+}
