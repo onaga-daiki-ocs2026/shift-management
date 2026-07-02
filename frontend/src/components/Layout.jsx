@@ -1,5 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import logo from "../assets/yayoi-logo.png";
+import woodTexture from "../assets/mokume.png";
 
 const PAGE_TITLES = {
 	"/": null,
@@ -18,7 +19,14 @@ function Layout({ children }) {
 
 	return (
 		<div className="app">
-			<header className="app-header">
+			<header
+				className="app-header"
+				style={{
+					backgroundImage: `url(${woodTexture})`,
+					backgroundSize: "cover",
+					backgroundPosition: "center",
+				}}
+			>
 				<div className="header-logo-area">
 					<img src={logo} alt="やよい軒" className="header-logo" />
 				</div>

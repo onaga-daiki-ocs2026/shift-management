@@ -35,7 +35,6 @@ body {
 }
 
 .app-header {
-	background-image: url("../assets/wood-texture.png");
 	background-size: cover;
 	background-position: center;
 	padding-bottom: 20px;
