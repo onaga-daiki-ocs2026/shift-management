@@ -30,4 +30,6 @@ public class ShiftRequest {
 	private boolean available;
 
 	private LocalDateTime createdAt;
+
+	private String comment;
 }

@@ -56,9 +56,17 @@ function ShiftSubmit() {
 			blocks.push({
 				title: blockIndex === 0 ? "提出必須期間" : `追加提出期間${blockIndex}`,
 				dates,
+				comment: "", // ← 追加
 			});
 		}
+		
 		return blocks;
+	};
+
+	const handleCommentChange = (blockIndex, value) => {
+		const newBlocks = [...shiftBlocks];
+		newBlocks[blockIndex].comment = value;
+		setShiftBlocks(newBlocks);
 	};
 
 	const formatDate = (date) => date.toISOString().split("T")[0];
@@ -107,7 +115,12 @@ function ShiftSubmit() {
 		}
 		const requests = shiftBlocks
 			.filter((_, index) => selectedBlocks.includes(index))
-			.flatMap((block) => block.dates);
+			.flatMap((block) =>
+				block.dates.map((date) => ({
+					...date,
+					comment: block.comment, // ← ブロックのコメントを全日付に付与
+				}))
+			);
 
 		const invalidShift = requests.find(
 			(shift) => shift.available && (!shift.startTime || !shift.endTime),
@@ -239,6 +252,20 @@ function ShiftSubmit() {
 										</div>
 									);
 								})}
+
+								<div className="comment-area">
+									<label className="comment-label">
+										📝 この期間のコメント
+										<span className="comment-optional">（任意）</span>
+									</label>
+									<textarea
+										className="comment-textarea"
+										placeholder="例：試験期間のため出勤日数が少なくなります"
+										value={block.comment}
+										onChange={(e) => handleCommentChange(blockIndex, e.target.value)}
+										rows={3}
+									/>
+								</div>
 
 								<button
 									type="button"

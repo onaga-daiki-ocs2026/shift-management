@@ -36,6 +36,7 @@ public class ShiftRequestService {
 			shiftRequest.setEndTime(item.endTime());
 			shiftRequest.setAvailable(item.available());
 			shiftRequest.setCreatedAt(LocalDateTime.now());
+			shiftRequest.setComment(item.comment());
 
 			shiftRequestRepository.save(shiftRequest);
 		}
