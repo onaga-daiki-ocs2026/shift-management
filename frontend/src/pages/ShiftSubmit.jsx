@@ -2,6 +2,17 @@ import { useEffect, useState } from "react";
 import Layout from "../components/Layout";
 import api from "../api/api";
 
+const DAY_NAMES = ["日", "月", "火", "水", "木", "金", "土"];
+const TIME_OPTIONS = [];
+for (let h = 0; h <= 24; h++) {
+	for (let m = 0; m < 60; m += 30) {
+		if (h === 24 && m > 0) break;
+		const hh = String(h).padStart(2, "0");
+		const mm = String(m).padStart(2, "0");
+		TIME_OPTIONS.push(`${hh}:${mm}`);
+	}
+}
+
 function ShiftSubmit() {
 	const [period, setPeriod] = useState(null);
 	const [shiftBlocks, setShiftBlocks] = useState([]);
@@ -17,9 +28,7 @@ function ShiftSubmit() {
 		try {
 			const response = await api.get("/api/submission-periods/current");
 			const currentPeriod = response.data;
-
 			setPeriod(currentPeriod);
-
 			const blocks = createShiftBlocks(currentPeriod.startDate, 5);
 			setShiftBlocks(blocks);
 		} catch (error) {
@@ -32,14 +41,11 @@ function ShiftSubmit() {
 	const createShiftBlocks = (startDate, blockCount) => {
 		const blocks = [];
 		const baseDate = new Date(startDate);
-
 		for (let blockIndex = 0; blockIndex < blockCount; blockIndex++) {
 			const dates = [];
-
 			for (let dayIndex = 0; dayIndex < 14; dayIndex++) {
 				const date = new Date(baseDate);
 				date.setDate(baseDate.getDate() + blockIndex * 14 + dayIndex);
-
 				dates.push({
 					workDate: formatDate(date),
 					available: false,
@@ -47,78 +53,76 @@ function ShiftSubmit() {
 					endTime: "",
 				});
 			}
-
 			blocks.push({
 				title: blockIndex === 0 ? "提出必須期間" : `追加提出期間${blockIndex}`,
 				dates,
 			});
 		}
-
 		return blocks;
 	};
 
-	const formatDate = (date) => {
-		return date.toISOString().split("T")[0];
-	};
+	const formatDate = (date) => date.toISOString().split("T")[0];
 
 	const formatDisplayDate = (dateString) => {
 		const date = new Date(dateString);
-		return `${date.getMonth() + 1}/${date.getDate()}`;
+		const day = DAY_NAMES[date.getDay()];
+		const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+		return { label: `${date.getMonth() + 1}/${date.getDate()}（${day}）`, isWeekend, isSun: date.getDay() === 0 };
+	};
+
+	const formatBlockRange = (block) => {
+		const start = new Date(block.dates[0].workDate);
+		const end = new Date(block.dates[block.dates.length - 1].workDate);
+		return `${start.getMonth() + 1}月${start.getDate()}日（${DAY_NAMES[start.getDay()]}）〜${end.getMonth() + 1}月${end.getDate()}日（${DAY_NAMES[end.getDay()]}）`;
+	};
+
+	const formatDeadline = (deadlineString) => {
+		if (!deadlineString) return null;
+		const d = new Date(deadlineString);
+		return `提出期限：${d.getMonth() + 1}月${d.getDate()}日（${DAY_NAMES[d.getDay()]}）`;
 	};
 
 	const handleChange = (blockIndex, dateIndex, field, value) => {
 		const newBlocks = [...shiftBlocks];
-
 		newBlocks[blockIndex].dates[dateIndex] = {
 			...newBlocks[blockIndex].dates[dateIndex],
 			[field]: value,
 		};
-
 		if (field === "available" && value === false) {
 			newBlocks[blockIndex].dates[dateIndex].startTime = "";
 			newBlocks[blockIndex].dates[dateIndex].endTime = "";
 		}
-
 		setShiftBlocks(newBlocks);
 	};
 
 	const handleSubmit = async () => {
 		const loginUser = JSON.parse(localStorage.getItem("loginUser"));
-
 		if (!loginUser) {
 			alert("ログイン情報がありません。もう一度LINEログインしてください。");
 			return;
 		}
-
-		// 追加：選択ブロックが必須期間のみ（実質ゼロ件）でないかチェック
 		if (selectedBlocks.length === 0) {
 			alert("提出する期間を1つ以上選択してください。");
 			return;
 		}
-
 		const requests = shiftBlocks
 			.filter((_, index) => selectedBlocks.includes(index))
 			.flatMap((block) => block.dates);
 
-		// 追加：出勤可能なのに時間未入力の項目をチェック
 		const invalidShift = requests.find(
-			(shift) => shift.available && (!shift.startTime || !shift.endTime)
+			(shift) => shift.available && (!shift.startTime || !shift.endTime),
 		);
-
 		if (invalidShift) {
-			alert(
-				`${formatDisplayDate(invalidShift.workDate)}の出勤時間が入力されていません。`
-			);
+			const { label } = formatDisplayDate(invalidShift.workDate);
+			alert(`${label}の出勤時間が入力されていません。`);
 			return;
 		}
-
 		try {
 			await api.post("/api/shift-requests", {
 				userId: loginUser.id,
 				periodId: period.id,
 				requests,
 			});
-
 			alert("シフトを提出しました！");
 		} catch (error) {
 			console.error("シフト提出に失敗しました", error);
@@ -126,123 +130,129 @@ function ShiftSubmit() {
 		}
 	};
 
-	if (loading) {
-		return (
-			<Layout>
-				<p>読み込み中...</p>
-			</Layout>
-		);
-	}
-
-	if (!period) {
-		return (
-			<Layout>
-				<p>提出期間が設定されていません。</p>
-			</Layout>
-		);
-	}
+	if (loading) return <Layout><p className="loading-text">読み込み中...</p></Layout>;
+	if (!period) return <Layout><p className="loading-text">提出期間が設定されていません。</p></Layout>;
 
 	return (
 		<Layout>
-			<h2>シフト提出</h2>
+			<div className="submit-info-box">
+				<span className="submit-info-icon">ℹ️</span>
+				<div>
+					<div className="submit-info-title">シフトを提出してください</div>
+					<div className="submit-info-sub">2週間ごとにシフトを提出できます。出勤可能な日にチェックを入れてください。</div>
+				</div>
+			</div>
 
 			{shiftBlocks.map((block, blockIndex) => {
-				const start = block.dates[0].workDate;
-				const end = block.dates[block.dates.length - 1].workDate;
 				const isOpen = openBlockIndex === blockIndex;
+				const isMandatory = blockIndex === 0;
 
 				return (
-					<div key={blockIndex} className="shift-block">
+					<div key={blockIndex} className={`shift-block ${isMandatory ? "mandatory" : ""}`}>
 						<div className="block-header">
-							<input
-								type="checkbox"
-								checked={selectedBlocks.includes(blockIndex)}
-								disabled={blockIndex === 0}
-								onChange={(e) => {
-									if (e.target.checked) {
-										setSelectedBlocks([...selectedBlocks, blockIndex]);
-									} else {
-										setSelectedBlocks(selectedBlocks.filter((i) => i !== blockIndex));
-									}
-								}}
-							/>
-							<button
-								type="button"
-								className="accordion-button"
-								onClick={() => setOpenBlockIndex(isOpen ? null : blockIndex)}
-							>
-								{isOpen ? "▼" : "▶"} {block.title}（{formatDisplayDate(start)}〜
-								{formatDisplayDate(end)}）
-								{blockIndex === 0 && <span className="required-badge"> 必須</span>}
-							</button>
+							<div className="block-header-left">
+								<span className="block-calendar-icon">📅</span>
+								<span className="block-range">{formatBlockRange(block)}</span>
+							</div>
+							<div className="block-header-right">
+								{isMandatory && period.deadline && (
+									<span className="deadline-badge">
+										{formatDeadline(period.deadline)}
+									</span>
+								)}
+								{!isMandatory && (
+									<input
+										type="checkbox"
+										className="block-checkbox"
+										checked={selectedBlocks.includes(blockIndex)}
+										onChange={(e) => {
+											if (e.target.checked) {
+												setSelectedBlocks([...selectedBlocks, blockIndex]);
+											} else {
+												setSelectedBlocks(selectedBlocks.filter((i) => i !== blockIndex));
+											}
+										}}
+									/>
+								)}
+								<button
+									type="button"
+									className="accordion-toggle"
+									onClick={() => setOpenBlockIndex(isOpen ? null : blockIndex)}
+								>
+									{isOpen ? "︿" : "﹀"}
+								</button>
+							</div>
 						</div>
 
 						{isOpen && (
 							<div className="accordion-content">
-								{block.dates.map((shift, dateIndex) => (
-									<div key={shift.workDate} className="shift-row">
-										<div className="shift-date">
-											{formatDisplayDate(shift.workDate)}
+								<div className="shift-table-header">
+									<span className="shift-date-col" />
+									<span className="shift-col-label">開始時間</span>
+									<span className="shift-col-label">終了時間</span>
+									<span className="shift-col-label">休み</span>
+								</div>
+
+								{block.dates.map((shift, dateIndex) => {
+									const { label, isSun, isWeekend } = formatDisplayDate(shift.workDate);
+									return (
+										<div key={shift.workDate} className="shift-row">
+											<div className={`shift-date ${isSun ? "sun" : isWeekend ? "sat" : ""}`}>
+												{label}
+											</div>
+
+											<select
+												className="time-select"
+												value={shift.startTime}
+												disabled={!shift.available}
+												onChange={(e) => handleChange(blockIndex, dateIndex, "startTime", e.target.value)}
+											>
+												<option value="">－</option>
+												{TIME_OPTIONS.map((t) => (
+													<option key={t} value={t}>{t}</option>
+												))}
+											</select>
+
+											<select
+												className="time-select"
+												value={shift.endTime}
+												disabled={!shift.available}
+												onChange={(e) => handleChange(blockIndex, dateIndex, "endTime", e.target.value)}
+											>
+												<option value="">－</option>
+												{TIME_OPTIONS.map((t) => (
+													<option key={t} value={t}>{t}</option>
+												))}
+											</select>
+
+											<div className="shift-rest">
+												<input
+													type="checkbox"
+													className="rest-checkbox"
+													checked={!shift.available}
+													onChange={(e) =>
+														handleChange(blockIndex, dateIndex, "available", !e.target.checked)
+													}
+												/>
+												<span className="rest-label">休み</span>
+											</div>
 										</div>
+									);
+								})}
 
-										<label>
-											<input
-												type="checkbox"
-												checked={shift.available}
-												onChange={(e) =>
-													handleChange(
-														blockIndex,
-														dateIndex,
-														"available",
-														e.target.checked,
-													)
-												}
-											/>
-											出勤可能
-										</label>
-
-										{shift.available && (
-											<>
-												<input
-													type="time"
-													value={shift.startTime}
-													onChange={(e) =>
-														handleChange(
-															blockIndex,
-															dateIndex,
-															"startTime",
-															e.target.value,
-														)
-													}
-												/>
-
-												<span>〜</span>
-
-												<input
-													type="time"
-													value={shift.endTime}
-													onChange={(e) =>
-														handleChange(
-															blockIndex,
-															dateIndex,
-															"endTime",
-															e.target.value,
-														)
-													}
-												/>
-											</>
-										)}
-									</div>
-								))}
+								<button
+									type="button"
+									className="block-submit-button"
+									onClick={handleSubmit}
+								>
+									<span>✈</span> この2週間分のシフトを確認して提出する
+								</button>
+								<p className="submit-note">※未入力や休みの選択漏れがある場合は、提出できません。</p>
 							</div>
 						)}
 					</div>
 				);
 			})}
-
-			<button type="button" onClick={handleSubmit}>
-				提出する
-			</button>
 		</Layout>
 	);
 }
