@@ -3,38 +3,55 @@ import Layout from "../components/Layout";
 import api from "../api/api";
 
 function ConfirmedShifts() {
-	const [shifts, setShifts] = useState([]);
+	const [pdfUrl, setPdfUrl] = useState(null);
+	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
 		api
-			.get("/api/confirmed-shifts")
+			.get("/api/pdfs/current")
 			.then((response) => {
-				console.log(response.data);
-				setShifts(response.data);
+				setPdfUrl(response.data.url || null);
 			})
 			.catch((error) => {
 				console.log(error);
+			})
+			.finally(() => {
+				setLoading(false);
 			});
 	}, []);
 
+	if (loading) {
+		return (
+			<Layout>
+				<p className="loading-text">読み込み中...</p>
+			</Layout>
+		);
+	}
+
 	return (
-		<Layout title="確定シフト確認">
-			{shifts.length > 0 ? (
-				<div>
-					{shifts.map((shift, index) => (
-						<div className="shift-card" key={index}>
-							<h3>{shift.workDate}</h3>
-
-							<p>{shift.name ? shift.name : `ユーザーID：${shift.userId}`}</p>
-
-							<p>
-								{shift.startTime}〜{shift.endTime}
-							</p>
-						</div>
-					))}
+		<Layout>
+			{pdfUrl ? (
+				<div className="pdf-viewer-area">
+					<p className="pdf-note">確定シフトのPDFを表示しています</p>
+					<iframe
+						src={pdfUrl}
+						className="pdf-iframe"
+						title="確定シフト"
+					/>
+					
+						href={pdfUrl}
+						target="_blank"
+						rel="noopener noreferrer"
+						className="pdf-download-button"
+					<a>
+						📥 PDFを開く・ダウンロード
+					</a>
 				</div>
 			) : (
-				<p>確定シフトはありません</p>
+				<div className="empty-state">
+					<p className="empty-icon">✅</p>
+					<p className="empty-text">確定シフトはまだ公開されていません</p>
+				</div>
 			)}
 		</Layout>
 	);

@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import Layout from "../components/Layout";
 import api from "../api/api";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 
 const RANGE_START = 0;
 const RANGE_END = 24;
@@ -14,6 +16,8 @@ function AdminConfirmedShiftCreate() {
 	const [loading, setLoading] = useState(true);
 	const [selected, setSelected] = useState(null);
 	const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+	const [exporting, setExporting] = useState(false);
+	const [periodStart, setPeriodStart] = useState(null);
 
 	function formatDate(date) {
 		const y = date.getFullYear();
@@ -48,6 +52,7 @@ function AdminConfirmedShiftCreate() {
 		try {
 			const response = await api.get("/api/submission-periods/current");
 			setPeriodId(response.data.id);
+			setPeriodStart(response.data.startDate); 
 			setCurrentDate(response.data.startDate);
 		} catch (error) {
 			console.error("提出期間の取得に失敗しました", error);
@@ -104,12 +109,16 @@ function AdminConfirmedShiftCreate() {
 	};
 
 	const goToPrevDay = () => {
+		if (currentDate <= periodStart) return; // 期間開始日より前には行けない
 		const date = new Date(currentDate);
 		date.setDate(date.getDate() - 1);
 		setCurrentDate(formatDate(date));
 	};
 
 	const goToNextDay = () => {
+		const endDate = new Date(periodStart);
+		endDate.setDate(endDate.getDate() + 13); // 14日後が終了日
+		if (currentDate >= formatDate(endDate)) return; // 期間終了日より後には行けない
 		const date = new Date(currentDate);
 		date.setDate(date.getDate() + 1);
 		setCurrentDate(formatDate(date));
@@ -217,6 +226,49 @@ function AdminConfirmedShiftCreate() {
 		}
 	};
 
+	const handleExportPdf = async () => {
+		setExporting(true);
+
+		try {
+			// 印刷用コンテナを取得
+			const element = document.getElementById("pdf-export-area");
+
+			const canvas = await html2canvas(element, {
+				scale: 2,
+				useCORS: true,
+				backgroundColor: "#ffffff",
+			});
+
+			const imgData = canvas.toDataURL("image/png");
+
+			// A4横向きPDF
+			const pdf = new jsPDF("landscape", "mm", "a4");
+			const pdfWidth = pdf.internal.pageSize.getWidth();
+			const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+			pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+
+			// PDFをBlobに変換
+			const pdfBlob = pdf.output("blob");
+
+			// バックエンドに送信
+			const formData = new FormData();
+			formData.append("file", pdfBlob, "shift.pdf");
+			formData.append("periodStart", currentDate);
+
+			await api.post("/api/pdfs/upload", formData, {
+				headers: { "Content-Type": "multipart/form-data" },
+			});
+
+			alert("PDFを保存しました！スタッフの確定シフト確認画面に反映されます。");
+		} catch (error) {
+			console.error("PDF出力に失敗しました", error);
+			alert("PDF出力に失敗しました");
+		} finally {
+			setExporting(false);
+		}
+	};
+
 	if (loading || !currentDate) {
 		return (
 			<Layout title="管理者：確定シフト作成">
@@ -228,9 +280,21 @@ function AdminConfirmedShiftCreate() {
 	return (
 		<Layout title="管理者：確定シフト作成">
 			<div className="date-nav">
-				<button type="button" onClick={goToPrevDay}>←</button>
+				<button
+					type="button"
+					onClick={goToPrevDay}
+					disabled={currentDate <= periodStart}
+				>
+					←
+				</button>
 				<span>{formatDisplayDate(currentDate)}</span>
-				<button type="button" onClick={goToNextDay}>→</button>
+				<button
+					type="button"
+					onClick={goToNextDay}
+					disabled={currentDate >= formatDate(new Date(new Date(periodStart).setDate(new Date(periodStart).getDate() + 13)))}
+				>
+					→
+				</button>
 			</div>
 
 			<button type="button" onClick={resetAll} className="reset-all-button">
@@ -269,6 +333,63 @@ function AdminConfirmedShiftCreate() {
 
 			<button type="button" onClick={handleSubmit} className="submit-button">
 				確定シフトを保存
+			</button>
+
+			{/* 印刷用エリア（画面には見えない） */}
+			<div
+				id="pdf-export-area"
+				style={{
+					position: "fixed",
+					top: "-9999px",
+					left: "-9999px",
+					width: "1120px",
+					background: "#fff",
+					padding: "24px",
+				}}
+			>
+				<h2 style={{ fontSize: "16px", marginBottom: "8px" }}>
+					確定シフト {formatDisplayDate(currentDate)}
+				</h2>
+
+				<ShiftSection
+					title="ホール"
+					position="HALL"
+					staffList={hallStaff}
+					isMobile={false}
+					selected={null}
+					setSelected={() => {}}
+					updateBlocks={() => {}}
+					resetOne={() => {}}
+					removeRow={() => {}}
+					splitBlock={() => {}}
+					deleteBlock={() => {}}
+					hourToLabel={hourToLabel}
+				/>
+
+				<ShiftSection
+					title="キッチン"
+					position="KITCHEN"
+					staffList={kitchenStaff}
+					isMobile={false}
+					selected={null}
+					setSelected={() => {}}
+					updateBlocks={() => {}}
+					resetOne={() => {}}
+					removeRow={() => {}}
+					splitBlock={() => {}}
+					deleteBlock={() => {}}
+					hourToLabel={hourToLabel}
+				/>
+			</div>
+
+			{/* PDF出力ボタン */}
+			<button
+				type="button"
+				className="pdf-export-button"
+				onClick={handleExportPdf}
+				disabled={exporting}
+			>
+				{exporting ? "PDF生成中..." : "📄 PDFを生成してスタッフに公開"}
 			</button>
 		</Layout>
 	);

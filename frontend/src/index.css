@@ -715,3 +715,231 @@ body {
     outline: none;
     border-color: var(--brown-light);
 }
+
+/* ==================== 提出済み確認画面 ==================== */
+
+.submission-row {
+	display: grid;
+	grid-template-columns: 120px 70px 1fr;
+	align-items: center;
+	padding: 8px 14px;
+	border-bottom: 1px solid #f0f0f0;
+	gap: 8px;
+}
+
+.submission-status {
+	text-align: center;
+}
+
+.status-available {
+	display: inline-block;
+	background: #e8f5e9;
+	color: #2e7d32;
+	font-size: 11px;
+	font-weight: bold;
+	padding: 2px 8px;
+	border-radius: 20px;
+	border: 1px solid #a5d6a7;
+}
+
+.status-rest {
+	display: inline-block;
+	background: #f5f5f5;
+	color: #888;
+	font-size: 11px;
+	font-weight: bold;
+	padding: 2px 8px;
+	border-radius: 20px;
+	border: 1px solid #ddd;
+}
+
+.submission-time {
+	font-size: 13px;
+	color: var(--text-main);
+	font-weight: 500;
+}
+
+.available-badge {
+	font-size: 11px;
+	background: #e8f5e9;
+	color: #2e7d32;
+	border: 1px solid #a5d6a7;
+	border-radius: 20px;
+	padding: 2px 10px;
+	white-space: nowrap;
+}
+
+/* ==================== 確定シフト確認画面 ==================== */
+
+.confirmed-list {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.confirmed-card {
+	background: var(--white);
+	border-radius: 12px;
+	overflow: hidden;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+	border: 1px solid var(--gray-border);
+}
+
+.confirmed-date {
+	padding: 10px 14px;
+	font-size: 14px;
+	font-weight: bold;
+	color: var(--brown);
+	background: var(--gray-light);
+	border-bottom: 1px solid var(--gray-border);
+}
+
+.confirmed-date.sun {
+	color: var(--red);
+}
+
+.confirmed-date.sat {
+	color: #2980b9;
+}
+
+.confirmed-time-row {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 10px 14px;
+	border-bottom: 1px solid #f0f0f0;
+}
+
+.confirmed-time-row:last-child {
+	border-bottom: none;
+}
+
+.confirmed-time-icon {
+	font-size: 16px;
+}
+
+.confirmed-time {
+	font-size: 16px;
+	font-weight: bold;
+	color: var(--text-main);
+}
+
+/* ==================== 空状態 ==================== */
+
+.empty-state {
+	text-align: center;
+	padding: 60px 0;
+}
+
+.empty-icon {
+	font-size: 48px;
+	margin: 0 0 12px;
+}
+
+.empty-text {
+	font-size: 14px;
+	color: var(--text-sub);
+	margin: 0;
+}
+
+/* ==================== 確定シフト確認画面（PDF） ==================== */
+
+.pdf-viewer-area {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.pdf-note {
+	font-size: 13px;
+	color: var(--text-sub);
+	margin: 0;
+	text-align: center;
+}
+
+.pdf-iframe {
+	width: 100%;
+	height: 70vh;
+	border: 1px solid var(--gray-border);
+	border-radius: 8px;
+}
+
+.pdf-download-button {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	padding: 14px;
+	background: var(--green);
+	color: var(--white);
+	font-size: 15px;
+	font-weight: bold;
+	border-radius: 30px;
+	text-decoration: none;
+}
+
+.pdf-download-button:active {
+	opacity: 0.85;
+}
+
+/* ==================== 確定シフト確認画面（PDF） ==================== */
+
+.pdf-viewer-area {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.pdf-note {
+	font-size: 13px;
+	color: var(--text-sub);
+	margin: 0;
+	text-align: center;
+}
+
+.pdf-iframe {
+	width: 100%;
+	height: 70vh;
+	border: 1px solid var(--gray-border);
+	border-radius: 8px;
+}
+
+.pdf-download-button {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	padding: 14px;
+	background: var(--green);
+	color: var(--white);
+	font-size: 15px;
+	font-weight: bold;
+	border-radius: 30px;
+	text-decoration: none;
+}
+
+.pdf-download-button:active {
+	opacity: 0.85;
+}
+
+.pdf-export-button {
+	width: 100%;
+	padding: 16px;
+	font-size: 15px;
+	font-weight: bold;
+	background: #2980b9;
+	color: var(--white);
+	border: none;
+	border-radius: 30px;
+	cursor: pointer;
+	margin-top: 12px;
+}
+
+.pdf-export-button:disabled {
+	opacity: 0.6;
+	cursor: not-allowed;
+}
+
+.pdf-export-button:active {
+	opacity: 0.85;
+}
