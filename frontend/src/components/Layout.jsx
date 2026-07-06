@@ -12,7 +12,7 @@ const PAGE_TITLES = {
 	"/admin/users": "ユーザー管理",
 };
 
-function Layout({ children }) {
+function Layout({ children, footer }) {
 	const location = useLocation();
 	const isHome = location.pathname === "/";
 	const title = PAGE_TITLES[location.pathname] ?? "シフト管理";
@@ -46,6 +46,8 @@ function Layout({ children }) {
 			</header>
 
 			<main className="app-main">{children}</main>
+
+			{footer && <div className="app-footer-wrapper">{footer}</div>}
 		</div>
 	);
 }
