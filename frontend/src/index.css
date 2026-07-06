@@ -115,13 +115,14 @@ html {
 }
 
 .app-main {
-	padding: 16px 16px 0;
+	padding: 16px;
 }
 
 /* ==================== ホーム画面 ==================== */
 
 .home-section {
 	margin-top: 8px;
+	padding-bottom: 24px;
 }
 
 .home-section-title {
