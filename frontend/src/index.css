@@ -121,6 +121,7 @@ body {
 .app-main {
 	padding: 16px 16px 0;
 	flex: 1;
+	padding-bottom:  env(safe-area-inset-bottom);
 }
 
 /* ==================== フッター ==================== */
