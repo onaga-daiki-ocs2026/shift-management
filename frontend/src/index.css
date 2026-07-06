@@ -1085,3 +1085,18 @@ body {
 	opacity: 0.6;
 	cursor: not-allowed;
 }
+
+.user-section {
+	margin-bottom: 20px;
+}
+
+.user-section-title {
+	font-size: 13px;
+	font-weight: bold;
+	color: var(--white);
+	background: var(--brown);
+	padding: 4px 12px;
+	border-radius: 6px;
+	margin-bottom: 8px;
+	display: inline-block;
+}

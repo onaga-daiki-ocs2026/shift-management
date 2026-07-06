@@ -78,14 +78,27 @@ function AdminUserManagement() {
 		}
 	};
 
-	const handleDragEnd = (event) => {
+	const handleDragEnd = (event, position) => {
 		const { active, over } = event;
 		if (!over || active.id === over.id) return;
 
 		setUsers((prev) => {
-			const oldIndex = prev.findIndex((u) => u.id === active.id);
-			const newIndex = prev.findIndex((u) => u.id === over.id);
-			return arrayMove(prev, oldIndex, newIndex);
+			const sectionUsers = prev.filter((u) => u.position === position);
+			const otherUsers = prev.filter((u) => u.position !== position);
+
+			const oldIndex = sectionUsers.findIndex((u) => u.id === active.id);
+			const newIndex = sectionUsers.findIndex((u) => u.id === over.id);
+			const reordered = arrayMove(sectionUsers, oldIndex, newIndex);
+
+			// positionに関係なく元の順番を保ちつつ置き換え
+			const result = [...prev];
+			let sectionIdx = 0;
+			for (let i = 0; i < result.length; i++) {
+				if (result[i].position === position) {
+					result[i] = reordered[sectionIdx++];
+				}
+			}
+			return result;
 		});
 		setOrderChanged(true);
 	};
@@ -127,30 +140,40 @@ function AdminUserManagement() {
 				)}
 			</div>
 
-			<DndContext
-				sensors={sensors}
-				collisionDetection={closestCenter}
-				onDragEnd={handleDragEnd}
-			>
-				<SortableContext
-					items={users.map((u) => u.id)}
-					strategy={verticalListSortingStrategy}
-				>
-					{users.map((user) => (
-						<SortableUserRow
-							key={user.id}
-							user={user}
-							editingId={editingId}
-							editingName={editingName}
-							savingId={savingId}
-							setEditingId={setEditingId}
-							setEditingName={setEditingName}
-							handleChange={handleChange}
-							handleSave={handleSave}
-						/>
-					))}
-				</SortableContext>
-			</DndContext>
+			{["HALL", "KITCHEN"].map((position) => {
+				const sectionUsers = users.filter((u) => u.position === position);
+				if (sectionUsers.length === 0) return null;
+
+				return (
+					<div key={position} className="user-section">
+						<div className="user-section-title">{position}</div>
+						<DndContext
+							sensors={sensors}
+							collisionDetection={closestCenter}
+							onDragEnd={(event) => handleDragEnd(event, position)}
+						>
+							<SortableContext
+								items={sectionUsers.map((u) => u.id)}
+								strategy={verticalListSortingStrategy}
+							>
+								{sectionUsers.map((user) => (
+									<SortableUserRow
+										key={user.id}
+										user={user}
+										editingId={editingId}
+										editingName={editingName}
+										savingId={savingId}
+										setEditingId={setEditingId}
+										setEditingName={setEditingName}
+										handleChange={handleChange}
+										handleSave={handleSave}
+									/>
+								))}
+							</SortableContext>
+						</DndContext>
+					</div>
+				);
+			})}
 		</Layout>
 	);
 }
@@ -226,8 +249,8 @@ function SortableUserRow({
 						value={user.position}
 						onChange={(e) => handleChange(user.id, "position", e.target.value)}
 					>
-						<option value="HALL">ホール</option>
-						<option value="KITCHEN">キッチン</option>
+						<option value="HALL">HALL</option>
+						<option value="KITCHEN">KITCHEN</option>
 					</select>
 
 					<select
@@ -235,8 +258,8 @@ function SortableUserRow({
 						value={user.role}
 						onChange={(e) => handleChange(user.id, "role", e.target.value)}
 					>
-						<option value="STAFF">スタッフ</option>
-						<option value="ADMIN">オーナー</option>
+						<option value="STAFF">STAFF</option>
+						<option value="ADMIN">ADMIN</option>
 					</select>
 				</div>
 			</div>
