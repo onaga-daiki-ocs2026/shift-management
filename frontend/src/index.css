@@ -1100,3 +1100,9 @@ body {
 	margin-bottom: 8px;
 	display: inline-block;
 }
+
+.staff-shift-range {
+	font-size: 11px;
+	color: var(--text-sub);
+	margin-top: 2px;
+}

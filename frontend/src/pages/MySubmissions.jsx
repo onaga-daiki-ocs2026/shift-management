@@ -6,7 +6,7 @@ const DAY_NAMES = ["日", "月", "火", "水", "木", "金", "土"];
 
 function MySubmissions() {
 	const [shifts, setShifts] = useState([]);
-	const [openBlockIndex, setOpenBlockIndex] = useState(0);
+	const [openBlockIndexes, setOpenBlockIndexes] = useState(new Set([0]));
 	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
@@ -25,6 +25,18 @@ function MySubmissions() {
 				setLoading(false);
 			});
 	}, []);
+
+	const toggleBlock = (blockIndex) => {
+		setOpenBlockIndexes((prev) => {
+			const next = new Set(prev);
+			if (next.has(blockIndex)) {
+				next.delete(blockIndex);
+			} else {
+				next.add(blockIndex);
+			}
+			return next;
+		});
+	};
 
 	const groupByBlock = (shifts) => {
 		const sorted = [...shifts].sort((a, b) =>
@@ -72,7 +84,7 @@ function MySubmissions() {
 			{blocks.length > 0 ? (
 				<div>
 					{blocks.map((block, blockIndex) => {
-						const isOpen = openBlockIndex === blockIndex;
+						const isOpen = openBlockIndexes.has(blockIndex);
 						const availableCount = block.dates.filter((d) => d.available).length;
 
 						return (
@@ -89,7 +101,7 @@ function MySubmissions() {
 										<button
 											type="button"
 											className="accordion-toggle"
-											onClick={() => setOpenBlockIndex(isOpen ? null : blockIndex)}
+											onClick={() => toggleBlock(blockIndex)}
 										>
 											{isOpen ? "︿" : "﹀"}
 										</button>
