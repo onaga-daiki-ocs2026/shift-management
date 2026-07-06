@@ -20,6 +20,7 @@
 
 html {
 	background-color: #f0ebe3;
+	overscroll-behavior: none;
 }
 
 body {
@@ -27,6 +28,7 @@ body {
 	font-family: "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Noto Sans JP", sans-serif;
 	background-color: #f0ebe3;
 	color: var(--text-main);
+	overscroll-behavior: none;
 }
 
 /* ==================== レイアウト ==================== */
@@ -129,7 +131,9 @@ body {
 
 .app-footer {
 	background: #fff;
+	padding-bottom: env(safe-area-inset-bottom);
 }
+
 
 .footer-bar {
 	height: 4px;
