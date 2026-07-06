@@ -994,7 +994,7 @@ html {
 }
 
 .footer-logo-area {
-	padding: 16px;
+	padding: 16px 16px 8px;
 }
 
 .footer-logo {
@@ -1008,4 +1008,13 @@ html {
 	color: var(--text-sub);
 	padding: 0 16px 16px;
 	margin: 0;
+}
+
+.home-section {
+	margin-top: 8px;
+	padding-bottom: 24px;
+}
+
+.app-main {
+	padding: 16px 16px 0;
 }
