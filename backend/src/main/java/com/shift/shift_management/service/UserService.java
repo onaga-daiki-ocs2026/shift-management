@@ -51,8 +51,12 @@ public class UserService {
 		if (request.displayName() != null && !request.displayName().isBlank()) {
 			user.setDisplayName(request.displayName());
 		}
-		user.setPosition(request.position());
-		user.setRole(request.role());
+		if (request.position() != null) {
+			user.setPosition(request.position());
+		}
+		if (request.role() != null) {
+			user.setRole(request.role());
+		}
 		if (request.sortOrder() != null) {
 			user.setSortOrder(request.sortOrder());
 		}
