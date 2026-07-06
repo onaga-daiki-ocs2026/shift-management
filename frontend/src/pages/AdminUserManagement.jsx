@@ -142,11 +142,12 @@ function AdminUserManagement() {
 
 			{["HALL", "KITCHEN"].map((position) => {
 				const sectionUsers = users.filter((u) => u.position === position);
+				const label = position === "HALL" ? "ホール" : "キッチン";
 				if (sectionUsers.length === 0) return null;
 
 				return (
 					<div key={position} className="user-section">
-						<div className="user-section-title">{position}</div>
+						<div className="user-section-title">{label}</div>
 						<DndContext
 							sensors={sensors}
 							collisionDetection={closestCenter}
