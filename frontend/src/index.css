@@ -968,3 +968,120 @@ body {
 	color: #c00;
 	border-color: #c00;
 }
+
+/* ==================== ユーザー管理画面 ==================== */
+
+.user-mgmt-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 12px;
+	gap: 8px;
+}
+
+.user-mgmt-note {
+	font-size: 12px;
+	color: var(--text-sub);
+	margin: 0;
+}
+
+.order-save-button {
+	padding: 8px 16px;
+	font-size: 13px;
+	font-weight: bold;
+	background: var(--green);
+	color: var(--white);
+	border: none;
+	border-radius: 20px;
+	cursor: pointer;
+	white-space: nowrap;
+}
+
+.user-card {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	background: var(--white);
+	border-radius: 12px;
+	padding: 12px 14px;
+	margin-bottom: 10px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+	border: 1px solid var(--gray-border);
+}
+
+.user-card-drag {
+	font-size: 18px;
+	color: var(--text-sub);
+	cursor: grab;
+	padding: 4px;
+	touch-action: none;
+}
+
+.user-card-body {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.user-card-name-row {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.user-name {
+	font-size: 15px;
+	font-weight: bold;
+	color: var(--brown);
+}
+
+.user-name-input {
+	font-size: 15px;
+	font-weight: bold;
+	color: var(--brown);
+	border: 1px solid var(--brown-light);
+	border-radius: 6px;
+	padding: 4px 8px;
+	flex: 1;
+}
+
+.user-name-edit-btn {
+	background: none;
+	border: none;
+	cursor: pointer;
+	font-size: 14px;
+	padding: 2px;
+}
+
+.user-card-selects {
+	display: flex;
+	gap: 8px;
+}
+
+.user-select {
+	flex: 1;
+	font-size: 12px;
+	padding: 6px 4px;
+	border: 1px solid var(--gray-border);
+	border-radius: 8px;
+	background: var(--white);
+	color: var(--text-main);
+}
+
+.user-save-btn {
+	padding: 8px 14px;
+	font-size: 13px;
+	font-weight: bold;
+	background: var(--brown);
+	color: var(--white);
+	border: none;
+	border-radius: 20px;
+	cursor: pointer;
+	white-space: nowrap;
+}
+
+.user-save-btn:disabled {
+	opacity: 0.6;
+	cursor: not-allowed;
+}
