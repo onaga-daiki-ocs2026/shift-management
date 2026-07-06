@@ -1028,3 +1028,10 @@ html {
 	margin-top: 8px;
 	padding-bottom: 24px;
 }
+
+.app-footer {
+	margin-top: 0;
+	background: #fff;
+	margin-left: -16px;
+	margin-right: -16px;
+}
