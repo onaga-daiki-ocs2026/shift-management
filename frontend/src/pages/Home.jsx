@@ -3,6 +3,7 @@ import Layout from "../components/Layout";
 import { useEffect, useState } from "react";
 import { initLiff } from "../liff/liff";
 import api from "../api/api";
+import logo from "../assets/yayoi-logo.png";
 
 const STAFF_MENUS = [
 	{
