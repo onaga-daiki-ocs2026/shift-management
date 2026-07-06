@@ -31,6 +31,8 @@ public class User {
 	// 登録日晁E
 	private LocalDateTime createdAt;
 
+	private Integer sortOrder = 0;
+	
 	@PrePersist
 	public void onCreate() {
 		createdAt = LocalDateTime.now();

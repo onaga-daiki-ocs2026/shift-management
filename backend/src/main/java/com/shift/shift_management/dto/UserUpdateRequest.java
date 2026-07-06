@@ -1,4 +1,7 @@
 package com.shift.shift_management.dto;
 
 public record UserUpdateRequest(
-        String position, String role){}
+		String displayName,
+		String position,
+		String role,
+		Integer sortOrder) {}

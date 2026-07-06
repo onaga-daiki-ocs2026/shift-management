@@ -37,17 +37,25 @@ public class UserService {
 	}
 
 	public List<UserResponse> findAll() {
-		return userRepository.findAll().stream().map(this::toResponse).toList();
+		return userRepository.findAllByOrderBySortOrderAsc()
+				.stream()
+				.map(this::toResponse)
+				.toList();
 	}
 
 	public UserResponse updateUser(Long id, UserUpdateRequest request) {
-		User user =
-				userRepository
-						.findById(id)
-						.orElseThrow(() -> new RuntimeException("ユーザーが見つかりません"));
+		User user = userRepository
+				.findById(id)
+				.orElseThrow(() -> new RuntimeException("ユーザーが見つかりません"));
 
+		if (request.displayName() != null && !request.displayName().isBlank()) {
+			user.setDisplayName(request.displayName());
+		}
 		user.setPosition(request.position());
 		user.setRole(request.role());
+		if (request.sortOrder() != null) {
+			user.setSortOrder(request.sortOrder());
+		}
 
 		User savedUser = userRepository.save(user);
 		return toResponse(savedUser);
@@ -60,6 +68,7 @@ public class UserService {
 		response.setDisplayName(user.getDisplayName());
 		response.setRole(user.getRole());
 		response.setPosition(user.getPosition());
+		response.setSortOrder(user.getSortOrder());
 		return response;
 	}
 }

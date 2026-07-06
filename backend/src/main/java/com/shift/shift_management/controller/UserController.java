@@ -6,6 +6,8 @@ import com.shift.shift_management.dto.UserUpdateRequest;
 import com.shift.shift_management.service.UserService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -28,5 +30,15 @@ public class UserController {
 	@PutMapping("/{id}")
 	public UserResponse updateUser(@PathVariable Long id, @RequestBody UserUpdateRequest request) {
 		return userService.updateUser(id, request);
+	}
+
+	@PutMapping("/sort-order")
+	public ResponseEntity<Void> updateSortOrder(
+			@RequestBody List<Long> userIds) {
+		for (int i = 0; i < userIds.size(); i++) {
+			UserUpdateRequest req = new UserUpdateRequest(null, null, null, i);
+			userService.updateUser(userIds.get(i), req);
+		}
+		return ResponseEntity.ok().build();
 	}
 }

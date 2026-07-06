@@ -16,4 +16,6 @@ public class UserResponse {
 	private String role;
 
 	private String position;
+
+		private Integer sortOrder;
 }
