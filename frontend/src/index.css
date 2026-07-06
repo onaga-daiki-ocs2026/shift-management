@@ -986,6 +986,8 @@ html {
 .app-footer {
 	margin-top: 0;
 	background: #fff;
+	margin-left: -16px;
+	margin-right: -16px;
 }
 
 .footer-bar {
