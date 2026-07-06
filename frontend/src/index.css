@@ -980,3 +980,32 @@ html {
 .pdf-export-button:active {
 	opacity: 0.85;
 }
+
+/* ==================== フッター ==================== */
+
+.app-footer {
+	margin-top: 32px;
+	background: #fff;
+}
+
+.footer-bar {
+	height: 4px;
+	background: linear-gradient(to right, #c0392b 50%, #4a7c59 50%);
+}
+
+.footer-logo-area {
+	padding: 16px;
+}
+
+.footer-logo {
+	height: 32px;
+	width: auto;
+	object-fit: contain;
+}
+
+.footer-copy {
+	font-size: 11px;
+	color: var(--text-sub);
+	padding: 0 16px 16px;
+	margin: 0;
+}

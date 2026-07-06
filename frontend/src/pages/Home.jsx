@@ -116,7 +116,15 @@ function Home() {
 					</>
 				)}
 			</div>
+			<footer className="app-footer">
+				<div className="footer-bar" />
+				<div className="footer-logo-area">
+					<img src={logo} alt="やよい軒" className="footer-logo" />
+				</div>
+				<p className="footer-copy">©PLENUS Co.,ltd. All Rights Reserved.</p>
+			</footer>
 		</Layout>
+		
 	);
 }
 

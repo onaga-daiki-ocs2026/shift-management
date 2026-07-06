@@ -16,7 +16,7 @@ for (let h = 0; h <= 24; h++) {
 function ShiftSubmit() {
 	const [period, setPeriod] = useState(null);
 	const [shiftBlocks, setShiftBlocks] = useState([]);
-	const [openBlockIndex, setOpenBlockIndex] = useState(0);
+	const [openBlockIndexes, setOpenBlockIndexes] = useState(new Set([0]));
 	const [loading, setLoading] = useState(true);
 	const [selectedBlocks, setSelectedBlocks] = useState([0]);
 
@@ -56,10 +56,9 @@ function ShiftSubmit() {
 			blocks.push({
 				title: blockIndex === 0 ? "提出必須期間" : `追加提出期間${blockIndex}`,
 				dates,
-				comment: "", // ← 追加
+				comment: "",
 			});
 		}
-		
 		return blocks;
 	};
 
@@ -67,6 +66,18 @@ function ShiftSubmit() {
 		const newBlocks = [...shiftBlocks];
 		newBlocks[blockIndex].comment = value;
 		setShiftBlocks(newBlocks);
+	};
+
+	const toggleBlock = (blockIndex) => {
+		setOpenBlockIndexes((prev) => {
+			const next = new Set(prev);
+			if (next.has(blockIndex)) {
+				next.delete(blockIndex);
+			} else {
+				next.add(blockIndex);
+			}
+			return next;
+		});
 	};
 
 	const formatDate = (date) => date.toISOString().split("T")[0];
@@ -118,7 +129,7 @@ function ShiftSubmit() {
 			.flatMap((block) =>
 				block.dates.map((date) => ({
 					...date,
-					comment: block.comment, // ← ブロックのコメントを全日付に付与
+					comment: block.comment,
 				}))
 			);
 
@@ -157,7 +168,7 @@ function ShiftSubmit() {
 			</div>
 
 			{shiftBlocks.map((block, blockIndex) => {
-				const isOpen = openBlockIndex === blockIndex;
+				const isOpen = openBlockIndexes.has(blockIndex);
 				const isMandatory = blockIndex === 0;
 
 				return (
@@ -190,7 +201,7 @@ function ShiftSubmit() {
 								<button
 									type="button"
 									className="accordion-toggle"
-									onClick={() => setOpenBlockIndex(isOpen ? null : blockIndex)}
+									onClick={() => toggleBlock(blockIndex)}
 								>
 									{isOpen ? "︿" : "﹀"}
 								</button>
