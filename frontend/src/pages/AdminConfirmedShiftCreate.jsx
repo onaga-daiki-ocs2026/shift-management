@@ -411,6 +411,15 @@ function ShiftSection({
 }) {
 	if (staffList.length === 0) return null;
 
+	// セクション全体の合計時間
+	const totalHours = staffList.reduce((sum, staff) => {
+		const staffTotal = staff.blocks.reduce(
+			(s, b) => s + (b.end - b.start),
+			0,
+		);
+		return sum + staffTotal;
+	}, 0);
+
 	return (
 		<div className={`shift-section ${position === "KITCHEN" ? "kitchen" : ""}`}>
 			<h3>{title}</h3>
@@ -424,6 +433,7 @@ function ShiftSection({
 						),
 					)}
 				</div>
+				<div className="timeline-hours-time">計画</div>
 			</div>
 
 			{staffList.map((staff) => (
@@ -442,6 +452,10 @@ function ShiftSection({
 					hourToLabel={hourToLabel}
 				/>
 			))}
+
+			<div className="section-total">
+				合計：<span>{totalHours.toFixed(1)}h</span>
+			</div>
 		</div>
 	);
 }
@@ -637,6 +651,13 @@ function StaffRow({
 						)}
 					</div>
 				))}
+			</div>
+
+			{/* 計画時間 */}
+			<div className="timeline-hours-time">
+				{staff.blocks
+					.reduce((sum, b) => sum + (b.end - b.start), 0)
+					.toFixed(1)}h
 			</div>
 
 			{isMobile && (
