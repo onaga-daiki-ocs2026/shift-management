@@ -122,7 +122,7 @@ function Home() {
 				<div className="footer-logo-area">
 					<img src={logo} alt="やよい軒" className="footer-logo" />
 				</div>
-				<p className="footer-copy">©PLENUS Co.,ltd. All Rights Reserved.</p>
+				<p className="footer-copy">© 2026 やよい軒 JR森ノ宮店 | Developed by daiki</p>
 			</footer>
 		</Layout>
 		
