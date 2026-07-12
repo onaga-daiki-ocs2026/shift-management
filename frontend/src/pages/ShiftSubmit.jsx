@@ -184,20 +184,6 @@ function ShiftSubmit() {
 										{formatDeadline(period.deadline)}
 									</span>
 								)}
-								{!isMandatory && (
-									<input
-										type="checkbox"
-										className="block-checkbox"
-										checked={selectedBlocks.includes(blockIndex)}
-										onChange={(e) => {
-											if (e.target.checked) {
-												setSelectedBlocks([...selectedBlocks, blockIndex]);
-											} else {
-												setSelectedBlocks(selectedBlocks.filter((i) => i !== blockIndex));
-											}
-										}}
-									/>
-								)}
 								<button
 									type="button"
 									className="accordion-toggle"
