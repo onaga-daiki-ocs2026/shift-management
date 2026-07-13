@@ -600,6 +600,7 @@ body {
 	font-weight: bold;
 	border-radius: 30px;
 	text-decoration: none;
+	cursor: pointer;
 }
 
 .pdf-download-button:active {
