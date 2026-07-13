@@ -1111,25 +1111,39 @@ body {
 
 @media (min-width: 768px) {
 	.app {
-		max-width: 480px;
-		box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
-	}
-}
-
-@media (min-width: 1024px) {
-	body {
-		display: flex;
-		justify-content: center;
-		align-items: flex-start;
-		min-height: 100vh;
-		padding: 40px 0;
+		max-width: 100%;
 	}
 
-	.app {
-		max-width: 480px;
-		min-height: auto;
-		border-radius: 16px;
-		overflow: hidden;
-		box-shadow: 0 8px 40px rgba(0, 0, 0, 0.15);
+	.app-header {
+		padding-bottom: 24px;
+	}
+
+	.menu {
+		display: grid;
+		grid-template-columns: repeat(2, 1fr);
+		gap: 16px;
+	}
+
+	.app-main {
+		max-width: 1200px;
+		margin: 0 auto;
+		padding: 24px 40px 0;
+	}
+
+	.app-footer {
+		margin-left: 0;
+		margin-right: 0;
+	}
+
+	.footer-copy {
+		max-width: 1200px;
+		margin: 0 auto;
+		padding: 0 40px 16px;
+	}
+
+	.footer-logo-area {
+		max-width: 1200px;
+		margin: 0 auto;
+		padding: 16px 40px 8px;
 	}
 }
