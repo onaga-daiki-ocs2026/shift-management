@@ -234,7 +234,7 @@ function AdminConfirmedShiftCreate() {
 			const element = document.getElementById("pdf-export-area");
 
 			const canvas = await html2canvas(element, {
-				scale: 2,
+				scale: 1, // 2から1に変更
 				useCORS: true,
 				backgroundColor: "#ffffff",
 			});
