@@ -32,19 +32,14 @@ function ConfirmedShifts() {
 		<Layout>
 			{pdfUrl ? (
 				<div className="pdf-viewer-area">
-					<p className="pdf-note">確定シフトのPDFを表示しています</p>
-					<iframe
-						src={pdfUrl}
-						className="pdf-iframe"
-						title="確定シフト"
-					/>
+					<p className="pdf-note">確定シフトのPDFが公開されています</p>
 					
 						href={pdfUrl}
 						target="_blank"
 						rel="noopener noreferrer"
 						className="pdf-download-button"
 					<a>
-						📥 PDFを開く・ダウンロード
+						📄 確定シフトを開く
 					</a>
 				</div>
 			) : (
