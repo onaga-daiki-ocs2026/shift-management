@@ -44,7 +44,7 @@ function ShiftSubmit() {
 				date.setDate(baseDate.getDate() + blockIndex * 14 + dayIndex);
 				dates.push({
 					workDate: formatDate(date),
-					available: false,
+					available: true,
 					startTime: "",
 					endTime: "",
 				});
@@ -175,7 +175,7 @@ function ShiftSubmit() {
 				<div>
 					<div className="submit-info-title">シフトを提出してください</div>
 					<div className="submit-info-sub">
-						2週間ごとにシフトを提出できます。出勤可能な日にチェックを入れてください。
+						2週間ごとにシフトを提出できます。休みの日にチェックを入れてください。
 					</div>
 				</div>
 			</div>
@@ -330,7 +330,6 @@ function ShiftSubmit() {
 				);
 			})}
 
-			{/* 全ブロック共通の提出ボタン（一番下に1つ） */}
 			<button
 				type="button"
 				className="block-submit-button"
@@ -339,7 +338,7 @@ function ShiftSubmit() {
 				<span>✈</span> チェックした期間のシフトを提出する
 			</button>
 			<p className="submit-note">
-				※未入力や休みの選択漏れがある場合は、提出できません。
+				※時間未入力の日がある場合は、提出できません。
 			</p>
 		</Layout>
 	);

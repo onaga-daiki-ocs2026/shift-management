@@ -1106,3 +1106,30 @@ body {
 	color: var(--text-sub);
 	margin-top: 2px;
 }
+
+/* ==================== PC対応（レスポンシブ） ==================== */
+
+@media (min-width: 768px) {
+	.app {
+		max-width: 480px;
+		box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
+	}
+}
+
+@media (min-width: 1024px) {
+	body {
+		display: flex;
+		justify-content: center;
+		align-items: flex-start;
+		min-height: 100vh;
+		padding: 40px 0;
+	}
+
+	.app {
+		max-width: 480px;
+		min-height: auto;
+		border-radius: 16px;
+		overflow: hidden;
+		box-shadow: 0 8px 40px rgba(0, 0, 0, 0.15);
+	}
+}
