@@ -33,12 +33,12 @@ function ConfirmedShifts() {
 			{pdfUrl ? (
 				<div className="pdf-viewer-area">
 					<p className="pdf-note">確定シフトのPDFが公開されています</p>
-					
+					<a
 						href={pdfUrl}
 						target="_blank"
 						rel="noopener noreferrer"
 						className="pdf-download-button"
-					<a>
+					>
 						📄 確定シフトを開く
 					</a>
 				</div>
