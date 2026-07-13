@@ -4,13 +4,9 @@ import api from "../api/api";
 
 const DAY_NAMES = ["日", "月", "火", "水", "木", "金", "土"];
 const TIME_OPTIONS = [];
-for (let h = 0; h <= 24; h++) {
-	for (let m = 0; m < 60; m += 30) {
-		if (h === 24 && m > 0) break;
-		const hh = String(h).padStart(2, "0");
-		const mm = String(m).padStart(2, "0");
-		TIME_OPTIONS.push(`${hh}:${mm}`);
-	}
+for (let h = 9; h <= 23; h++) {
+	const hh = String(h).padStart(2, "0");
+	TIME_OPTIONS.push(`${hh}:00`);
 }
 
 function ShiftSubmit() {
@@ -86,7 +82,11 @@ function ShiftSubmit() {
 		const date = new Date(dateString);
 		const day = DAY_NAMES[date.getDay()];
 		const isWeekend = date.getDay() === 0 || date.getDay() === 6;
-		return { label: `${date.getMonth() + 1}/${date.getDate()}（${day}）`, isWeekend, isSun: date.getDay() === 0 };
+		return {
+			label: `${date.getMonth() + 1}/${date.getDate()}（${day}）`,
+			isWeekend,
+			isSun: date.getDay() === 0,
+		};
 	};
 
 	const formatBlockRange = (block) => {
@@ -124,13 +124,14 @@ function ShiftSubmit() {
 			alert("提出する期間を1つ以上選択してください。");
 			return;
 		}
+
 		const requests = shiftBlocks
 			.filter((_, index) => selectedBlocks.includes(index))
 			.flatMap((block) =>
 				block.dates.map((date) => ({
 					...date,
 					comment: block.comment,
-				}))
+				})),
 			);
 
 		const invalidShift = requests.find(
@@ -154,8 +155,18 @@ function ShiftSubmit() {
 		}
 	};
 
-	if (loading) return <Layout><p className="loading-text">読み込み中...</p></Layout>;
-	if (!period) return <Layout><p className="loading-text">提出期間が設定されていません。</p></Layout>;
+	if (loading)
+		return (
+			<Layout>
+				<p className="loading-text">読み込み中...</p>
+			</Layout>
+		);
+	if (!period)
+		return (
+			<Layout>
+				<p className="loading-text">提出期間が設定されていません。</p>
+			</Layout>
+		);
 
 	return (
 		<Layout>
@@ -163,7 +174,9 @@ function ShiftSubmit() {
 				<span className="submit-info-icon">ℹ️</span>
 				<div>
 					<div className="submit-info-title">シフトを提出してください</div>
-					<div className="submit-info-sub">2週間ごとにシフトを提出できます。出勤可能な日にチェックを入れてください。</div>
+					<div className="submit-info-sub">
+						2週間ごとにシフトを提出できます。出勤可能な日にチェックを入れてください。
+					</div>
 				</div>
 			</div>
 
@@ -172,7 +185,10 @@ function ShiftSubmit() {
 				const isMandatory = blockIndex === 0;
 
 				return (
-					<div key={blockIndex} className={`shift-block ${isMandatory ? "mandatory" : ""}`}>
+					<div
+						key={blockIndex}
+						className={`shift-block ${isMandatory ? "mandatory" : ""}`}
+					>
 						<div className="block-header">
 							<div className="block-header-left">
 								<span className="block-calendar-icon">📅</span>
@@ -183,6 +199,22 @@ function ShiftSubmit() {
 									<span className="deadline-badge">
 										{formatDeadline(period.deadline)}
 									</span>
+								)}
+								{!isMandatory && (
+									<input
+										type="checkbox"
+										className="block-checkbox"
+										checked={selectedBlocks.includes(blockIndex)}
+										onChange={(e) => {
+											if (e.target.checked) {
+												setSelectedBlocks([...selectedBlocks, blockIndex]);
+											} else {
+												setSelectedBlocks(
+													selectedBlocks.filter((i) => i !== blockIndex),
+												);
+											}
+										}}
+									/>
 								)}
 								<button
 									type="button"
@@ -204,10 +236,14 @@ function ShiftSubmit() {
 								</div>
 
 								{block.dates.map((shift, dateIndex) => {
-									const { label, isSun, isWeekend } = formatDisplayDate(shift.workDate);
+									const { label, isSun, isWeekend } = formatDisplayDate(
+										shift.workDate,
+									);
 									return (
 										<div key={shift.workDate} className="shift-row">
-											<div className={`shift-date ${isSun ? "sun" : isWeekend ? "sat" : ""}`}>
+											<div
+												className={`shift-date ${isSun ? "sun" : isWeekend ? "sat" : ""}`}
+											>
 												{label}
 											</div>
 
@@ -215,11 +251,20 @@ function ShiftSubmit() {
 												className="time-select"
 												value={shift.startTime}
 												disabled={!shift.available}
-												onChange={(e) => handleChange(blockIndex, dateIndex, "startTime", e.target.value)}
+												onChange={(e) =>
+													handleChange(
+														blockIndex,
+														dateIndex,
+														"startTime",
+														e.target.value,
+													)
+												}
 											>
 												<option value="">－</option>
 												{TIME_OPTIONS.map((t) => (
-													<option key={t} value={t}>{t}</option>
+													<option key={t} value={t}>
+														{t}
+													</option>
 												))}
 											</select>
 
@@ -227,11 +272,20 @@ function ShiftSubmit() {
 												className="time-select"
 												value={shift.endTime}
 												disabled={!shift.available}
-												onChange={(e) => handleChange(blockIndex, dateIndex, "endTime", e.target.value)}
+												onChange={(e) =>
+													handleChange(
+														blockIndex,
+														dateIndex,
+														"endTime",
+														e.target.value,
+													)
+												}
 											>
 												<option value="">－</option>
 												{TIME_OPTIONS.map((t) => (
-													<option key={t} value={t}>{t}</option>
+													<option key={t} value={t}>
+														{t}
+													</option>
 												))}
 											</select>
 
@@ -241,7 +295,12 @@ function ShiftSubmit() {
 													className="rest-checkbox"
 													checked={!shift.available}
 													onChange={(e) =>
-														handleChange(blockIndex, dateIndex, "available", !e.target.checked)
+														handleChange(
+															blockIndex,
+															dateIndex,
+															"available",
+															!e.target.checked,
+														)
 													}
 												/>
 												<span className="rest-label">休み</span>
@@ -259,24 +318,29 @@ function ShiftSubmit() {
 										className="comment-textarea"
 										placeholder="例：試験期間のため出勤日数が少なくなります"
 										value={block.comment}
-										onChange={(e) => handleCommentChange(blockIndex, e.target.value)}
+										onChange={(e) =>
+											handleCommentChange(blockIndex, e.target.value)
+										}
 										rows={3}
 									/>
 								</div>
-
-								<button
-									type="button"
-									className="block-submit-button"
-									onClick={handleSubmit}
-								>
-									<span>✈</span> この2週間分のシフトを確認して提出する
-								</button>
-								<p className="submit-note">※未入力や休みの選択漏れがある場合は、提出できません。</p>
 							</div>
 						)}
 					</div>
 				);
 			})}
+
+			{/* 全ブロック共通の提出ボタン（一番下に1つ） */}
+			<button
+				type="button"
+				className="block-submit-button"
+				onClick={handleSubmit}
+			>
+				<span>✈</span> チェックした期間のシフトを提出する
+			</button>
+			<p className="submit-note">
+				※未入力や休みの選択漏れがある場合は、提出できません。
+			</p>
 		</Layout>
 	);
 }
