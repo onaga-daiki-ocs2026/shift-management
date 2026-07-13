@@ -33,9 +33,12 @@ public class ShiftPdfService {
 		Map uploadResult = cloudinary.uploader().upload(
 				file.getBytes(),
 				ObjectUtils.asMap(
-						"resource_type", "raw",
-						"folder", "shift-pdfs",
-						"format", "pdf"));
+					"resource_type", "raw",
+					"folder", "shift-pdfs",
+					"type", "upload",
+					"format", "pdf",
+					"access_mode", "public"
+				));
 
 		String pdfUrl = (String) uploadResult.get("secure_url");
 		String publicId = (String) uploadResult.get("public_id");
