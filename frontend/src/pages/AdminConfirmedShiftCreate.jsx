@@ -643,6 +643,9 @@ function StaffRow({
 		<div className="timeline-row">
 			<div className="timeline-name">
 				<span>{staff.name}</span>
+				<span className="staff-position">
+					{position === "HALL" ? "ホール" : "キッチン"}
+				</span>
 				<div className="row-actions">
 					<button
 						type="button"
@@ -655,7 +658,7 @@ function StaffRow({
 						className="danger"
 						onClick={() => removeRow(date, position, staff.userId)}
 					>
-						行削除
+						削除
 					</button>
 				</div>
 			</div>
