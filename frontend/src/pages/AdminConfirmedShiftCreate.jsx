@@ -7,30 +7,18 @@ import jsPDF from "jspdf";
 const RANGE_START = 0;
 const RANGE_END = 24;
 const TOTAL_HOURS = RANGE_END - RANGE_START;
+const DAY_NAMES = ["日", "月", "火", "水", "木", "金", "土"];
 
 function AdminConfirmedShiftCreate() {
-	const [currentDate, setCurrentDate] = useState(null);
 	const [periodId, setPeriodId] = useState(null);
-	const [hallStaff, setHallStaff] = useState([]);
-	const [kitchenStaff, setKitchenStaff] = useState([]);
+	const [periodStart, setPeriodStart] = useState(null);
+	const [dates, setDates] = useState([]);
+	const [dayStaffMap, setDayStaffMap] = useState({});
 	const [loading, setLoading] = useState(true);
 	const [selected, setSelected] = useState(null);
 	const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 	const [exporting, setExporting] = useState(false);
-	const [periodStart, setPeriodStart] = useState(null);
-
-	function formatDate(date) {
-		const y = date.getFullYear();
-		const m = String(date.getMonth() + 1).padStart(2, "0");
-		const d = String(date.getDate()).padStart(2, "0");
-		return `${y}-${m}-${d}`;
-	}
-
-	function formatDisplayDate(dateString) {
-		const date = new Date(dateString);
-		const days = ["日", "月", "火", "水", "木", "金", "土"];
-		return `${date.getMonth() + 1}月${date.getDate()}日（${days[date.getDay()]}）`;
-	}
+	const [currentWeek, setCurrentWeek] = useState(0); // 0=前半, 1=後半
 
 	useEffect(() => {
 		const handleResize = () => setIsMobile(window.innerWidth < 768);
@@ -39,56 +27,82 @@ function AdminConfirmedShiftCreate() {
 	}, []);
 
 	useEffect(() => {
-		fetchPeriod();
+		fetchPeriodAndShifts();
 	}, []);
 
-	useEffect(() => {
-		if (currentDate) {
-			fetchShiftsForDate(currentDate);
-		}
-	}, [currentDate]);
-
-	const fetchPeriod = async () => {
+	const fetchPeriodAndShifts = async () => {
 		try {
 			const response = await api.get("/api/submission-periods/current");
-			setPeriodId(response.data.id);
-			setPeriodStart(response.data.startDate); 
-			setCurrentDate(response.data.startDate);
+			const period = response.data;
+			setPeriodId(period.id);
+			setPeriodStart(period.startDate);
+
+			const startDate = new Date(period.startDate);
+			const dateList = [];
+			for (let i = 0; i < 14; i++) {
+				const d = new Date(startDate);
+				d.setDate(startDate.getDate() + i);
+				dateList.push(formatDate(d));
+			}
+			setDates(dateList);
+
+			const results = await Promise.all(
+				dateList.map((date) =>
+					api
+						.get(`/api/shift-requests/date/${date}`)
+						.then((res) => ({ date, shifts: res.data }))
+						.catch(() => ({ date, shifts: [] })),
+				),
+			);
+
+			const map = {};
+			results.forEach(({ date, shifts }) => {
+				const toStaffList = (list) =>
+					list.map((shift) => {
+						const start = timeToHour(shift.startTime);
+						const end = timeToHour(shift.endTime);
+						const original = [{ start, end }];
+						return {
+							userId: shift.userId,
+							name: shift.displayName,
+							comment: shift.comment || "",
+							original,
+							blocks: JSON.parse(JSON.stringify(original)),
+						};
+					});
+
+				map[date] = {
+					hall: toStaffList(shifts.filter((s) => s.position === "HALL")),
+					kitchen: toStaffList(
+						shifts.filter((s) => s.position === "KITCHEN"),
+					),
+				};
+			});
+			setDayStaffMap(map);
 		} catch (error) {
 			console.error("提出期間の取得に失敗しました", error);
-		}
-	};
-
-	const fetchShiftsForDate = async (date) => {
-		setLoading(true);
-		setSelected(null);
-
-		try {
-			const response = await api.get(`/api/shift-requests/date/${date}`);
-			const shifts = response.data;
-
-			const toStaffList = (list) =>
-				list.map((shift) => {
-					const start = timeToHour(shift.startTime);
-					const end = timeToHour(shift.endTime);
-					const original = [{ start, end }];
-					return {
-						userId: shift.userId,
-						name: shift.displayName,
-						original,
-						blocks: JSON.parse(JSON.stringify(original)),
-					};
-				});
-
-			setHallStaff(toStaffList(shifts.filter((s) => s.position === "HALL")));
-			setKitchenStaff(
-				toStaffList(shifts.filter((s) => s.position === "KITCHEN")),
-			);
-		} catch (error) {
-			console.error("シフトの取得に失敗しました", error);
 		} finally {
 			setLoading(false);
 		}
+	};
+
+	const formatDate = (date) => {
+		const y = date.getFullYear();
+		const m = String(date.getMonth() + 1).padStart(2, "0");
+		const d = String(date.getDate()).padStart(2, "0");
+		return `${y}-${m}-${d}`;
+	};
+
+	const formatDisplayDate = (dateString) => {
+		const date = new Date(dateString);
+		const day = DAY_NAMES[date.getDay()];
+		const isSun = date.getDay() === 0;
+		const isSat = date.getDay() === 6;
+		return {
+			label: `${date.getMonth() + 1}月${date.getDate()}日（${day}）`,
+			isSun,
+			isSat,
+		};
 	};
 
 	const timeToHour = (timeString) => {
@@ -108,73 +122,74 @@ function AdminConfirmedShiftCreate() {
 		return m === 0 ? `${h}:00` : `${h}:${m}`;
 	};
 
-	const goToPrevDay = () => {
-		if (currentDate <= periodStart) return; // 期間開始日より前には行けない
-		const date = new Date(currentDate);
-		date.setDate(date.getDate() - 1);
-		setCurrentDate(formatDate(date));
+	const getStaffList = (date, position) =>
+		dayStaffMap[date]?.[position === "HALL" ? "hall" : "kitchen"] ?? [];
+
+	const updateBlocks = (date, position, userId, newBlocks) => {
+		const key = position === "HALL" ? "hall" : "kitchen";
+		setDayStaffMap((prev) => ({
+			...prev,
+			[date]: {
+				...prev[date],
+				[key]: prev[date][key].map((s) =>
+					s.userId === userId ? { ...s, blocks: newBlocks } : s,
+				),
+			},
+		}));
 	};
 
-	const goToNextDay = () => {
-		const endDate = new Date(periodStart);
-		endDate.setDate(endDate.getDate() + 13); // 14日後が終了日
-		if (currentDate >= formatDate(endDate)) return; // 期間終了日より後には行けない
-		const date = new Date(currentDate);
-		date.setDate(date.getDate() + 1);
-		setCurrentDate(formatDate(date));
-	};
-
-	const getStaffList = (position) =>
-		position === "HALL" ? hallStaff : kitchenStaff;
-
-	const setStaffList = (position, updater) => {
-		if (position === "HALL") {
-			setHallStaff(updater);
-		} else {
-			setKitchenStaff(updater);
-		}
-	};
-
-	const updateBlocks = (position, userId, newBlocks) => {
-		setStaffList(position, (prev) =>
-			prev.map((s) => (s.userId === userId ? { ...s, blocks: newBlocks } : s)),
-		);
-	};
-
-	const resetOne = (position, userId) => {
-		setStaffList(position, (prev) =>
-			prev.map((s) =>
-				s.userId === userId
-					? { ...s, blocks: JSON.parse(JSON.stringify(s.original)) }
-					: s,
-			),
-		);
+	const resetOne = (date, position, userId) => {
+		const key = position === "HALL" ? "hall" : "kitchen";
+		setDayStaffMap((prev) => ({
+			...prev,
+			[date]: {
+				...prev[date],
+				[key]: prev[date][key].map((s) =>
+					s.userId === userId
+						? { ...s, blocks: JSON.parse(JSON.stringify(s.original)) }
+						: s,
+				),
+			},
+		}));
 		setSelected(null);
 	};
 
-	const removeRow = (position, userId) => {
-		setStaffList(position, (prev) => prev.filter((s) => s.userId !== userId));
+	const removeRow = (date, position, userId) => {
+		const key = position === "HALL" ? "hall" : "kitchen";
+		setDayStaffMap((prev) => ({
+			...prev,
+			[date]: {
+				...prev[date],
+				[key]: prev[date][key].filter((s) => s.userId !== userId),
+			},
+		}));
 		setSelected(null);
 	};
 
 	const resetAll = () => {
-		setHallStaff((prev) =>
-			prev.map((s) => ({
-				...s,
-				blocks: JSON.parse(JSON.stringify(s.original)),
-			})),
-		);
-		setKitchenStaff((prev) =>
-			prev.map((s) => ({
-				...s,
-				blocks: JSON.parse(JSON.stringify(s.original)),
-			})),
-		);
+		setDayStaffMap((prev) => {
+			const next = {};
+			Object.entries(prev).forEach(([date, { hall, kitchen }]) => {
+				next[date] = {
+					hall: hall.map((s) => ({
+						...s,
+						blocks: JSON.parse(JSON.stringify(s.original)),
+					})),
+					kitchen: kitchen.map((s) => ({
+						...s,
+						blocks: JSON.parse(JSON.stringify(s.original)),
+					})),
+				};
+			});
+			return next;
+		});
 		setSelected(null);
 	};
 
-	const splitBlock = (position, userId, blockIndex) => {
-		const staff = getStaffList(position).find((s) => s.userId === userId);
+	const splitBlock = (date, position, userId, blockIndex) => {
+		const staff = getStaffList(date, position).find(
+			(s) => s.userId === userId,
+		);
 		const b = staff.blocks[blockIndex];
 		if (b.end - b.start <= 1) return;
 
@@ -186,28 +201,37 @@ function AdminConfirmedShiftCreate() {
 			{ start: b.start, end: mid - 0.5 },
 			{ start: mid + 0.5, end: b.end },
 		);
-		updateBlocks(position, userId, newBlocks);
+		updateBlocks(date, position, userId, newBlocks);
 		setSelected(null);
 	};
 
-	const deleteBlock = (position, userId, blockIndex) => {
-		const staff = getStaffList(position).find((s) => s.userId === userId);
+	const deleteBlock = (date, position, userId, blockIndex) => {
+		const staff = getStaffList(date, position).find(
+			(s) => s.userId === userId,
+		);
 		const newBlocks = staff.blocks.filter((_, i) => i !== blockIndex);
-		updateBlocks(position, userId, newBlocks);
+		updateBlocks(date, position, userId, newBlocks);
 		setSelected(null);
 	};
 
 	const handleSubmit = async () => {
-		const allStaff = [...hallStaff, ...kitchenStaff];
-
-		const requests = allStaff.flatMap((staff) =>
-			staff.blocks.map((b) => ({
-				userId: staff.userId,
-				workDate: currentDate,
-				startTime: hourToTime(b.start),
-				endTime: hourToTime(b.end),
-			})),
-		);
+		const requests = [];
+		dates.forEach((date) => {
+			const allStaff = [
+				...getStaffList(date, "HALL"),
+				...getStaffList(date, "KITCHEN"),
+			];
+			allStaff.forEach((staff) => {
+				staff.blocks.forEach((b) => {
+					requests.push({
+						userId: staff.userId,
+						workDate: date,
+						startTime: hourToTime(b.start),
+						endTime: hourToTime(b.end),
+					});
+				});
+			});
+		});
 
 		if (requests.length === 0) {
 			alert("確定するシフトがありません。");
@@ -215,11 +239,8 @@ function AdminConfirmedShiftCreate() {
 		}
 
 		try {
-			await api.post("/api/confirmed-shifts", {
-				periodId,
-				requests,
-			});
-			alert("確定シフトを保存しました！");
+			await api.post("/api/confirmed-shifts", { periodId, requests });
+			alert("14日分の確定シフトを保存しました！");
 		} catch (error) {
 			console.error("保存に失敗しました", error);
 			alert("保存に失敗しました");
@@ -228,38 +249,28 @@ function AdminConfirmedShiftCreate() {
 
 	const handleExportPdf = async () => {
 		setExporting(true);
-
 		try {
-			// 印刷用コンテナを取得
 			const element = document.getElementById("pdf-export-area");
-
 			const canvas = await html2canvas(element, {
-				scale: 1, // 2から1に変更
+				scale: 1,
 				useCORS: true,
 				backgroundColor: "#ffffff",
 			});
 
 			const imgData = canvas.toDataURL("image/png");
-
-			// A4横向きPDF
 			const pdf = new jsPDF("landscape", "mm", "a4");
 			const pdfWidth = pdf.internal.pageSize.getWidth();
 			const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-
 			pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
 
-			// PDFをBlobに変換
 			const pdfBlob = pdf.output("blob");
-
-			// バックエンドに送信
 			const formData = new FormData();
 			formData.append("file", pdfBlob, "shift.pdf");
-			formData.append("periodStart", currentDate);
+			formData.append("periodStart", periodStart);
 
 			await api.post("/api/pdfs/upload", formData, {
 				headers: { "Content-Type": "multipart/form-data" },
 			});
-
 			alert("PDFを保存しました！スタッフの確定シフト確認画面に反映されます。");
 		} catch (error) {
 			console.error("PDF出力に失敗しました", error);
@@ -269,75 +280,126 @@ function AdminConfirmedShiftCreate() {
 		}
 	};
 
-	if (loading || !currentDate) {
+	const displayDates = dates.filter((_, i) =>
+    	currentWeek === 0 ? i < 7 : i >= 7
+	);
+
+	if (loading) {
 		return (
-			<Layout title="管理者：確定シフト作成">
-				<p>読み込み中...</p>
+			<Layout>
+				<p className="loading-text">読み込み中...</p>
 			</Layout>
 		);
 	}
 
 	return (
-		<Layout title="管理者：確定シフト作成">
-			<div className="date-nav">
+		<Layout>
+			<div className="confirmed-create-toolbar">
 				<button
 					type="button"
-					onClick={goToPrevDay}
-					disabled={currentDate <= periodStart}
+					onClick={resetAll}
+					className="reset-all-button"
 				>
-					←
+					全員リセット
 				</button>
-				<span>{formatDisplayDate(currentDate)}</span>
+				<div className="confirmed-create-actions">
+					<button
+						type="button"
+						onClick={handleSubmit}
+						className="submit-button"
+					>
+						確定シフトを保存
+					</button>
+					<button
+						type="button"
+						className="pdf-export-button"
+						onClick={handleExportPdf}
+						disabled={exporting}
+					>
+						{exporting ? "PDF生成中..." : "📄 PDFを生成・公開"}
+					</button>
+				</div>
+			</div>
+
+			<div className="week-tabs">
 				<button
 					type="button"
-					onClick={goToNextDay}
-					disabled={currentDate >= formatDate(new Date(new Date(periodStart).setDate(new Date(periodStart).getDate() + 13)))}
+					className={`week-tab ${currentWeek === 0 ? "active" : ""}`}
+					onClick={() => setCurrentWeek(0)}
 				>
-					→
+					前半（1〜7日目）
+				</button>
+				<button
+					type="button"
+					className={`week-tab ${currentWeek === 1 ? "active" : ""}`}
+					onClick={() => setCurrentWeek(1)}
+				>
+					後半（8〜14日目）
 				</button>
 			</div>
 
-			<button type="button" onClick={resetAll} className="reset-all-button">
-				全員リセット
-			</button>
+			<div id="pdf-export-area">
+				{dates.map((date) => {
+					const { label, isSun, isSat } = formatDisplayDate(date);
+					const hallList = getStaffList(date, "HALL");
+					const kitchenList = getStaffList(date, "KITCHEN");
 
-			<ShiftSection
-				title="ホール"
-				position="HALL"
-				staffList={hallStaff}
-				isMobile={isMobile}
-				selected={selected}
-				setSelected={setSelected}
-				updateBlocks={updateBlocks}
-				resetOne={resetOne}
-				removeRow={removeRow}
-				splitBlock={splitBlock}
-				deleteBlock={deleteBlock}
-				hourToLabel={hourToLabel}
-			/>
+					return (
+						<div key={date} className="day-section">
+							<div
+								className={`day-section-title ${isSun ? "sun" : isSat ? "sat" : ""}`}
+							>
+								{label}
+							</div>
 
-			<ShiftSection
-				title="キッチン"
-				position="KITCHEN"
-				staffList={kitchenStaff}
-				isMobile={isMobile}
-				selected={selected}
-				setSelected={setSelected}
-				updateBlocks={updateBlocks}
-				resetOne={resetOne}
-				removeRow={removeRow}
-				splitBlock={splitBlock}
-				deleteBlock={deleteBlock}
-				hourToLabel={hourToLabel}
-			/>
+							{hallList.length === 0 && kitchenList.length === 0 ? (
+								<p className="day-no-staff">希望シフトの提出者なし</p>
+							) : (
+								<>
+									{hallList.length > 0 && (
+										<ShiftSection
+											title="ホール"
+											position="HALL"
+											date={date}
+											staffList={hallList}
+											isMobile={isMobile}
+											selected={selected}
+											setSelected={setSelected}
+											updateBlocks={updateBlocks}
+											resetOne={resetOne}
+											removeRow={removeRow}
+											splitBlock={splitBlock}
+											deleteBlock={deleteBlock}
+											hourToLabel={hourToLabel}
+										/>
+									)}
+									{kitchenList.length > 0 && (
+										<ShiftSection
+											title="キッチン"
+											position="KITCHEN"
+											date={date}
+											staffList={kitchenList}
+											isMobile={isMobile}
+											selected={selected}
+											setSelected={setSelected}
+											updateBlocks={updateBlocks}
+											resetOne={resetOne}
+											removeRow={removeRow}
+											splitBlock={splitBlock}
+											deleteBlock={deleteBlock}
+											hourToLabel={hourToLabel}
+										/>
+									)}
+								</>
+							)}
+						</div>
+					);
+				})}
+			</div>
 
-			<button type="button" onClick={handleSubmit} className="submit-button">
-				確定シフトを保存
-			</button>
-
-			{/* 印刷用エリア（画面には見えない） */}
+			{/* PDF印刷用（非表示） */}
 			<div
-				id="pdf-export-area"
+				id="pdf-print-area"
 				style={{
 					position: "fixed",
 					top: "-9999px",
@@ -347,50 +409,55 @@ function AdminConfirmedShiftCreate() {
 					padding: "24px",
 				}}
 			>
-				<h2 style={{ fontSize: "16px", marginBottom: "8px" }}>
-					確定シフト {formatDisplayDate(currentDate)}
-				</h2>
+				{dates.map((date) => {
+					const { label } = formatDisplayDate(date);
+					const hallList = getStaffList(date, "HALL");
+					const kitchenList = getStaffList(date, "KITCHEN");
+					if (hallList.length === 0 && kitchenList.length === 0) return null;
 
-				<ShiftSection
-					title="ホール"
-					position="HALL"
-					staffList={hallStaff}
-					isMobile={false}
-					selected={null}
-					setSelected={() => {}}
-					updateBlocks={() => {}}
-					resetOne={() => {}}
-					removeRow={() => {}}
-					splitBlock={() => {}}
-					deleteBlock={() => {}}
-					hourToLabel={hourToLabel}
-				/>
-
-				<ShiftSection
-					title="キッチン"
-					position="KITCHEN"
-					staffList={kitchenStaff}
-					isMobile={false}
-					selected={null}
-					setSelected={() => {}}
-					updateBlocks={() => {}}
-					resetOne={() => {}}
-					removeRow={() => {}}
-					splitBlock={() => {}}
-					deleteBlock={() => {}}
-					hourToLabel={hourToLabel}
-				/>
+					return (
+						<div key={date} style={{ marginBottom: "16px" }}>
+							<h3 style={{ fontSize: "13px", margin: "0 0 4px 0" }}>
+								{label}
+							</h3>
+							{hallList.length > 0 && (
+								<ShiftSection
+									title="ホール"
+									position="HALL"
+									date={date}
+									staffList={hallList}
+									isMobile={false}
+									selected={null}
+									setSelected={() => {}}
+									updateBlocks={() => {}}
+									resetOne={() => {}}
+									removeRow={() => {}}
+									splitBlock={() => {}}
+									deleteBlock={() => {}}
+									hourToLabel={hourToLabel}
+								/>
+							)}
+							{kitchenList.length > 0 && (
+								<ShiftSection
+									title="キッチン"
+									position="KITCHEN"
+									date={date}
+									staffList={kitchenList}
+									isMobile={false}
+									selected={null}
+									setSelected={() => {}}
+									updateBlocks={() => {}}
+									resetOne={() => {}}
+									removeRow={() => {}}
+									splitBlock={() => {}}
+									deleteBlock={() => {}}
+									hourToLabel={hourToLabel}
+								/>
+							)}
+						</div>
+					);
+				})}
 			</div>
-
-			{/* PDF出力ボタン */}
-			<button
-				type="button"
-				className="pdf-export-button"
-				onClick={handleExportPdf}
-				disabled={exporting}
-			>
-				{exporting ? "PDF生成中..." : "📄 PDFを生成してスタッフに公開"}
-			</button>
 		</Layout>
 	);
 }
@@ -398,6 +465,7 @@ function AdminConfirmedShiftCreate() {
 function ShiftSection({
 	title,
 	position,
+	date,
 	staffList,
 	isMobile,
 	selected,
@@ -411,7 +479,6 @@ function ShiftSection({
 }) {
 	if (staffList.length === 0) return null;
 
-	// セクション全体の合計時間
 	const totalHours = staffList.reduce((sum, staff) => {
 		const staffTotal = staff.blocks.reduce(
 			(s, b) => s + (b.end - b.start),
@@ -421,17 +488,20 @@ function ShiftSection({
 	}, 0);
 
 	return (
-		<div className={`shift-section ${position === "KITCHEN" ? "kitchen" : ""}`}>
+		<div
+			className={`shift-section ${position === "KITCHEN" ? "kitchen" : ""}`}
+		>
 			<h3>{title}</h3>
 
 			<div className="timeline-header">
 				<div className="timeline-name-spacer" />
 				<div className="timeline-hours">
-					{Array.from({ length: TOTAL_HOURS }, (_, i) => RANGE_START + i).map(
-						(h) => (
-							<span key={h}>{h}</span>
-						),
-					)}
+					{Array.from(
+						{ length: TOTAL_HOURS },
+						(_, i) => RANGE_START + i,
+					).map((h) => (
+						<span key={h}>{h}</span>
+					))}
 				</div>
 				<div className="timeline-hours-time">計画</div>
 			</div>
@@ -439,6 +509,7 @@ function ShiftSection({
 			{staffList.map((staff) => (
 				<StaffRow
 					key={staff.userId}
+					date={date}
 					position={position}
 					staff={staff}
 					isMobile={isMobile}
@@ -461,6 +532,7 @@ function ShiftSection({
 }
 
 function StaffRow({
+	date,
 	position,
 	staff,
 	isMobile,
@@ -485,13 +557,13 @@ function StaffRow({
 
 	const handleBarClick = (blockIndex) => {
 		if (isMobile) {
-			setSelected({ position, userId: staff.userId, blockIndex });
+			setSelected({ date, position, userId: staff.userId, blockIndex });
 		}
 	};
 
 	const handleDoubleClick = (blockIndex) => {
 		if (!isMobile) {
-			splitBlock(position, staff.userId, blockIndex);
+			splitBlock(date, position, staff.userId, blockIndex);
 		}
 	};
 
@@ -525,7 +597,10 @@ function StaffRow({
 					blockIndex < newBlocks.length - 1
 						? newBlocks[blockIndex + 1].start
 						: RANGE_END;
-				newStart = Math.max(prevEnd, Math.min(nextStart - duration, newStart));
+				newStart = Math.max(
+					prevEnd,
+					Math.min(nextStart - duration, newStart),
+				);
 				b.start = newStart;
 				b.end = newStart + duration;
 			} else if (mode === "left") {
@@ -541,7 +616,7 @@ function StaffRow({
 			}
 
 			newBlocks[blockIndex] = b;
-			updateBlocks(position, staff.userId, newBlocks);
+			updateBlocks(date, position, staff.userId, newBlocks);
 		};
 
 		const stop = () => {
@@ -559,6 +634,7 @@ function StaffRow({
 
 	const isBarSelected = (blockIndex) =>
 		selected &&
+		selected.date === date &&
 		selected.position === position &&
 		selected.userId === staff.userId &&
 		selected.blockIndex === blockIndex;
@@ -568,13 +644,16 @@ function StaffRow({
 			<div className="timeline-name">
 				<span>{staff.name}</span>
 				<div className="row-actions">
-					<button type="button" onClick={() => resetOne(position, staff.userId)}>
+					<button
+						type="button"
+						onClick={() => resetOne(date, position, staff.userId)}
+					>
 						戻す
 					</button>
 					<button
 						type="button"
 						className="danger"
-						onClick={() => removeRow(position, staff.userId)}
+						onClick={() => removeRow(date, position, staff.userId)}
 					>
 						行削除
 					</button>
@@ -642,7 +721,12 @@ function StaffRow({
 									className="bar-delete"
 									onClick={(e) => {
 										e.stopPropagation();
-										deleteBlock(position, staff.userId, blockIndex);
+										deleteBlock(
+											date,
+											position,
+											staff.userId,
+											blockIndex,
+										);
 									}}
 								>
 									×
@@ -653,15 +737,16 @@ function StaffRow({
 				))}
 			</div>
 
-			{/* 計画時間 */}
 			<div className="timeline-hours-time">
 				{staff.blocks
 					.reduce((sum, b) => sum + (b.end - b.start), 0)
-					.toFixed(1)}h
+					.toFixed(1)}
+				h
 			</div>
 
 			{isMobile && (
 				<MobilePanel
+					date={date}
 					position={position}
 					staff={staff}
 					selected={selected}
@@ -676,6 +761,7 @@ function StaffRow({
 }
 
 function MobilePanel({
+	date,
 	position,
 	staff,
 	selected,
@@ -686,6 +772,7 @@ function MobilePanel({
 }) {
 	const isThisRowSelected =
 		selected &&
+		selected.date === date &&
 		selected.position === position &&
 		selected.userId === staff.userId;
 
@@ -705,7 +792,7 @@ function MobilePanel({
 			...newBlocks[blockIndex],
 			start: parseFloat(value),
 		};
-		updateBlocks(position, staff.userId, newBlocks);
+		updateBlocks(date, position, staff.userId, newBlocks);
 	};
 
 	const handleEndChange = (value) => {
@@ -714,7 +801,7 @@ function MobilePanel({
 			...newBlocks[blockIndex],
 			end: parseFloat(value),
 		};
-		updateBlocks(position, staff.userId, newBlocks);
+		updateBlocks(date, position, staff.userId, newBlocks);
 	};
 
 	return (
@@ -746,14 +833,18 @@ function MobilePanel({
 			<div className="mobile-panel-actions">
 				<button
 					type="button"
-					onClick={() => splitBlock(position, staff.userId, blockIndex)}
+					onClick={() =>
+						splitBlock(date, position, staff.userId, blockIndex)
+					}
 				>
 					分割
 				</button>
 				<button
 					type="button"
 					className="danger"
-					onClick={() => deleteBlock(position, staff.userId, blockIndex)}
+					onClick={() =>
+						deleteBlock(date, position, staff.userId, blockIndex)
+					}
 				>
 					削除
 				</button>

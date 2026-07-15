@@ -1147,3 +1147,59 @@ body {
 		padding: 16px 40px 8px;
 	}
 }
+
+/* ==================== 確定シフト作成ツールバー ==================== */
+
+.confirmed-create-toolbar {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 16px;
+	gap: 12px;
+	position: sticky;
+	top: 0;
+	background: #f0ebe3;
+	padding: 8px 0;
+	z-index: 10;
+}
+
+.confirmed-create-actions {
+	display: flex;
+	gap: 8px;
+}
+
+.confirmed-create-actions .submit-button {
+	margin-top: 0;
+	padding: 10px 20px;
+	font-size: 14px;
+}
+
+.confirmed-create-actions .pdf-export-button {
+	margin-top: 0;
+	padding: 10px 20px;
+	font-size: 14px;
+}
+
+.week-tabs {
+	display: flex;
+	gap: 8px;
+	margin-bottom: 16px;
+}
+
+.week-tab {
+	flex: 1;
+	padding: 10px;
+	font-size: 14px;
+	font-weight: bold;
+	border: 2px solid var(--gray-border);
+	border-radius: 8px;
+	background: var(--white);
+	color: var(--text-sub);
+	cursor: pointer;
+}
+
+.week-tab.active {
+	border-color: var(--brown);
+	color: var(--brown);
+	background: #fdf6ee;
+}
