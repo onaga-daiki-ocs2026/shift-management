@@ -19,6 +19,12 @@ function AdminConfirmedShiftCreate() {
 	const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 	const [exporting, setExporting] = useState(false);
 	const [currentWeek, setCurrentWeek] = useState(0); // 0=前半, 1=後半
+	const [dayMemoMap, setDayMemoMap] = useState({});
+	const [dayNoteMap, setDayNoteMap] = useState({}); // { "2026-07-05": "10時オープン" }
+
+	const updateDayNote = (date, value) => {
+		setDayNoteMap((prev) => ({ ...prev, [date]: value }));
+	};
 
 	useEffect(() => {
 		const handleResize = () => setIsMobile(window.innerWidth < 768);
@@ -66,6 +72,7 @@ function AdminConfirmedShiftCreate() {
 							userId: shift.userId,
 							name: shift.displayName,
 							comment: shift.comment || "",
+							role: "",
 							original,
 							blocks: JSON.parse(JSON.stringify(original)),
 						};
@@ -136,6 +143,23 @@ function AdminConfirmedShiftCreate() {
 				),
 			},
 		}));
+	};
+
+	const updateRole = (date, position, userId, role) => {
+		const key = position === "HALL" ? "hall" : "kitchen";
+		setDayStaffMap((prev) => ({
+			...prev,
+			[date]: {
+				...prev[date],
+				[key]: prev[date][key].map((s) =>
+					s.userId === userId ? { ...s, role } : s,
+				),
+			},
+		}));
+	};
+
+	const updateDayMemo = (date, memo) => {
+		setDayMemoMap((prev) => ({ ...prev, [date]: memo }));
 	};
 
 	const resetOne = (date, position, userId) => {
@@ -284,7 +308,7 @@ function AdminConfirmedShiftCreate() {
 	};
 
 	const displayDates = dates.filter((_, i) =>
-		currentWeek === 0 ? i < 7 : i >= 7
+    	currentWeek === 0 ? i < 7 : i >= 7
 	);
 
 	const selectedStaff = selected
@@ -371,6 +395,7 @@ function AdminConfirmedShiftCreate() {
 								selected={selected}
 								setSelected={setSelected}
 								updateBlocks={updateBlocks}
+								updateRole={updateRole}
 								resetOne={resetOne}
 								removeRow={removeRow}
 								splitBlock={splitBlock}
@@ -386,12 +411,23 @@ function AdminConfirmedShiftCreate() {
 								selected={selected}
 								setSelected={setSelected}
 								updateBlocks={updateBlocks}
+								updateRole={updateRole}
 								resetOne={resetOne}
 								removeRow={removeRow}
 								splitBlock={splitBlock}
 								deleteBlock={deleteBlock}
 								hourToLabel={hourToLabel}
 							/>
+
+							<div className="day-memo-area">
+								<span className="day-memo-label">伝達事項</span>
+								<textarea
+									className="day-memo-textarea"
+									placeholder="この日の伝達事項を入力（例：10時オープン）"
+									value={dayMemoMap[date] || ""}
+									onChange={(e) => updateDayMemo(date, e.target.value)}
+								/>
+							</div>
 						</div>
 					);
 				})}
@@ -487,6 +523,7 @@ function ShiftSection({
 	selected,
 	setSelected,
 	updateBlocks,
+	updateRole,
 	resetOne,
 	removeRow,
 	splitBlock,
@@ -513,8 +550,8 @@ function ShiftSection({
 			<h3>{title}</h3>
 
 			<div className="timeline-header">
-				<div className="timeline-icon-spacer" />
-				<div className="timeline-name-spacer" />
+				<div className="timeline-role-spacer">役割</div>
+				<div className="timeline-name-spacer">氏名</div>
 				<div className="timeline-hours">
 					{Array.from(
 						{ length: TOTAL_HOURS },
@@ -524,6 +561,7 @@ function ShiftSection({
 					))}
 				</div>
 				<div className="timeline-hours-time">計画</div>
+				<div className="timeline-icon-spacer" />
 			</div>
 
 			{staffList.map((staff) => (
@@ -536,6 +574,7 @@ function ShiftSection({
 					selected={selected}
 					setSelected={setSelected}
 					updateBlocks={updateBlocks}
+					updateRole={updateRole}
 					resetOne={resetOne}
 					removeRow={removeRow}
 					splitBlock={splitBlock}
@@ -558,10 +597,11 @@ function ShiftSection({
 function EmptyRow() {
 	return (
 		<div className="timeline-row empty-row">
-			<div className="row-icon-actions" />
+			<div className="timeline-role" />
 			<div className="timeline-name" />
 			<div className="timeline-track" />
 			<div className="timeline-hours-time" />
+			<div className="row-icon-actions" />
 		</div>
 	);
 }
@@ -574,6 +614,7 @@ function StaffRow({
 	selected,
 	setSelected,
 	updateBlocks,
+	updateRole,
 	resetOne,
 	removeRow,
 	splitBlock,
@@ -674,22 +715,16 @@ function StaffRow({
 
 	return (
 		<div className="timeline-row">
-			<div className="row-icon-actions">
-				<button
-					type="button"
-					title="戻す"
-					onClick={() => resetOne(date, position, staff.userId)}
-				>
-					↺
-				</button>
-				<button
-					type="button"
-					className="danger"
-					title="削除"
-					onClick={() => removeRow(date, position, staff.userId)}
-				>
-					✕
-				</button>
+			<div className="timeline-role">
+				<input
+					type="text"
+					className="role-input"
+					placeholder="役割"
+					value={staff.role || ""}
+					onChange={(e) =>
+						updateRole(date, position, staff.userId, e.target.value)
+					}
+				/>
 			</div>
 			<div className="timeline-name">
 				<span>{staff.name}</span>
@@ -782,6 +817,24 @@ function StaffRow({
 					.reduce((sum, b) => sum + (b.end - b.start), 0)
 					.toFixed(1)}
 				h
+			</div>
+
+			<div className="row-icon-actions">
+				<button
+					type="button"
+					title="戻す"
+					onClick={() => resetOne(date, position, staff.userId)}
+				>
+					↺
+				</button>
+				<button
+					type="button"
+					className="danger"
+					title="削除"
+					onClick={() => removeRow(date, position, staff.userId)}
+				>
+					✕
+				</button>
 			</div>
 
 			{isMobile && (

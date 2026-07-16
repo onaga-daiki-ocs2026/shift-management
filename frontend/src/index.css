@@ -121,7 +121,7 @@ body {
 .app-main {
 	padding: 16px 16px 0;
 	flex: 1;
-	padding-bottom:  env(safe-area-inset-bottom);
+	padding-bottom: env(safe-area-inset-bottom);
 }
 
 /* ==================== フッター ==================== */
@@ -134,7 +134,6 @@ body {
 	background: #fff;
 	padding-bottom: env(safe-area-inset-bottom);
 }
-
 
 .footer-bar {
 	height: 4px;
@@ -353,10 +352,6 @@ body {
 	font-size: 11px;
 	color: var(--text-sub);
 	text-align: center;
-}
-
-.shift-date-col {
-	/* 空欄 */
 }
 
 .shift-row {
@@ -646,329 +641,6 @@ body {
 	margin: 0;
 }
 
-/* ==================== 確定シフト作成画面 ==================== */
-
-.confirmed-create-header {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	margin-bottom: 16px;
-}
-
-.confirmed-create-period {
-	font-size: 13px;
-	color: var(--brown);
-	font-weight: 500;
-}
-
-.day-section {
-	margin-bottom: 20px;
-	border-radius: 10px;
-	overflow: hidden;
-	border: 1px solid var(--gray-border);
-	background: var(--white);
-}
-
-.day-section-title {
-	padding: 8px 12px;
-	font-size: 14px;
-	font-weight: bold;
-	color: var(--brown);
-	background: var(--gray-light);
-	border-bottom: 1px solid var(--gray-border);
-}
-
-.day-section-title.sun {
-	color: var(--red);
-}
-
-.day-section-title.sat {
-	color: #2980b9;
-}
-
-.day-no-staff {
-	font-size: 12px;
-	color: var(--text-sub);
-	padding: 8px 12px;
-	margin: 0;
-}
-
-.date-nav {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	gap: 16px;
-	margin-bottom: 12px;
-	font-size: 16px;
-	font-weight: bold;
-}
-
-.date-nav button {
-	padding: 4px 12px;
-	font-size: 16px;
-	cursor: pointer;
-}
-
-.reset-all-button {
-	display: block;
-	margin-bottom: 16px;
-	padding: 6px 14px;
-	font-size: 13px;
-	cursor: pointer;
-}
-
-.shift-section {
-	margin-bottom: 24px;
-	overflow-x: auto;
-}
-
-.shift-section h3 {
-	font-size: 13px;
-	font-weight: bold;
-	margin: 0 0 4px 0;
-	padding: 2px 6px;
-	background: #eee;
-	border-left: 4px solid #555;
-}
-
-.timeline-header {
-	display: flex;
-	align-items: center;
-	min-width: 700px;
-}
-
-.timeline-name-spacer {
-	width: 72px;
-	flex-shrink: 0;
-}
-
-.timeline-hours {
-	flex: 1;
-	display: grid;
-	grid-template-columns: repeat(48, 1fr);
-	border-bottom: 1px solid #ccc;
-}
-
-.timeline-hours span {
-	font-size: 10px;
-	color: #666;
-	text-align: left;
-	padding-left: 2px;
-	grid-column: span 2;
-}
-
-.timeline-hours-time {
-	width: 48px;
-	flex-shrink: 0;
-	font-size: 10px;
-	color: #666;
-	text-align: right;
-	padding-left: 4px;
-	white-space: nowrap;
-}
-
-.section-total {
-	display: flex;
-	justify-content: flex-end;
-	padding: 4px 8px;
-	font-size: 11px;
-	color: var(--text-sub);
-	border-top: 1px solid var(--gray-border);
-}
-
-.section-total span {
-	font-weight: bold;
-	color: var(--brown);
-}
-
-.timeline-row {
-	display: flex;
-	align-items: center;
-	min-width: 700px;
-	min-height: 32px;
-	border-bottom: 1px solid #e0e0e0;
-	gap: 0;
-	flex-wrap: nowrap;
-	margin-bottom: 0;
-}
-
-.timeline-name {
-	width: 72px;
-	flex-shrink: 0;
-	display: flex;
-	flex-direction: column;
-	gap: 2px;
-	padding-right: 4px;
-}
-
-.timeline-name span {
-	font-size: 12px;
-	font-weight: bold;
-	white-space: nowrap;
-}
-
-.row-actions {
-	display: flex;
-	gap: 2px;
-}
-
-.row-actions button {
-	font-size: 9px;
-	padding: 1px 4px;
-	cursor: pointer;
-	border: 1px solid #ccc;
-	background: #f5f5f5;
-	border-radius: 3px;
-}
-
-.row-actions button.danger {
-	color: #c00;
-	border-color: #c00;
-}
-
-.timeline-track {
-	flex: 1;
-	position: relative;
-	height: 22px;
-	background-color: #f9f9f9;
-	background-image: repeating-linear-gradient(
-		to right,
-		#e0e0e0 0,
-		#e0e0e0 0.5px,
-		transparent 0.5px,
-		transparent calc(100% / 48)
-	),
-	repeating-linear-gradient(
-		to right,
-		#ccc 0,
-		#ccc 0.5px,
-		transparent 0.5px,
-		transparent calc(100% / 24)
-	);
-	border: 1px solid #ddd;
-	overflow: hidden;
-}
-
-.timeline-bar {
-	position: absolute;
-	top: 1px;
-	height: calc(100% - 2px);
-	background-color: #c0392b;
-	border-radius: 2px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	cursor: grab;
-	overflow: visible;
-	z-index: 1;
-}
-
-.timeline-bar.selected {
-	background-color: #922b21;
-	box-shadow: 0 0 0 2px #e74c3c;
-}
-
-.kitchen .timeline-bar {
-	background-color: #1a7a6e;
-}
-
-.kitchen .timeline-bar.selected {
-	background-color: #0e5048;
-	box-shadow: 0 0 0 2px #1abc9c;
-}
-
-.bar-label {
-	font-size: 9px;
-	color: #fff;
-	white-space: nowrap;
-	pointer-events: none;
-	user-select: none;
-}
-
-.resize-handle {
-	position: absolute;
-	top: 0;
-	width: 8px;
-	height: 100%;
-	cursor: ew-resize;
-	z-index: 2;
-}
-
-.resize-handle.left {
-	left: -3px;
-}
-
-.resize-handle.right {
-	right: -3px;
-}
-
-.bar-delete {
-	position: absolute;
-	top: -8px;
-	right: -4px;
-	width: 14px;
-	height: 14px;
-	font-size: 9px;
-	padding: 0;
-	line-height: 14px;
-	text-align: center;
-	border-radius: 50%;
-	background: #fff;
-	border: 1px solid #999;
-	color: #333;
-	cursor: pointer;
-	z-index: 3;
-	display: none;
-}
-
-.timeline-bar:hover .bar-delete {
-	display: block;
-}
-
-.mobile-panel {
-	min-width: 700px;
-	padding: 10px 12px;
-	background: #f0f0f0;
-	border-top: 1px solid #ccc;
-	border-bottom: 1px solid #ccc;
-}
-
-.mobile-panel p {
-	font-size: 12px;
-	font-weight: bold;
-	margin: 0 0 8px 0;
-}
-
-.mobile-panel-time {
-	display: flex;
-	align-items: center;
-	gap: 8px;
-	margin-bottom: 8px;
-}
-
-.mobile-panel-time select {
-	flex: 1;
-	font-size: 13px;
-	padding: 4px;
-}
-
-.mobile-panel-actions {
-	display: flex;
-	gap: 8px;
-}
-
-.mobile-panel-actions button {
-	flex: 1;
-	font-size: 13px;
-	padding: 6px;
-	cursor: pointer;
-}
-
-.mobile-panel-actions button.danger {
-	color: #c00;
-	border-color: #c00;
-}
-
 /* ==================== ユーザー管理画面 ==================== */
 
 .user-mgmt-header {
@@ -1148,46 +820,384 @@ body {
 	}
 }
 
-/* 確定シフト作成画面 - 名前欄（改善版） */
+/* ====================================================================
+   確定シフト作成画面（AdminConfirmedShiftCreate.jsx）
+   ==================================================================== */
 
-/* ---- 行全体（コンパクト化） ---- */
-.timeline-row {
+.confirmed-create-toolbar {
 	display: flex;
 	align-items: center;
-	min-width: 900px;
-	min-height: 30px;
-	border-bottom: 1px solid #e0e0e0;
-	gap: 0;
-	flex-wrap: nowrap;
-	margin-bottom: 0;
+	justify-content: space-between;
+	margin-bottom: 16px;
+	gap: 12px;
+	position: sticky;
+	top: 0;
+	background: #f0ebe3;
+	padding: 8px 0;
+	z-index: 10;
 }
 
-/* ---- ヘッダー側の位置合わせ用スペーサー ---- */
-.timeline-icon-spacer {
-	width: 26px;
+.confirmed-create-actions {
+	display: flex;
+	gap: 8px;
+}
+
+.confirmed-create-actions .submit-button {
+	margin-top: 0;
+	padding: 10px 20px;
+	font-size: 14px;
+}
+
+.confirmed-create-actions .pdf-export-button {
+	margin-top: 0;
+	padding: 10px 20px;
+	font-size: 14px;
+}
+
+.reset-all-button {
+	display: block;
+	margin-bottom: 16px;
+	padding: 6px 14px;
+	font-size: 13px;
+	cursor: pointer;
+}
+
+.week-tabs {
+	display: flex;
+	gap: 8px;
+	margin-bottom: 16px;
+}
+
+.week-tab {
+	flex: 1;
+	padding: 10px;
+	font-size: 14px;
+	font-weight: bold;
+	border: 2px solid var(--gray-border);
+	border-radius: 8px;
+	background: var(--white);
+	color: var(--text-sub);
+	cursor: pointer;
+}
+
+.week-tab.active {
+	border-color: var(--brown);
+	color: var(--brown);
+	background: #fdf6ee;
+}
+
+/* ---- 日ごとのセクション ---- */
+
+.day-section {
+	margin-bottom: 20px;
+	border-radius: 10px;
+	overflow: hidden;
+	border: 1px solid var(--gray-border);
+	background: var(--white);
+}
+
+.day-section-title {
+	padding: 8px 12px;
+	font-size: 14px;
+	font-weight: bold;
+	color: var(--brown);
+	background: var(--gray-light);
+	border-bottom: 1px solid var(--gray-border);
+}
+
+.day-section-title.sun {
+	color: var(--red);
+}
+
+.day-section-title.sat {
+	color: #2980b9;
+}
+
+/* ---- ホール／キッチンのセクション ---- */
+
+.shift-section {
+	margin-bottom: 32px;
+	overflow-x: auto;
+}
+
+.shift-section h3 {
+	font-size: 14px;
+	font-weight: bold;
+	margin: 0 0 8px 0;
+	padding: 4px 8px;
+	background: #eee;
+	border-left: 4px solid #555;
+}
+
+/* ---- ヘッダー行（時間の目盛り） ---- */
+
+.timeline-header {
+	display: flex;
+	align-items: center;
+	min-width: 960px;
+	gap: 6px;
+	padding-bottom: 4px;
+	margin-bottom: 4px;
+	border-bottom: 2px solid var(--brown);
+}
+
+.timeline-role-spacer {
+	width: 70px;
 	flex-shrink: 0;
+	font-size: 11px;
+	font-weight: bold;
+	color: var(--brown);
+	text-align: center;
 }
 
 .timeline-name-spacer {
 	width: 110px;
 	flex-shrink: 0;
+	font-size: 11px;
+	font-weight: bold;
+	color: var(--brown);
+	text-align: center;
 }
 
-/* ---- 左端のアイコンボタン（戻す・削除） ---- */
-.row-icon-actions {
-	width: 26px;
+.timeline-hours {
+	flex: 1;
+	display: grid;
+	grid-template-columns: repeat(48, 1fr);
+	border-bottom: 1px solid #ccc;
+}
+
+.timeline-hours span {
+	font-size: 11px;
+	color: #666;
+	text-align: left;
+	padding-left: 3px;
+	grid-column: span 2;
+}
+
+.timeline-icon-spacer {
+	width: 30px;
+	flex-shrink: 0;
+}
+
+/* ---- 1行（スタッフ1人分） ---- */
+
+.timeline-row {
+	display: flex;
+	align-items: stretch;
+	min-width: 960px;
+	min-height: 42px;
+	border-bottom: 1px solid #ccc;
+	gap: 6px;
+	flex-wrap: nowrap;
+	margin-bottom: 4px;
+	padding: 2px 0;
+}
+
+.empty-row {
+	border-bottom: 1px solid #eee;
+	background: transparent;
+}
+
+/* ---- 役割入力欄（名前の左隣：指導・仕込み・研修など） ---- */
+
+.timeline-role {
+	width: 70px;
+	flex-shrink: 0;
+	display: flex;
+	align-items: center;
+}
+
+.role-input {
+	width: 100%;
+	height: 100%;
+	min-height: 34px;
+	font-size: 11px;
+	text-align: center;
+	border: 1px solid var(--gray-border);
+	border-radius: 6px;
+	background: #fffdf7;
+	color: var(--text-main);
+	padding: 2px 4px;
+}
+
+.role-input:focus {
+	outline: none;
+	border-color: var(--brown-light);
+	background: #fff;
+}
+
+.role-input::placeholder {
+	color: #bbb;
+}
+
+/* ---- 名前欄 ---- */
+
+.timeline-name {
+	width: 110px;
 	flex-shrink: 0;
 	display: flex;
 	flex-direction: column;
-	gap: 2px;
+	justify-content: center;
+	gap: 1px;
+	padding: 4px 8px;
+	border: 1px solid var(--gray-border);
+	border-radius: 6px;
+	background: #fafafa;
+}
+
+.timeline-name span {
+	font-size: 13px;
+	font-weight: bold;
+	white-space: normal;
+	word-break: break-word;
+	line-height: 1.3;
+	color: var(--brown);
+}
+
+.timeline-name .staff-position {
+	font-size: 10px;
+	color: var(--text-sub);
+	font-weight: normal;
+}
+
+/* ---- タイムライン（時間バーが乗るグリッド） ---- */
+
+.timeline-track {
+	flex: 1;
+	position: relative;
+	height: 32px;
+	background-color: #fafafa;
+	background-image: repeating-linear-gradient(
+		to right,
+		#e5e5e5 0,
+		#e5e5e5 1px,
+		transparent 1px,
+		transparent calc(100% / 48)
+	),
+	repeating-linear-gradient(
+		to right,
+		#bbb 0,
+		#bbb 1px,
+		transparent 1px,
+		transparent calc(100% / 24)
+	);
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	overflow: hidden;
+}
+
+.empty-row .timeline-track {
+	background-color: #fcfcfc;
+}
+
+.timeline-bar {
+	position: absolute;
+	top: 2px;
+	height: calc(100% - 4px);
+	background-color: #c0392b;
+	border-radius: 3px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: grab;
+	overflow: visible;
+	z-index: 1;
+}
+
+.timeline-bar.selected {
+	background-color: #922b21;
+	box-shadow: 0 0 0 2px #e74c3c;
+}
+
+.kitchen .timeline-bar {
+	background-color: #1a7a6e;
+}
+
+.kitchen .timeline-bar.selected {
+	background-color: #0e5048;
+	box-shadow: 0 0 0 2px #1abc9c;
+}
+
+.bar-label {
+	font-size: 9px;
+	color: #fff;
+	white-space: nowrap;
+	pointer-events: none;
+	user-select: none;
+}
+
+.resize-handle {
+	position: absolute;
+	top: 0;
+	width: 8px;
+	height: 100%;
+	cursor: ew-resize;
+	z-index: 2;
+}
+
+.resize-handle.left {
+	left: -3px;
+}
+
+.resize-handle.right {
+	right: -3px;
+}
+
+.bar-delete {
+	position: absolute;
+	top: -8px;
+	right: -4px;
+	width: 14px;
+	height: 14px;
+	font-size: 9px;
+	padding: 0;
+	line-height: 14px;
+	text-align: center;
+	border-radius: 50%;
+	background: #fff;
+	border: 1px solid #999;
+	color: #333;
+	cursor: pointer;
+	z-index: 3;
+	display: none;
+}
+
+.timeline-bar:hover .bar-delete {
+	display: block;
+}
+
+/* ---- 計画時間欄 ---- */
+
+.timeline-hours-time {
+	width: 56px;
+	flex-shrink: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 12px;
+	font-weight: bold;
+	color: var(--brown);
+	border: 1px solid var(--gray-border);
+	border-radius: 6px;
+	background: #fafafa;
+}
+
+/* ---- 右端：戻す・削除アイコン ---- */
+
+.row-icon-actions {
+	width: 30px;
+	flex-shrink: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 3px;
 	align-items: center;
 	justify-content: center;
 }
 
 .row-icon-actions button {
-	width: 20px;
-	height: 20px;
-	font-size: 11px;
+	width: 22px;
+	height: 22px;
+	font-size: 12px;
 	line-height: 1;
 	padding: 0;
 	border: 1px solid #ccc;
@@ -1206,33 +1216,111 @@ body {
 	border-color: #e0a0a0;
 }
 
-/* ---- 名前欄（コンパクト・フル表示） ---- */
-.timeline-name {
-	width: 110px;
-	flex-shrink: 0;
+/* ---- 合計欄 ---- */
+
+.section-total {
 	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	gap: 1px;
-	padding: 2px 6px 2px 2px;
+	justify-content: flex-end;
+	padding: 4px 8px;
+	font-size: 11px;
+	color: var(--text-sub);
+	border-top: 1px solid var(--gray-border);
 }
 
-.timeline-name span {
-	font-size: 12px;
+.section-total span {
 	font-weight: bold;
-	white-space: normal;
-	word-break: break-word;
-	line-height: 1.25;
 	color: var(--brown);
 }
 
-.timeline-name .staff-position {
-	font-size: 10px;
-	color: var(--text-sub);
-	font-weight: normal;
+/* ---- 日付ごとの伝達事項テキストボックス ---- */
+
+.day-memo-area {
+	display: flex;
+	align-items: flex-start;
+	gap: 10px;
+	margin: 12px 0 4px;
+	padding: 10px 12px;
+	background: #fff8e8;
+	border: 1px solid #f0d080;
+	border-radius: 8px;
+}
+
+.day-memo-label {
+	flex-shrink: 0;
+	font-size: 12px;
+	font-weight: bold;
+	color: var(--brown);
+	padding-top: 6px;
+	white-space: nowrap;
+}
+
+.day-memo-textarea {
+	flex: 1;
+	min-height: 44px;
+	font-size: 13px;
+	padding: 6px 8px;
+	border: 1px solid var(--gray-border);
+	border-radius: 6px;
+	background: #fff;
+	color: var(--text-main);
+	font-family: inherit;
+	resize: vertical;
+	line-height: 1.5;
+}
+
+.day-memo-textarea:focus {
+	outline: none;
+	border-color: var(--brown-light);
+}
+
+/* ---- モバイル用：バー選択時の下部パネル ---- */
+
+.mobile-panel {
+	min-width: 960px;
+	padding: 10px 12px;
+	background: #f0f0f0;
+	border-top: 1px solid #ccc;
+	border-bottom: 1px solid #ccc;
+}
+
+.mobile-panel p {
+	font-size: 12px;
+	font-weight: bold;
+	margin: 0 0 8px 0;
+}
+
+.mobile-panel-time {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin-bottom: 8px;
+}
+
+.mobile-panel-time select {
+	flex: 1;
+	font-size: 13px;
+	padding: 4px;
+}
+
+.mobile-panel-actions {
+	display: flex;
+	gap: 8px;
+}
+
+.mobile-panel-actions button {
+	flex: 1;
+	font-size: 13px;
+	padding: 6px;
+	cursor: pointer;
+}
+
+.mobile-panel-actions button.danger {
+	color: #c00;
+	border-color: #c00;
 }
 
 /* ---- PC用：画面中央のポップアップ編集モーダル ---- */
+
 .edit-modal-overlay {
 	position: fixed;
 	inset: 0;
@@ -1261,10 +1349,6 @@ body {
 	color: #fff;
 	font-size: 15px;
 	font-weight: bold;
-}
-
-.timeline-hours-time {
-	padding-left: 8px;
 }
 
 .edit-modal-position {
@@ -1358,38 +1442,9 @@ body {
 }
 
 /* ---- PDF出力時：操作用ボタンを一時的に非表示 ---- */
+
 .pdf-mode .row-icon-actions,
 .pdf-mode .bar-delete,
 .pdf-mode .resize-handle {
 	display: none !important;
-}
-
-/* ---- 固定行数の空白行（人数が少ない日の余白埋め） ---- */
-.empty-row {
-	background: transparent;
-}
-
-.empty-row .timeline-track {
-	background-color: #fbfbfb;
-	background-image: repeating-linear-gradient(
-		to right,
-		#eee 0,
-		#eee 0.5px,
-		transparent 0.5px,
-		transparent calc(100% / 48)
-	),
-	repeating-linear-gradient(
-		to right,
-		#ddd 0,
-		#ddd 0.5px,
-		transparent 0.5px,
-		transparent calc(100% / 24)
-	);
-	border: 1px solid #eee;
-	height: 22px;
-}
-
-/* 「計画」の文字・時間数値の左に少し余白を追加 */
-.timeline-hours-time {
-	padding-left: 8px;
 }
