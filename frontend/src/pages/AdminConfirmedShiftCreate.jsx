@@ -494,6 +494,7 @@ function ShiftSection({
 			<h3>{title}</h3>
 
 			<div className="timeline-header">
+				<div className="timeline-icon-spacer" />
 				<div className="timeline-name-spacer" />
 				<div className="timeline-hours">
 					{Array.from(
@@ -639,118 +640,125 @@ function StaffRow({
 
 	return (
 		<div className="timeline-row">
-			{!isMobile && selected && 
-			selected.date === date && 
-			selected.position === position && 
-			selected.userId === staff.userId && (
-				<EditPanelPC
-					staff={staff}
-					selected={selected}
-					setSelected={setSelected}
-					updateBlocks={updateBlocks}
-					splitBlock={splitBlock}
-					deleteBlock={deleteBlock}
-					date={date}
-					position={position}
-				/>
-			)}			
+			<div className="row-icon-actions">
+				<button
+					type="button"
+					title="戻す"
+					onClick={() => resetOne(date, position, staff.userId)}
+				>
+					↺
+				</button>
+				<button
+					type="button"
+					className="danger"
+					title="削除"
+					onClick={() => removeRow(date, position, staff.userId)}
+				>
+					✕
+				</button>
+			</div>
 			<div className="timeline-name">
 				<span>{staff.name}</span>
 				<span className="staff-position">
 					{position === "HALL" ? "ホール" : "キッチン"}
 				</span>
-				<div className="row-actions">
-					<button
-						type="button"
-						onClick={() => resetOne(date, position, staff.userId)}
-					>
-						戻す
-					</button>
-					<button
-						type="button"
-						className="danger"
-						onClick={() => removeRow(date, position, staff.userId)}
-					>
-						削除
-					</button>
-				</div>
 			</div>
 
 			<div className="timeline-track">
-				{staff.blocks.map((b, blockIndex) => (
-					<div
-						key={blockIndex}
-						className={`timeline-bar ${isBarSelected(blockIndex) ? "selected" : ""}`}
-						style={{
-							left: `${hourToPct(b.start)}%`,
-							width: `${hourToPct(b.end) - hourToPct(b.start)}%`,
-						}}
-						onClick={() => handleBarClick(blockIndex)}
-						onDoubleClick={() => handleDoubleClick(blockIndex)}
-						onMouseDown={(e) =>
-							handleDragStart(
-								"move",
-								blockIndex,
-								e,
-								e.currentTarget.parentElement,
-							)
-						}
-						onTouchStart={(e) =>
-							handleDragStart(
-								"move",
-								blockIndex,
-								e,
-								e.currentTarget.parentElement,
-							)
-						}
-					>
-						<span className="bar-label">
-							{hourToLabel(b.start)}〜{hourToLabel(b.end)}
-						</span>
+				{staff.blocks.map((b, blockIndex) => {
+					const selectedHere = !isMobile && isBarSelected(blockIndex);
 
-						{!isMobile && (
-							<>
-								<div
-									className="resize-handle left"
-									onMouseDown={(e) =>
-										handleDragStart(
-											"left",
-											blockIndex,
-											e,
-											e.currentTarget.parentElement.parentElement,
-										)
-									}
-								/>
-								<div
-									className="resize-handle right"
-									onMouseDown={(e) =>
-										handleDragStart(
-											"right",
-											blockIndex,
-											e,
-											e.currentTarget.parentElement.parentElement,
-										)
-									}
-								/>
-								<button
-									type="button"
-									className="bar-delete"
-									onClick={(e) => {
-										e.stopPropagation();
-										deleteBlock(
-											date,
-											position,
-											staff.userId,
-											blockIndex,
-										);
-									}}
-								>
-									×
-								</button>
-							</>
-						)}
-					</div>
-				))}
+					if (selectedHere) {
+						return (
+							<InlineEditBar
+								key={blockIndex}
+								date={date}
+								position={position}
+								staff={staff}
+								blockIndex={blockIndex}
+								updateBlocks={updateBlocks}
+								splitBlock={splitBlock}
+								deleteBlock={deleteBlock}
+								setSelected={setSelected}
+							/>
+						);
+					}
+
+					return (
+						<div
+							key={blockIndex}
+							className={`timeline-bar ${isBarSelected(blockIndex) ? "selected" : ""}`}
+							style={{
+								left: `${hourToPct(b.start)}%`,
+								width: `${hourToPct(b.end) - hourToPct(b.start)}%`,
+							}}
+							onClick={() => handleBarClick(blockIndex)}
+							onDoubleClick={() => handleDoubleClick(blockIndex)}
+							onMouseDown={(e) =>
+								handleDragStart(
+									"move",
+									blockIndex,
+									e,
+									e.currentTarget.parentElement,
+								)
+							}
+							onTouchStart={(e) =>
+								handleDragStart(
+									"move",
+									blockIndex,
+									e,
+									e.currentTarget.parentElement,
+								)
+							}
+						>
+							<span className="bar-label">
+								{hourToLabel(b.start)}〜{hourToLabel(b.end)}
+							</span>
+
+							{!isMobile && (
+								<>
+									<div
+										className="resize-handle left"
+										onMouseDown={(e) =>
+											handleDragStart(
+												"left",
+												blockIndex,
+												e,
+												e.currentTarget.parentElement.parentElement,
+											)
+										}
+									/>
+									<div
+										className="resize-handle right"
+										onMouseDown={(e) =>
+											handleDragStart(
+												"right",
+												blockIndex,
+												e,
+												e.currentTarget.parentElement.parentElement,
+											)
+										}
+									/>
+									<button
+										type="button"
+										className="bar-delete"
+										onClick={(e) => {
+											e.stopPropagation();
+											deleteBlock(
+												date,
+												position,
+												staff.userId,
+												blockIndex,
+											);
+										}}
+									>
+										×
+									</button>
+								</>
+							)}
+						</div>
+					);
+				})}
 			</div>
 
 			<div className="timeline-hours-time">
@@ -872,17 +880,16 @@ function MobilePanel({
 	);
 }
 
-function EditPanelPC({
+function InlineEditBar({
+	date,
+	position,
 	staff,
-	selected,
-	setSelected,
+	blockIndex,
 	updateBlocks,
 	splitBlock,
 	deleteBlock,
-	date,
-	position,
+	setSelected,
 }) {
-	const blockIndex = selected.blockIndex;
 	const block = staff.blocks[blockIndex];
 
 	const hourOptions = [];
@@ -915,70 +922,49 @@ function EditPanelPC({
 	};
 
 	return (
-		<div className="edit-panel">
-			<div className="edit-panel-header">
-				🎯 {staff.name} のシフト編集
-			</div>
-
-			<div className="edit-panel-body">
-				<div className="edit-panel-time">
-					<span className="edit-panel-label">開始時刻：</span>
-					<select
-						value={block.start}
-						onChange={(e) => handleStartChange(e.target.value)}
-						className="edit-panel-select"
-					>
-						{hourOptions.map((h) => (
-							<option key={h} value={h}>
-								{hourToLabel(h)}
-							</option>
-						))}
-					</select>
-
-					<span className="edit-panel-label" style={{ marginLeft: "12px" }}>
-						終了時刻：
-					</span>
-					<select
-						value={block.end}
-						onChange={(e) => handleEndChange(e.target.value)}
-						className="edit-panel-select"
-					>
-						{hourOptions.map((h) => (
-							<option key={h} value={h}>
-								{hourToLabel(h)}
-							</option>
-						))}
-					</select>
-				</div>
-
-				<div className="edit-panel-actions">
-					<button
-						type="button"
-						className="edit-panel-btn edit-panel-btn-split"
-						onClick={() =>
-							splitBlock(date, position, staff.userId, blockIndex)
-						}
-					>
-						分割
-					</button>
-					<button
-						type="button"
-						className="edit-panel-btn edit-panel-btn-delete"
-						onClick={() =>
-							deleteBlock(date, position, staff.userId, blockIndex)
-						}
-					>
-						削除
-					</button>
-					<button
-						type="button"
-						className="edit-panel-btn edit-panel-btn-close"
-						onClick={() => setSelected(null)}
-					>
-						閉じる
-					</button>
-				</div>
-			</div>
+		<div className="inline-edit-bar" onClick={(e) => e.stopPropagation()}>
+			<select
+				value={block.start}
+				onChange={(e) => handleStartChange(e.target.value)}
+			>
+				{hourOptions.map((h) => (
+					<option key={h} value={h}>
+						{hourToLabel(h)}
+					</option>
+				))}
+			</select>
+			<span>〜</span>
+			<select
+				value={block.end}
+				onChange={(e) => handleEndChange(e.target.value)}
+			>
+				{hourOptions.map((h) => (
+					<option key={h} value={h}>
+						{hourToLabel(h)}
+					</option>
+				))}
+			</select>
+			<button
+				type="button"
+				className="btn-split"
+				onClick={() => splitBlock(date, position, staff.userId, blockIndex)}
+			>
+				分割
+			</button>
+			<button
+				type="button"
+				className="btn-delete"
+				onClick={() => deleteBlock(date, position, staff.userId, blockIndex)}
+			>
+				削除
+			</button>
+			<button
+				type="button"
+				className="btn-close"
+				onClick={() => setSelected(null)}
+			>
+				×
+			</button>
 		</div>
 	);
 }
