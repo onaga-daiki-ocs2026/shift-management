@@ -284,7 +284,7 @@ function AdminConfirmedShiftCreate() {
 	};
 
 	const displayDates = dates.filter((_, i) =>
-    	currentWeek === 0 ? i < 7 : i >= 7
+		currentWeek === 0 ? i < 7 : i >= 7
 	);
 
 	const selectedStaff = selected
@@ -362,46 +362,36 @@ function AdminConfirmedShiftCreate() {
 								{label}
 							</div>
 
-							{hallList.length === 0 && kitchenList.length === 0 ? (
-								<p className="day-no-staff">希望シフトの提出者なし</p>
-							) : (
-								<>
-									{hallList.length > 0 && (
-										<ShiftSection
-											title="ホール"
-											position="HALL"
-											date={date}
-											staffList={hallList}
-											isMobile={isMobile}
-											selected={selected}
-											setSelected={setSelected}
-											updateBlocks={updateBlocks}
-											resetOne={resetOne}
-											removeRow={removeRow}
-											splitBlock={splitBlock}
-											deleteBlock={deleteBlock}
-											hourToLabel={hourToLabel}
-										/>
-									)}
-									{kitchenList.length > 0 && (
-										<ShiftSection
-											title="キッチン"
-											position="KITCHEN"
-											date={date}
-											staffList={kitchenList}
-											isMobile={isMobile}
-											selected={selected}
-											setSelected={setSelected}
-											updateBlocks={updateBlocks}
-											resetOne={resetOne}
-											removeRow={removeRow}
-											splitBlock={splitBlock}
-											deleteBlock={deleteBlock}
-											hourToLabel={hourToLabel}
-										/>
-									)}
-								</>
-							)}
+							<ShiftSection
+								title="ホール"
+								position="HALL"
+								date={date}
+								staffList={hallList}
+								isMobile={isMobile}
+								selected={selected}
+								setSelected={setSelected}
+								updateBlocks={updateBlocks}
+								resetOne={resetOne}
+								removeRow={removeRow}
+								splitBlock={splitBlock}
+								deleteBlock={deleteBlock}
+								hourToLabel={hourToLabel}
+							/>
+							<ShiftSection
+								title="キッチン"
+								position="KITCHEN"
+								date={date}
+								staffList={kitchenList}
+								isMobile={isMobile}
+								selected={selected}
+								setSelected={setSelected}
+								updateBlocks={updateBlocks}
+								resetOne={resetOne}
+								removeRow={removeRow}
+								splitBlock={splitBlock}
+								deleteBlock={deleteBlock}
+								hourToLabel={hourToLabel}
+							/>
 						</div>
 					);
 				})}
@@ -486,6 +476,8 @@ function AdminConfirmedShiftCreate() {
 	);
 }
 
+const FIXED_ROWS_PER_SECTION = 15;
+
 function ShiftSection({
 	title,
 	position,
@@ -501,8 +493,6 @@ function ShiftSection({
 	deleteBlock,
 	hourToLabel,
 }) {
-	if (staffList.length === 0) return null;
-
 	const totalHours = staffList.reduce((sum, staff) => {
 		const staffTotal = staff.blocks.reduce(
 			(s, b) => s + (b.end - b.start),
@@ -510,6 +500,11 @@ function ShiftSection({
 		);
 		return sum + staffTotal;
 	}, 0);
+
+	const emptyRowCount = Math.max(
+		0,
+		FIXED_ROWS_PER_SECTION - staffList.length,
+	);
 
 	return (
 		<div
@@ -549,9 +544,24 @@ function ShiftSection({
 				/>
 			))}
 
+			{Array.from({ length: emptyRowCount }, (_, i) => (
+				<EmptyRow key={`empty-${i}`} />
+			))}
+
 			<div className="section-total">
 				合計：<span>{totalHours.toFixed(1)}h</span>
 			</div>
+		</div>
+	);
+}
+
+function EmptyRow() {
+	return (
+		<div className="timeline-row empty-row">
+			<div className="row-icon-actions" />
+			<div className="timeline-name" />
+			<div className="timeline-track" />
+			<div className="timeline-hours-time" />
 		</div>
 	);
 }

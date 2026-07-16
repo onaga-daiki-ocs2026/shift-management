@@ -1263,6 +1263,10 @@ body {
 	font-weight: bold;
 }
 
+.timeline-hours-time {
+	padding-left: 8px;
+}
+
 .edit-modal-position {
 	font-size: 12px;
 	font-weight: normal;
@@ -1358,4 +1362,34 @@ body {
 .pdf-mode .bar-delete,
 .pdf-mode .resize-handle {
 	display: none !important;
+}
+
+/* ---- 固定行数の空白行（人数が少ない日の余白埋め） ---- */
+.empty-row {
+	background: transparent;
+}
+
+.empty-row .timeline-track {
+	background-color: #fbfbfb;
+	background-image: repeating-linear-gradient(
+		to right,
+		#eee 0,
+		#eee 0.5px,
+		transparent 0.5px,
+		transparent calc(100% / 48)
+	),
+	repeating-linear-gradient(
+		to right,
+		#ddd 0,
+		#ddd 0.5px,
+		transparent 0.5px,
+		transparent calc(100% / 24)
+	);
+	border: 1px solid #eee;
+	height: 22px;
+}
+
+/* 「計画」の文字・時間数値の左に少し余白を追加 */
+.timeline-hours-time {
+	padding-left: 8px;
 }
