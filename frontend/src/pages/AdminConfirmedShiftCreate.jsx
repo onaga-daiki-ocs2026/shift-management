@@ -556,9 +556,7 @@ function StaffRow({
 	};
 
 	const handleBarClick = (blockIndex) => {
-		if (isMobile) {
-			setSelected({ date, position, userId: staff.userId, blockIndex });
-		}
+		setSelected({ date, position, userId: staff.userId, blockIndex });
 	};
 
 	const handleDoubleClick = (blockIndex) => {
@@ -641,6 +639,21 @@ function StaffRow({
 
 	return (
 		<div className="timeline-row">
+			{!isMobile && selected && 
+			selected.date === date && 
+			selected.position === position && 
+			selected.userId === staff.userId && (
+				<EditPanelPC
+					staff={staff}
+					selected={selected}
+					setSelected={setSelected}
+					updateBlocks={updateBlocks}
+					splitBlock={splitBlock}
+					deleteBlock={deleteBlock}
+					date={date}
+					position={position}
+				/>
+			)}			
 			<div className="timeline-name">
 				<span>{staff.name}</span>
 				<span className="staff-position">
@@ -857,6 +870,117 @@ function MobilePanel({
 			</div>
 		</div>
 	);
+
+	function EditPanelPC({
+		staff,
+		selected,
+		setSelected,
+		updateBlocks,
+		splitBlock,
+		deleteBlock,
+		date,
+		position,
+	}) {
+		const blockIndex = selected.blockIndex;
+		const block = staff.blocks[blockIndex];
+
+		const hourOptions = [];
+		for (let h = RANGE_START; h <= RANGE_END; h += 0.5) {
+			hourOptions.push(h);
+		}
+
+		const hourToLabel = (hour) => {
+			const h = Math.floor(hour);
+			const m = Math.round((hour - h) * 60);
+			return m === 0 ? `${h}:00` : `${h}:${m}`;
+		};
+
+		const handleStartChange = (value) => {
+			const newBlocks = [...staff.blocks];
+			newBlocks[blockIndex] = {
+				...newBlocks[blockIndex],
+				start: parseFloat(value),
+			};
+			updateBlocks(date, position, staff.userId, newBlocks);
+		};
+
+		const handleEndChange = (value) => {
+			const newBlocks = [...staff.blocks];
+			newBlocks[blockIndex] = {
+				...newBlocks[blockIndex],
+				end: parseFloat(value),
+			};
+			updateBlocks(date, position, staff.userId, newBlocks);
+		};
+
+		return (
+			<div className="edit-panel">
+				<div className="edit-panel-header">
+					🎯 {staff.name} のシフト編集
+				</div>
+
+				<div className="edit-panel-body">
+					<div className="edit-panel-time">
+						<span className="edit-panel-label">開始時刻：</span>
+						<select
+							value={block.start}
+							onChange={(e) => handleStartChange(e.target.value)}
+							className="edit-panel-select"
+						>
+							{hourOptions.map((h) => (
+								<option key={h} value={h}>
+									{hourToLabel(h)}
+								</option>
+							))}
+						</select>
+
+						<span className="edit-panel-label" style={{ marginLeft: "12px" }}>
+							終了時刻：
+						</span>
+						<select
+							value={block.end}
+							onChange={(e) => handleEndChange(e.target.value)}
+							className="edit-panel-select"
+						>
+							{hourOptions.map((h) => (
+								<option key={h} value={h}>
+									{hourToLabel(h)}
+								</option>
+							))}
+						</select>
+					</div>
+
+					<div className="edit-panel-actions">
+						<button
+							type="button"
+							className="edit-panel-btn edit-panel-btn-split"
+							onClick={() =>
+								splitBlock(date, position, staff.userId, blockIndex)
+							}
+						>
+							分割
+						</button>
+						<button
+							type="button"
+							className="edit-panel-btn edit-panel-btn-delete"
+							onClick={() =>
+								deleteBlock(date, position, staff.userId, blockIndex)
+							}
+						>
+							削除
+						</button>
+						<button
+							type="button"
+							className="edit-panel-btn edit-panel-btn-close"
+							onClick={() => setSelected(null)}
+						>
+							閉じる
+						</button>
+					</div>
+				</div>
+			</div>
+		);
+	}
 }
 
 export default AdminConfirmedShiftCreate;

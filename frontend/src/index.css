@@ -1214,3 +1214,86 @@ body {
 	color: #c00;
 	border-color: #c00;
 }
+
+/* ==================== PC用クリック編集パネル ==================== */
+
+.edit-panel {
+	min-width: 700px;
+	padding: 12px;
+	background: #f0f8ff;
+	border: 2px solid var(--brown);
+	border-radius: 8px;
+	margin-bottom: 8px;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.edit-panel-header {
+	font-size: 13px;
+	font-weight: bold;
+	color: var(--brown);
+	margin-bottom: 8px;
+}
+
+.edit-panel-body {
+	display: flex;
+	gap: 8px;
+	align-items: center;
+	margin-bottom: 8px;
+}
+
+.edit-panel-time {
+	display: flex;
+	gap: 8px;
+	align-items: center;
+	flex: 1;
+}
+
+.edit-panel-label {
+	font-size: 12px;
+	color: var(--text-sub);
+	white-space: nowrap;
+}
+
+.edit-panel-select {
+	font-size: 12px;
+	padding: 6px 8px;
+	border: 1px solid var(--gray-border);
+	border-radius: 6px;
+	background: var(--white);
+	color: var(--text-main);
+	cursor: pointer;
+}
+
+.edit-panel-actions {
+	display: flex;
+	gap: 6px;
+}
+
+.edit-panel-btn {
+	padding: 6px 12px;
+	font-size: 12px;
+	font-weight: bold;
+	border: none;
+	border-radius: 6px;
+	cursor: pointer;
+	white-space: nowrap;
+}
+
+.edit-panel-btn-split {
+	background: #4a7c59;
+	color: white;
+}
+
+.edit-panel-btn-delete {
+	background: #ff6b6b;
+	color: white;
+}
+
+.edit-panel-btn-close {
+	background: #ccc;
+	color: #333;
+}
+
+.edit-panel-btn:hover {
+	opacity: 0.85;
+}
