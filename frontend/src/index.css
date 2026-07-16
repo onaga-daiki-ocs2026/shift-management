@@ -1150,6 +1150,7 @@ body {
 
 /* 確定シフト作成画面 - 名前欄（改善版） */
 
+/* ---- 行全体（コンパクト化） ---- */
 .timeline-row {
 	display: flex;
 	align-items: center;
@@ -1160,18 +1161,18 @@ body {
 	flex-wrap: nowrap;
 	margin-bottom: 0;
 }
- 
+
 /* ---- ヘッダー側の位置合わせ用スペーサー ---- */
 .timeline-icon-spacer {
 	width: 26px;
 	flex-shrink: 0;
 }
- 
+
 .timeline-name-spacer {
 	width: 110px;
 	flex-shrink: 0;
 }
- 
+
 /* ---- 左端のアイコンボタン（戻す・削除） ---- */
 .row-icon-actions {
 	width: 26px;
@@ -1182,7 +1183,7 @@ body {
 	align-items: center;
 	justify-content: center;
 }
- 
+
 .row-icon-actions button {
 	width: 20px;
 	height: 20px;
@@ -1195,16 +1196,16 @@ body {
 	cursor: pointer;
 	color: #555;
 }
- 
+
 .row-icon-actions button:hover {
 	background: #ececec;
 }
- 
+
 .row-icon-actions button.danger {
 	color: #c00;
 	border-color: #e0a0a0;
 }
- 
+
 /* ---- 名前欄（コンパクト・フル表示） ---- */
 .timeline-name {
 	width: 110px;
@@ -1215,7 +1216,7 @@ body {
 	gap: 1px;
 	padding: 2px 6px 2px 2px;
 }
- 
+
 .timeline-name span {
 	font-size: 12px;
 	font-weight: bold;
@@ -1224,71 +1225,137 @@ body {
 	line-height: 1.25;
 	color: var(--brown);
 }
- 
+
 .timeline-name .staff-position {
 	font-size: 10px;
 	color: var(--text-sub);
 	font-weight: normal;
 }
- 
-/* ---- PC用：バーの位置に直接置き換わる編集フォーム ---- */
-.inline-edit-bar {
-	position: absolute;
-	top: 0;
-	left: 0;
-	right: 0;
-	height: 100%;
+
+/* ---- PC用：画面中央のポップアップ編集モーダル ---- */
+.edit-modal-overlay {
+	position: fixed;
+	inset: 0;
+	background: rgba(0, 0, 0, 0.45);
 	display: flex;
 	align-items: center;
-	gap: 4px;
-	background: #fff8e0;
-	border: 2px solid var(--brown);
-	border-radius: 3px;
-	padding: 0 4px;
-	z-index: 5;
-	white-space: nowrap;
+	justify-content: center;
+	z-index: 1000;
 }
- 
-.inline-edit-bar select {
-	font-size: 10px;
-	padding: 0 2px;
-	height: 18px;
-	border: 1px solid #ccc;
-	border-radius: 3px;
+
+.edit-modal {
 	background: #fff;
+	border-radius: 12px;
+	width: 360px;
+	max-width: 90vw;
+	box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+	overflow: hidden;
 }
- 
-.inline-edit-bar span {
-	font-size: 10px;
-	color: #666;
+
+.edit-modal-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 14px 16px;
+	background: var(--brown);
+	color: #fff;
+	font-size: 15px;
+	font-weight: bold;
 }
- 
-.inline-edit-bar button {
-	font-size: 10px;
-	padding: 0 5px;
-	height: 18px;
-	line-height: 16px;
+
+.edit-modal-position {
+	font-size: 12px;
+	font-weight: normal;
+	opacity: 0.85;
+	margin-left: 2px;
+}
+
+.edit-modal-close-x {
+	background: none;
 	border: none;
-	border-radius: 3px;
+	color: #fff;
+	font-size: 20px;
+	line-height: 1;
+	cursor: pointer;
+	padding: 0 4px;
+}
+
+.edit-modal-body {
+	padding: 20px 16px;
+}
+
+.edit-modal-time {
+	display: flex;
+	align-items: flex-end;
+	gap: 10px;
+	justify-content: center;
+}
+
+.edit-modal-time-group {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.edit-modal-time-group label {
+	font-size: 12px;
+	color: var(--text-sub);
+	text-align: center;
+}
+
+.edit-modal-time-group select {
+	font-size: 16px;
+	padding: 8px 10px;
+	border: 1px solid var(--gray-border);
+	border-radius: 8px;
+	background: var(--white);
+	color: var(--text-main);
+}
+
+.edit-modal-tilde {
+	font-size: 16px;
+	color: var(--text-sub);
+	padding-bottom: 10px;
+}
+
+.edit-modal-actions {
+	display: flex;
+	gap: 8px;
+	padding: 0 16px 16px;
+}
+
+.edit-modal-btn {
+	flex: 1;
+	padding: 10px;
+	font-size: 13px;
+	font-weight: bold;
+	border: none;
+	border-radius: 8px;
 	cursor: pointer;
 }
- 
-.inline-edit-bar .btn-split {
+
+.edit-modal-btn-split {
 	background: #4a7c59;
 	color: #fff;
 }
- 
-.inline-edit-bar .btn-delete {
+
+.edit-modal-btn-delete {
 	background: #ff6b6b;
 	color: #fff;
 }
- 
-.inline-edit-bar .btn-close {
-	background: #ccc;
+
+.edit-modal-btn-close {
+	background: #eee;
 	color: #333;
-	font-weight: bold;
 }
- 
-.inline-edit-bar button:hover {
+
+.edit-modal-btn:hover {
 	opacity: 0.85;
+}
+
+/* ---- PDF出力時：操作用ボタンを一時的に非表示 ---- */
+.pdf-mode .row-icon-actions,
+.pdf-mode .bar-delete,
+.pdf-mode .resize-handle {
+	display: none !important;
 }

@@ -249,8 +249,10 @@ function AdminConfirmedShiftCreate() {
 
 	const handleExportPdf = async () => {
 		setExporting(true);
+		setSelected(null);
+		const element = document.getElementById("pdf-export-area");
+		element.classList.add("pdf-mode");
 		try {
-			const element = document.getElementById("pdf-export-area");
 			const canvas = await html2canvas(element, {
 				scale: 1,
 				useCORS: true,
@@ -276,13 +278,20 @@ function AdminConfirmedShiftCreate() {
 			console.error("PDF出力に失敗しました", error);
 			alert("PDF出力に失敗しました");
 		} finally {
+			element.classList.remove("pdf-mode");
 			setExporting(false);
 		}
 	};
 
 	const displayDates = dates.filter((_, i) =>
-		currentWeek === 0 ? i < 7 : i >= 7
+    	currentWeek === 0 ? i < 7 : i >= 7
 	);
+
+	const selectedStaff = selected
+		? getStaffList(selected.date, selected.position).find(
+				(s) => s.userId === selected.userId,
+			)
+		: null;
 
 	if (loading) {
 		return (
@@ -293,6 +302,7 @@ function AdminConfirmedShiftCreate() {
 	}
 
 	return (
+		<>
 		<Layout>
 			<div className="confirmed-create-toolbar">
 				<button
@@ -459,6 +469,20 @@ function AdminConfirmedShiftCreate() {
 				})}
 			</div>
 		</Layout>
+
+		{!isMobile && selected && selectedStaff && (
+			<EditModal
+				date={selected.date}
+				position={selected.position}
+				staff={selectedStaff}
+				blockIndex={selected.blockIndex}
+				updateBlocks={updateBlocks}
+				splitBlock={splitBlock}
+				deleteBlock={deleteBlock}
+				setSelected={setSelected}
+			/>
+		)}
+		</>
 	);
 }
 
@@ -666,24 +690,6 @@ function StaffRow({
 
 			<div className="timeline-track">
 				{staff.blocks.map((b, blockIndex) => {
-					const selectedHere = !isMobile && isBarSelected(blockIndex);
-
-					if (selectedHere) {
-						return (
-							<InlineEditBar
-								key={blockIndex}
-								date={date}
-								position={position}
-								staff={staff}
-								blockIndex={blockIndex}
-								updateBlocks={updateBlocks}
-								splitBlock={splitBlock}
-								deleteBlock={deleteBlock}
-								setSelected={setSelected}
-							/>
-						);
-					}
-
 					return (
 						<div
 							key={blockIndex}
@@ -880,7 +886,7 @@ function MobilePanel({
 	);
 }
 
-function InlineEditBar({
+function EditModal({
 	date,
 	position,
 	staff,
@@ -922,49 +928,84 @@ function InlineEditBar({
 	};
 
 	return (
-		<div className="inline-edit-bar" onClick={(e) => e.stopPropagation()}>
-			<select
-				value={block.start}
-				onChange={(e) => handleStartChange(e.target.value)}
-			>
-				{hourOptions.map((h) => (
-					<option key={h} value={h}>
-						{hourToLabel(h)}
-					</option>
-				))}
-			</select>
-			<span>〜</span>
-			<select
-				value={block.end}
-				onChange={(e) => handleEndChange(e.target.value)}
-			>
-				{hourOptions.map((h) => (
-					<option key={h} value={h}>
-						{hourToLabel(h)}
-					</option>
-				))}
-			</select>
-			<button
-				type="button"
-				className="btn-split"
-				onClick={() => splitBlock(date, position, staff.userId, blockIndex)}
-			>
-				分割
-			</button>
-			<button
-				type="button"
-				className="btn-delete"
-				onClick={() => deleteBlock(date, position, staff.userId, blockIndex)}
-			>
-				削除
-			</button>
-			<button
-				type="button"
-				className="btn-close"
-				onClick={() => setSelected(null)}
-			>
-				×
-			</button>
+		<div className="edit-modal-overlay" onClick={() => setSelected(null)}>
+			<div className="edit-modal" onClick={(e) => e.stopPropagation()}>
+				<div className="edit-modal-header">
+					<span>
+						{staff.name}
+						<span className="edit-modal-position">
+							（{position === "HALL" ? "ホール" : "キッチン"}）
+						</span>
+					</span>
+					<button
+						type="button"
+						className="edit-modal-close-x"
+						onClick={() => setSelected(null)}
+					>
+						×
+					</button>
+				</div>
+
+				<div className="edit-modal-body">
+					<div className="edit-modal-time">
+						<div className="edit-modal-time-group">
+							<label>開始時刻</label>
+							<select
+								value={block.start}
+								onChange={(e) => handleStartChange(e.target.value)}
+							>
+								{hourOptions.map((h) => (
+									<option key={h} value={h}>
+										{hourToLabel(h)}
+									</option>
+								))}
+							</select>
+						</div>
+						<span className="edit-modal-tilde">〜</span>
+						<div className="edit-modal-time-group">
+							<label>終了時刻</label>
+							<select
+								value={block.end}
+								onChange={(e) => handleEndChange(e.target.value)}
+							>
+								{hourOptions.map((h) => (
+									<option key={h} value={h}>
+										{hourToLabel(h)}
+									</option>
+								))}
+							</select>
+						</div>
+					</div>
+				</div>
+
+				<div className="edit-modal-actions">
+					<button
+						type="button"
+						className="edit-modal-btn edit-modal-btn-split"
+						onClick={() =>
+							splitBlock(date, position, staff.userId, blockIndex)
+						}
+					>
+						分割
+					</button>
+					<button
+						type="button"
+						className="edit-modal-btn edit-modal-btn-delete"
+						onClick={() =>
+							deleteBlock(date, position, staff.userId, blockIndex)
+						}
+					>
+						削除
+					</button>
+					<button
+						type="button"
+						className="edit-modal-btn edit-modal-btn-close"
+						onClick={() => setSelected(null)}
+					>
+						閉じる
+					</button>
+				</div>
+			</div>
 		</div>
 	);
 }
