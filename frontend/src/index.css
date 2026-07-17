@@ -1633,6 +1633,20 @@ select.role-input {
 	display: none !important;
 }
 
+/* ---- PDF出力時：重いグラデーション背景を軽量化（生成速度対策） ----
+   細かい縞模様のグラデーションは html2canvas での描画が非常に重く、
+   14日分×最大30行を撮影すると数分〜十分以上かかることがあったため、
+   PDF撮影の瞬間だけ背景をベタ塗りに一時的に差し替える。
+   画面上の通常表示（縞模様つき）には影響しない。 */
+.pdf-mode .timeline-track {
+	background-image: none !important;
+	background-color: #fafafa !important;
+}
+
+.pdf-mode .empty-row .timeline-track {
+	background-color: #fcfcfc !important;
+}
+
 /* ---- PDF生成中の進捗オーバーレイ ---- */
 
 .pdf-progress-overlay {

@@ -309,9 +309,12 @@ function AdminConfirmedShiftCreate() {
 					useCORS: true,
 					backgroundColor: "#ffffff",
 					windowWidth: dayElement.scrollWidth,
+					logging: false,
 				});
 
-				const imgData = canvas.toDataURL("image/png");
+				// PNGだとファイルサイズが大きくなりアップロードが不安定になるため、
+				// JPEG（軽量・高圧縮）に変換する
+				const imgData = canvas.toDataURL("image/jpeg", 0.85);
 
 				// ページ内に収まるよう、縦横比を保ったまま縮小
 				const ratio = Math.min(
@@ -322,7 +325,7 @@ function AdminConfirmedShiftCreate() {
 				const imgHeight = canvas.height * ratio;
 
 				if (i > 0) pdf.addPage();
-				pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
+				pdf.addImage(imgData, "JPEG", 0, 0, imgWidth, imgHeight);
 
 				setExportProgress({ current: i + 1, total: dates.length });
 
