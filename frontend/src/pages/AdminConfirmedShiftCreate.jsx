@@ -360,20 +360,28 @@ function AdminConfirmedShiftCreate() {
 			)
 		: null;
 
-	// 表示中の週（前半/後半）に提出されているコメント一覧
-	const commentsList = displayDates.flatMap((date) => {
-		const { label } = formatDisplayDate(date);
-		const hall = getStaffList(date, "HALL");
-		const kitchen = getStaffList(date, "KITCHEN");
-		return [...hall, ...kitchen]
-			.filter((s) => s.comment && s.comment.trim() !== "")
-			.map((s) => ({
-				key: `${date}-${s.userId}`,
-				label,
-				name: s.name,
-				comment: s.comment,
-			}));
-	});
+	// 期間全体（14日分）のコメントを、スタッフごとにグループ化
+	const commentsByUser = (() => {
+		const map = {};
+		dates.forEach((date) => {
+			const { label } = formatDisplayDate(date);
+			const hall = getStaffList(date, "HALL");
+			const kitchen = getStaffList(date, "KITCHEN");
+			[...hall, ...kitchen]
+				.filter((s) => s.comment && s.comment.trim() !== "")
+				.forEach((s) => {
+					if (!map[s.userId]) {
+						map[s.userId] = { userId: s.userId, name: s.name, entries: [] };
+					}
+					map[s.userId].entries.push({
+						key: `${date}-${s.userId}`,
+						label,
+						comment: s.comment,
+					});
+				});
+		});
+		return Object.values(map);
+	})();
 
 	if (loading) {
 		return (
@@ -502,15 +510,18 @@ function AdminConfirmedShiftCreate() {
 			</div>
 		</Layout>
 
-		{!isMobile && commentsList.length > 0 && (
+		{!isMobile && commentsByUser.length > 0 && (
 			<aside className="comments-sidebar">
-				<div className="comments-sidebar-title">💬 コメント一覧</div>
-				{commentsList.map((c) => (
-					<div key={c.key} className="comments-sidebar-item">
-						<div className="comments-sidebar-meta">
-							{c.label}　<span className="comments-sidebar-name">{c.name}</span>
-						</div>
-						<div className="comments-sidebar-text">{c.comment}</div>
+				<div className="comments-sidebar-title">💬 コメント一覧（14日分）</div>
+				{commentsByUser.map((u) => (
+					<div key={u.userId} className="comments-sidebar-user-group">
+						<div className="comments-sidebar-user-name">{u.name}</div>
+						{u.entries.map((e) => (
+							<div key={e.key} className="comments-sidebar-item">
+								<div className="comments-sidebar-meta">{e.label}</div>
+								<div className="comments-sidebar-text">{e.comment}</div>
+							</div>
+						))}
 					</div>
 				))}
 			</aside>

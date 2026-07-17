@@ -40,7 +40,6 @@ body {
 	background-color: #f0ebe3;
 	display: flex;
 	flex-direction: column;
-	overflow-x: hidden;
 }
 
 .app-header {
@@ -895,27 +894,17 @@ body {
 .confirmed-create-toolbar {
 	position: sticky;
 	top: 0;
-	width: 100vw;
-	margin-left: calc(50% - 50vw);
-	margin-right: calc(50% - 50vw);
 	box-sizing: border-box;
 	background: #f0ebe3;
 	border-bottom: 2px solid #333;
-	padding: 8px 16px;
-	margin-top: 0;
-	margin-bottom: 12px;
+	padding: 8px 0;
+	margin: 0 0 12px;
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
 	gap: 12px;
 	flex-wrap: wrap;
 	z-index: 10;
-}
-
-@media (min-width: 768px) {
-	.confirmed-create-toolbar {
-		padding: 8px 40px;
-	}
 }
 
 .confirmed-create-actions {
@@ -1670,8 +1659,8 @@ select.role-input {
 }
 
 .comments-sidebar-item {
-	margin-bottom: 12px;
-	padding-bottom: 12px;
+	margin-bottom: 10px;
+	padding-bottom: 10px;
 	border-bottom: 1px dashed var(--gray-border);
 }
 
@@ -1686,15 +1675,35 @@ select.role-input {
 	margin-bottom: 4px;
 }
 
-.comments-sidebar-name {
-	font-weight: bold;
-	color: var(--brown);
-}
-
 .comments-sidebar-text {
 	font-size: 12px;
 	color: var(--text-main);
 	line-height: 1.5;
 	white-space: pre-wrap;
 	word-break: break-word;
+}
+
+/* ---- コメント一覧：スタッフごとのグループ ---- */
+
+.comments-sidebar-user-group {
+	margin-bottom: 16px;
+	padding-bottom: 16px;
+	border-bottom: 2px solid var(--gray-border);
+}
+
+.comments-sidebar-user-group:last-child {
+	margin-bottom: 0;
+	padding-bottom: 0;
+	border-bottom: none;
+}
+
+.comments-sidebar-user-name {
+	font-size: 13px;
+	font-weight: bold;
+	color: #fff;
+	background: var(--brown);
+	padding: 3px 10px;
+	border-radius: 12px;
+	display: inline-block;
+	margin-bottom: 8px;
 }
