@@ -1666,3 +1666,107 @@ select.role-input {
 	font-size: 12px;
 	color: var(--text-sub);
 }
+
+/* ---- 固定ツールバー：横幅を画面いっぱいにする ---- */
+.confirmed-create-toolbar {
+	position: sticky;
+	top: 0;
+	left: 50%;
+	transform: translateX(-50%);
+	width: 100vw;
+	box-sizing: border-box;
+	background: #f0ebe3;
+	border-bottom: 2px solid #333;
+	padding: 6px 16px;
+	margin: 0 0 12px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	flex-wrap: wrap;
+	z-index: 10;
+}
+
+@media (min-width: 768px) {
+	.confirmed-create-toolbar {
+		padding: 6px 40px;
+	}
+}
+
+/* ---- ヘッダーとツールバーの間の余白を詰める（全体的に上へ） ---- */
+.app-header {
+	padding-bottom: 8px;
+}
+
+.app-main {
+	padding-top: 8px;
+}
+
+@media (min-width: 768px) {
+	.app-main {
+		padding-top: 8px;
+	}
+}
+
+/* ---- コメント一覧サイドパネル（画面右の余白を活用） ---- */
+.comments-sidebar {
+	display: none;
+}
+
+/* 十分な余白がある広い画面でのみ表示 */
+@media (min-width: 1500px) {
+	.comments-sidebar {
+		display: block;
+		position: fixed;
+		top: 160px;
+		right: 24px;
+		width: 260px;
+		max-height: calc(100vh - 200px);
+		overflow-y: auto;
+		background: #fff;
+		border: 1px solid var(--gray-border);
+		border-radius: 10px;
+		padding: 14px;
+		box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+		z-index: 5;
+	}
+}
+
+.comments-sidebar-title {
+	font-size: 13px;
+	font-weight: bold;
+	color: var(--brown);
+	margin-bottom: 10px;
+	padding-bottom: 8px;
+	border-bottom: 1px solid var(--gray-border);
+}
+
+.comments-sidebar-item {
+	margin-bottom: 12px;
+	padding-bottom: 12px;
+	border-bottom: 1px dashed var(--gray-border);
+}
+
+.comments-sidebar-item:last-child {
+	margin-bottom: 0;
+	border-bottom: none;
+}
+
+.comments-sidebar-meta {
+	font-size: 11px;
+	color: var(--text-sub);
+	margin-bottom: 4px;
+}
+
+.comments-sidebar-name {
+	font-weight: bold;
+	color: var(--brown);
+}
+
+.comments-sidebar-text {
+	font-size: 12px;
+	color: var(--text-main);
+	line-height: 1.5;
+	white-space: pre-wrap;
+	word-break: break-word;
+}

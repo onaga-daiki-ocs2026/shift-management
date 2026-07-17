@@ -364,6 +364,21 @@ function AdminConfirmedShiftCreate() {
 			)
 		: null;
 
+	// 表示中の週（前半/後半）に提出されているコメント一覧
+	const commentsList = displayDates.flatMap((date) => {
+		const { label } = formatDisplayDate(date);
+		const hall = getStaffList(date, "HALL");
+		const kitchen = getStaffList(date, "KITCHEN");
+		return [...hall, ...kitchen]
+			.filter((s) => s.comment && s.comment.trim() !== "")
+			.map((s) => ({
+				key: `${date}-${s.userId}`,
+				label,
+				name: s.name,
+				comment: s.comment,
+			}));
+	});
+
 	if (loading) {
 		return (
 			<Layout>
@@ -544,6 +559,20 @@ function AdminConfirmedShiftCreate() {
 				})}
 			</div>
 		</Layout>
+
+		{!isMobile && commentsList.length > 0 && (
+			<aside className="comments-sidebar">
+				<div className="comments-sidebar-title">💬 コメント一覧</div>
+				{commentsList.map((c) => (
+					<div key={c.key} className="comments-sidebar-item">
+						<div className="comments-sidebar-meta">
+							{c.label}　<span className="comments-sidebar-name">{c.name}</span>
+						</div>
+						<div className="comments-sidebar-text">{c.comment}</div>
+					</div>
+				))}
+			</aside>
+		)}
 
 		{!isMobile && selected && selectedStaff && (
 			<EditModal
