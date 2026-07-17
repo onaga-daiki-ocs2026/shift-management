@@ -85,6 +85,7 @@ function AdminConfirmedShiftCreate() {
 					),
 				};
 			});
+
 			setDayStaffMap(map);
 		} catch (error) {
 			console.error("提出期間の取得に失敗しました", error);
@@ -308,7 +309,7 @@ function AdminConfirmedShiftCreate() {
 	};
 
 	const displayDates = dates.filter((_, i) =>
-    	currentWeek === 0 ? i < 7 : i >= 7
+		currentWeek === 0 ? i < 7 : i >= 7
 	);
 
 	const selectedStaff = selected
@@ -336,23 +337,6 @@ function AdminConfirmedShiftCreate() {
 				>
 					全員リセット
 				</button>
-				<div className="confirmed-create-actions">
-					<button
-						type="button"
-						onClick={handleSubmit}
-						className="submit-button"
-					>
-						確定シフトを保存
-					</button>
-					<button
-						type="button"
-						className="pdf-export-button"
-						onClick={handleExportPdf}
-						disabled={exporting}
-					>
-						{exporting ? "PDF生成中..." : "📄 PDFを生成・公開"}
-					</button>
-				</div>
 			</div>
 
 			<div className="week-tabs">
@@ -493,6 +477,24 @@ function AdminConfirmedShiftCreate() {
 						</div>
 					);
 				})}
+			</div>
+
+			<div className="confirmed-create-bottom-actions">
+				<button
+					type="button"
+					onClick={handleSubmit}
+					className="submit-button"
+				>
+					確定シフトを保存
+				</button>
+				<button
+					type="button"
+					className="pdf-export-button"
+					onClick={handleExportPdf}
+					disabled={exporting}
+				>
+					{exporting ? "PDF生成中..." : "📄 PDFを生成・公開"}
+				</button>
 			</div>
 		</Layout>
 
@@ -716,18 +718,31 @@ function StaffRow({
 	return (
 		<div className="timeline-row">
 			<div className="timeline-role">
-				<input
-					type="text"
+				<select
 					className="role-input"
-					placeholder="役割"
 					value={staff.role || ""}
 					onChange={(e) =>
 						updateRole(date, position, staff.userId, e.target.value)
 					}
-				/>
+				>
+					<option value=""></option>
+					<option value="指導">指導</option>
+					<option value="仕込">仕込</option>
+					<option value="研修">研修</option>
+				</select>
 			</div>
 			<div className="timeline-name">
-				<span>{staff.name}</span>
+				<span>
+					{staff.name}
+					{staff.comment && (
+						<span
+							className="comment-icon"
+							title={`コメント：${staff.comment}`}
+						>
+							💬
+						</span>
+					)}
+				</span>
 				<span className="staff-position">
 					{position === "HALL" ? "ホール" : "キッチン"}
 				</span>

@@ -1448,3 +1448,124 @@ body {
 .pdf-mode .resize-handle {
 	display: none !important;
 }
+
+/* role-input を <select> 用に調整（4択：空欄・指導・仕込・研修） */
+select.role-input {
+	cursor: pointer;
+	appearance: none;
+	-webkit-appearance: none;
+	background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'><path fill='%23888' d='M0 0l5 6 5-6z'/></svg>");
+	background-repeat: no-repeat;
+	background-position: right 4px center;
+	background-size: 8px;
+	padding-right: 14px;
+}
+
+/* ====================================================================
+   PC未対応画面のレスポンシブ対応
+   （ホーム／シフト提出／提出済み確認／確定シフト確認／
+     希望シフト一覧／ユーザー管理）
+   ==================================================================== */
+
+@media (min-width: 768px) {
+
+	/* ---- ホーム画面：メニューを3列に ---- */
+	.menu {
+		grid-template-columns: repeat(3, 1fr);
+	}
+
+	/* ---- シフト提出画面：カードが間延びしないよう最大幅を制限 ---- */
+	.shift-block {
+		max-width: 640px;
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	.submit-info-box {
+		max-width: 640px;
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	.comment-area {
+		max-width: 640px;
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	.block-submit-button {
+		max-width: 640px;
+		margin-left: auto;
+		margin-right: auto;
+		width: 100%;
+	}
+
+	.submit-note {
+		max-width: 640px;
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	/* シフト提出の行間隔・文字サイズにも少し余裕を */
+	.shift-row,
+	.shift-table-header {
+		grid-template-columns: 120px 1fr 1fr 90px;
+		padding: 10px 16px;
+	}
+
+	.time-select {
+		font-size: 15px;
+		padding: 8px 6px;
+	}
+
+	/* ---- 提出済み確認画面：横幅を制限して見やすく ---- */
+	.submission-row {
+		max-width: 640px;
+		margin-left: auto;
+		margin-right: auto;
+		grid-template-columns: 140px 80px 1fr;
+		padding: 10px 16px;
+	}
+
+	/* ---- 確定シフト確認画面（PDFビューア）---- */
+	.pdf-viewer-area {
+		max-width: 640px;
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	.pdf-iframe {
+		height: 80vh;
+	}
+
+	/* ---- 希望シフト一覧・確定シフト確認共通：空状態 ---- */
+	.empty-state {
+		max-width: 640px;
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	/* ---- ユーザー管理画面：カードを2列に ---- */
+	.user-mgmt-header {
+		max-width: 900px;
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	.user-card {
+		max-width: 900px;
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	.user-section {
+		max-width: 900px;
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	.user-name,
+	.user-name-input {
+		font-size: 16px;
+	}
+}

@@ -3,9 +3,12 @@ package com.shift.shift_management.service;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.shift.shift_management.entity.ShiftPdf;
+import com.shift.shift_management.entity.User;
 import com.shift.shift_management.repository.ShiftPdfRepository;
+import com.shift.shift_management.repository.UserRepository;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -16,8 +19,13 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 public class ShiftPdfService {
 
+	private static final DateTimeFormatter DATE_FORMAT =
+			DateTimeFormatter.ofPattern("M月d日");
+
 	private final ShiftPdfRepository shiftPdfRepository;
 	private final Cloudinary cloudinary;
+	private final UserRepository userRepository;
+	private final LineNotificationService lineNotificationService;
 
 	public String uploadPdf(MultipartFile file, LocalDate periodStart) throws IOException {
 
@@ -50,6 +58,9 @@ public class ShiftPdfService {
 		shiftPdf.setCloudinaryPublicId(publicId);
 		shiftPdfRepository.save(shiftPdf);
 
+		// シフト確定をLINEで全スタッフに通知（対象期間つき）
+		notifyStaffShiftConfirmed(periodStart);
+
 		return pdfUrl;
 	}
 
@@ -58,5 +69,19 @@ public class ShiftPdfService {
 				.findByPeriodStart(periodStart)
 				.map(ShiftPdf::getPdfUrl)
 				.orElse(null);
+	}
+
+	private void notifyStaffShiftConfirmed(LocalDate periodStart) {
+		// 確定シフト作成画面は14日分をまとめて扱うため、期間終了日は開始日+13日
+		LocalDate periodEnd = periodStart.plusDays(13);
+
+		String message =
+				"📋 " + periodStart.format(DATE_FORMAT) + "から"
+						+ periodEnd.format(DATE_FORMAT) + "のシフトを公開しました。\n"
+						+ "アプリの「確定シフト確認」からご確認ください。";
+
+		userRepository.findAll().stream()
+				.filter(user -> "STAFF".equals(user.getRole()))
+				.forEach(user -> lineNotificationService.push(user.getLineUserId(), message));
 	}
 }
