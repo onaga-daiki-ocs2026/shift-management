@@ -10,6 +10,7 @@ const PAGE_TITLES = {
 	"/admin/shift-requests": "希望シフト一覧",
 	"/admin/confirmed-shifts/create": "確定シフト作成",
 	"/admin/users": "ユーザー管理",
+	"/help": "ヘルプ",
 };
 
 function Layout({ children, footer }) {
@@ -19,34 +20,21 @@ function Layout({ children, footer }) {
 
 	return (
 		<div className="app">
-			<header
-				className="app-header"
-				style={{
-					backgroundImage: `url(${woodTexture})`,
-					backgroundSize: "cover",
-					backgroundPosition: "center",
-				}}
-			>
+			<header className="app-header" style={{ backgroundImage: `url(${woodTexture})`, backgroundSize: "cover", backgroundPosition: "center" }}>
 				<div className="header-logo-area">
 					<img src={logo} alt="やよい軒" className="header-logo" />
 				</div>
-
 				{!isHome && (
 					<div className="header-top">
-						<Link to="/" className="back-button">
-							＜ ホームに戻る
-						</Link>
+						<Link to="/" className="back-button">＜ ホームに戻る</Link>
 					</div>
 				)}
-
 				<div className="header-title-area">
 					<h1 className="header-title">{isHome ? "ホーム" : title}</h1>
 					<div className={`header-underline ${isHome ? "red" : "green"}`} />
 				</div>
 			</header>
-
 			<main className="app-main">{children}</main>
-
 			{footer && <div className="app-footer-wrapper">{footer}</div>}
 		</div>
 	);

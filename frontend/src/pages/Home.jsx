@@ -24,6 +24,12 @@ const STAFF_MENUS = [
 		label: "確定シフト確認",
 		sub: "確定したシフトを確認します",
 	},
+	{
+		to: "/help",
+		icon: "❓",
+		label: "ヘルプ",
+		sub: "使い方・よくある質問",
+	},
 ];
 
 const ADMIN_MENUS = [

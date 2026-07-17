@@ -641,6 +641,64 @@ body {
 	margin: 0;
 }
 
+/* ==================== ヘルプ画面 ==================== */
+
+.help-section {
+	margin-bottom: 24px;
+}
+
+.help-section-title {
+	font-size: 14px;
+	font-weight: bold;
+	color: var(--brown);
+	margin: 0 0 10px;
+	padding-bottom: 6px;
+	border-bottom: 2px solid var(--beige-dark);
+}
+
+.help-item {
+	background: var(--white);
+	border-radius: 10px;
+	margin-bottom: 8px;
+	overflow: hidden;
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+	border: 1px solid var(--gray-border);
+}
+
+.help-question {
+	width: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px;
+	padding: 12px 14px;
+	background: none;
+	border: none;
+	text-align: left;
+	font-size: 13px;
+	font-weight: 500;
+	color: var(--text-main);
+	cursor: pointer;
+}
+
+.help-question:active {
+	background: var(--gray-light);
+}
+
+.help-toggle-icon {
+	flex-shrink: 0;
+	color: var(--brown);
+	font-size: 14px;
+}
+
+.help-answer {
+	padding: 0 14px 14px;
+	font-size: 13px;
+	color: var(--text-sub);
+	line-height: 1.7;
+	white-space: pre-wrap;
+}
+
 /* ==================== ユーザー管理画面 ==================== */
 
 .user-mgmt-header {

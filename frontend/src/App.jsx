@@ -7,6 +7,7 @@ import ConfirmedShifts from "./pages/ConfirmedShifts";
 import AdminShiftRequests from "./pages/AdminShiftRequests";
 import AdminConfirmedShiftCreate from "./pages/AdminConfirmedShiftCreate";
 import AdminUserManagement from "./pages/AdminUserManagement";
+import Help from "./pages/Help";
 
 function App() {
 	return (
@@ -18,6 +19,7 @@ function App() {
 			<Route path="/admin/shift-requests" element={<AdminShiftRequests />} />
 			<Route path="/admin/confirmed-shifts/create"element={<AdminConfirmedShiftCreate />}/>
 			<Route path="/admin/users" element={<AdminUserManagement />} />
+			<Route path="/help" element={<Help />} />
 		</Routes>
 	);
 }
