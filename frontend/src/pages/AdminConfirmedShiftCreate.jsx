@@ -385,35 +385,33 @@ function AdminConfirmedShiftCreate() {
 
 	return (
 		<>
-		<div className="confirmed-create-toolbar">
-			<button
-				type="button"
-				onClick={resetAll}
-				className="reset-all-button"
-			>
-				全員リセット
-			</button>
-			<div className="confirmed-create-actions">
-				<button
-					type="button"
-					onClick={handleSubmit}
-					className="submit-button"
-				>
-					確定シフトを保存
-				</button>
-				<button
-					type="button"
-					className="pdf-export-button"
-					onClick={handleExportPdf}
-					disabled={exporting}
-				>
-					{exporting ? "PDF生成中..." : "📄 PDFを生成・公開"}
-				</button>
-			</div>
-		</div>
-
 		<Layout>
-			<div className="confirmed-create-toolbar-spacer" />
+			<div className="confirmed-create-toolbar">
+				<button
+					type="button"
+					onClick={resetAll}
+					className="reset-all-button"
+				>
+					全員リセット
+				</button>
+				<div className="confirmed-create-actions">
+					<button
+						type="button"
+						onClick={handleSubmit}
+						className="submit-button"
+					>
+						確定シフトを保存
+					</button>
+					<button
+						type="button"
+						className="pdf-export-button"
+						onClick={handleExportPdf}
+						disabled={exporting}
+					>
+						{exporting ? "PDF生成中..." : "📄 PDFを生成・公開"}
+					</button>
+				</div>
+			</div>
 
 			<div className="week-tabs">
 				<button

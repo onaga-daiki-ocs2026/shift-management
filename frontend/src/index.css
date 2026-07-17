@@ -892,39 +892,19 @@ body {
 
 /* ---- 固定ツールバー：画面幅いっぱい・全ボタン常時表示 ---- */
 .confirmed-create-toolbar {
-	position: fixed;
+	position: sticky;
 	top: 0;
-	left: 0;
-	width: 100%;
 	box-sizing: border-box;
 	background: #f0ebe3;
 	border-bottom: 2px solid #333;
-	padding: 6px 16px;
-	margin: 0;
+	padding: 8px 0;
+	margin: 0 0 12px;
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
 	gap: 12px;
 	flex-wrap: wrap;
-	z-index: 100;
-}
-
-@media (min-width: 768px) {
-	.confirmed-create-toolbar {
-		padding: 6px 40px;
-	}
-}
-
-/* ツールバーがposition:fixedで浮いている分、
-   実際のコンテンツが隠れないようにする空のスペーサー */
-.confirmed-create-toolbar-spacer {
-	height: 64px;
-}
-
-@media (min-width: 768px) {
-	.confirmed-create-toolbar-spacer {
-		height: 56px;
-	}
+	z-index: 10;
 }
 
 .confirmed-create-actions {
