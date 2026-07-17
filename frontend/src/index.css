@@ -21,7 +21,6 @@
 html {
 	background-color: #f0ebe3;
 	overscroll-behavior: none;
-	overflow-x: hidden;
 }
 
 body {
@@ -30,7 +29,6 @@ body {
 	background-color: #f0ebe3;
 	color: var(--text-main);
 	overscroll-behavior: none;
-	overflow-x: hidden;
 }
 
 /* ==================== レイアウト ==================== */
@@ -894,28 +892,38 @@ body {
 
 /* ---- 固定ツールバー：画面幅いっぱい・全ボタン常時表示 ---- */
 .confirmed-create-toolbar {
-	position: sticky;
+	position: fixed;
 	top: 0;
-	width: 100vw;
-	margin-left: calc(50% - 50vw);
-	margin-right: calc(50% - 50vw);
+	left: 0;
+	width: 100%;
 	box-sizing: border-box;
 	background: #f0ebe3;
 	border-bottom: 2px solid #333;
 	padding: 6px 16px;
-	margin-top: 0;
-	margin-bottom: 12px;
+	margin: 0;
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
 	gap: 12px;
 	flex-wrap: wrap;
-	z-index: 10;
+	z-index: 100;
 }
 
 @media (min-width: 768px) {
 	.confirmed-create-toolbar {
 		padding: 6px 40px;
+	}
+}
+
+/* ツールバーがposition:fixedで浮いている分、
+   実際のコンテンツが隠れないようにする空のスペーサー */
+.confirmed-create-toolbar-spacer {
+	height: 64px;
+}
+
+@media (min-width: 768px) {
+	.confirmed-create-toolbar-spacer {
+		height: 56px;
 	}
 }
 
