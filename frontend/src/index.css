@@ -1770,3 +1770,34 @@ select.role-input {
 	white-space: pre-wrap;
 	word-break: break-word;
 }
+
+/* ---- 固定ツールバー：正しい計算式で画面幅いっぱいにする ---- */
+/* 前回の left:50%+transform 方式はズレの原因になっていたため、
+   margin の calc() 方式に修正 */
+.confirmed-create-toolbar {
+	position: sticky;
+	top: 0;
+	left: auto;
+	transform: none;
+	width: 100vw;
+	margin-left: calc(50% - 50vw);
+	margin-right: calc(50% - 50vw);
+	box-sizing: border-box;
+	background: #f0ebe3;
+	border-bottom: 2px solid #333;
+	padding: 6px 16px;
+	margin-top: 0;
+	margin-bottom: 12px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	flex-wrap: wrap;
+	z-index: 10;
+}
+
+@media (min-width: 768px) {
+	.confirmed-create-toolbar {
+		padding: 6px 40px;
+	}
+}
