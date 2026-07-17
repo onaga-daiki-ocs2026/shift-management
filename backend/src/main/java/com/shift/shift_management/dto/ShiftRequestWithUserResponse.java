@@ -8,4 +8,5 @@ public record ShiftRequestWithUserResponse(
 		String position,
 		boolean available,
 		LocalTime startTime,
-		LocalTime endTime) {}
+		LocalTime endTime,
+		String comment) {}

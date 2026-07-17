@@ -84,7 +84,8 @@ public class ShiftRequestService {
 							user.getPosition(),
 							shift.isAvailable(),
 							shift.getStartTime(),
-							shift.getEndTime());
+							shift.getEndTime(),
+							shift.getComment());
 				})
 				.toList();
 	}
