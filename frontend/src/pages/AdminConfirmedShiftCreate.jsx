@@ -295,7 +295,12 @@ function AdminConfirmedShiftCreate() {
 		container.classList.add("pdf-mode");
 
 		try {
-			const pdf = new jsPDF("landscape", "mm", "a4");
+			const pdf = new jsPDF({
+				orientation: "landscape",
+				unit: "mm",
+				format: "a4",
+				compress: true,
+			});
 			const pdfWidth = pdf.internal.pageSize.getWidth();
 			const pdfHeight = pdf.internal.pageSize.getHeight();
 
@@ -305,16 +310,16 @@ function AdminConfirmedShiftCreate() {
 				if (!dayElement) continue;
 
 				const canvas = await html2canvas(dayElement, {
-					scale: 1,
+					scale: 0.75,
 					useCORS: true,
 					backgroundColor: "#ffffff",
 					windowWidth: dayElement.scrollWidth,
 					logging: false,
 				});
 
-				// PNGだとファイルサイズが大きくなりアップロードが不安定になるため、
-				// JPEG（軽量・高圧縮）に変換する
-				const imgData = canvas.toDataURL("image/jpeg", 0.85);
+				// Cloudinary無料プランのアップロード上限（10MB）を超えないよう、
+				// PNGではなくJPEG（強めに圧縮）に変換する
+				const imgData = canvas.toDataURL("image/jpeg", 0.6);
 
 				// ページ内に収まるよう、縦横比を保ったまま縮小
 				const ratio = Math.min(
@@ -334,6 +339,16 @@ function AdminConfirmedShiftCreate() {
 			}
 
 			const pdfBlob = pdf.output("blob");
+			const pdfSizeMB = pdfBlob.size / 1024 / 1024;
+
+			if (pdfBlob.size > 10 * 1024 * 1024) {
+				alert(
+					`PDFのファイルサイズが大きすぎます（${pdfSizeMB.toFixed(1)}MB / 上限10MB）。\n` +
+						`スタッフの人数や日数が多い場合に発生します。お手数ですが開発者に連絡してください。`,
+				);
+				return;
+			}
+
 			const formData = new FormData();
 			formData.append("file", pdfBlob, "shift.pdf");
 			formData.append("periodStart", periodStart);
@@ -342,11 +357,17 @@ function AdminConfirmedShiftCreate() {
 				headers: { "Content-Type": "multipart/form-data" },
 			});
 			alert(
-				`PDFを保存しました！（${dates.length}日分・${(exportElapsed / 1000).toFixed(1)}秒）\nスタッフの確定シフト確認画面に反映されます。`,
+				`PDFを保存しました！（${dates.length}日分・${pdfSizeMB.toFixed(1)}MB・${(exportElapsed / 1000).toFixed(1)}秒）\nスタッフの確定シフト確認画面に反映されます。`,
 			);
 		} catch (error) {
 			console.error("PDF出力に失敗しました", error);
-			alert("PDF出力に失敗しました");
+			if (error.response?.status === 500) {
+				alert(
+					"PDF出力に失敗しました（サーバー側のエラー）。\nファイルサイズが大きすぎる可能性があります。",
+				);
+			} else {
+				alert("PDF出力に失敗しました");
+			}
 		} finally {
 			container.classList.remove("pdf-mode");
 			setExporting(false);
