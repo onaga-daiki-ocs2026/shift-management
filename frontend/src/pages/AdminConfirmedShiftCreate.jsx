@@ -360,27 +360,30 @@ function AdminConfirmedShiftCreate() {
 			)
 		: null;
 
-	// 期間全体（14日分）のコメントを、スタッフごとにグループ化
+	// 期間全体（14日分）のコメントを、スタッフごとに「同じ文言は1つにまとめて」表示
 	const commentsByUser = (() => {
 		const map = {};
 		dates.forEach((date) => {
-			const { label } = formatDisplayDate(date);
 			const hall = getStaffList(date, "HALL");
 			const kitchen = getStaffList(date, "KITCHEN");
 			[...hall, ...kitchen]
 				.filter((s) => s.comment && s.comment.trim() !== "")
 				.forEach((s) => {
 					if (!map[s.userId]) {
-						map[s.userId] = { userId: s.userId, name: s.name, entries: [] };
+						map[s.userId] = { userId: s.userId, name: s.name, comments: new Set() };
 					}
-					map[s.userId].entries.push({
-						key: `${date}-${s.userId}`,
-						label,
-						comment: s.comment,
-					});
+					map[s.userId].comments.add(s.comment);
 				});
 		});
-		return Object.values(map);
+
+		return Object.values(map).map((u) => ({
+			userId: u.userId,
+			name: u.name,
+			entries: Array.from(u.comments).map((comment) => ({
+				key: `${u.userId}-${comment}`,
+				comment,
+			})),
+		}));
 	})();
 
 	if (loading) {
@@ -518,7 +521,6 @@ function AdminConfirmedShiftCreate() {
 						<div className="comments-sidebar-user-name">{u.name}</div>
 						{u.entries.map((e) => (
 							<div key={e.key} className="comments-sidebar-item">
-								<div className="comments-sidebar-meta">{e.label}</div>
 								<div className="comments-sidebar-text">{e.comment}</div>
 							</div>
 						))}

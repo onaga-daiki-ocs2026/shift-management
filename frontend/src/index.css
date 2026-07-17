@@ -1635,17 +1635,23 @@ select.role-input {
 	.comments-sidebar {
 		display: block;
 		position: fixed;
-		top: 160px;
-		right: 24px;
-		width: 260px;
-		max-height: calc(100vh - 200px);
+		top: 100px;
+		right: 20px;
+		width: 340px;
+		max-height: calc(100vh - 120px);
 		overflow-y: auto;
 		background: #fff;
 		border: 1px solid var(--gray-border);
 		border-radius: 10px;
-		padding: 14px;
+		padding: 18px;
 		box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
 		z-index: 5;
+	}
+}
+
+@media (min-width: 1700px) {
+	.comments-sidebar {
+		width: 420px;
 	}
 }
 
@@ -1669,16 +1675,10 @@ select.role-input {
 	border-bottom: none;
 }
 
-.comments-sidebar-meta {
-	font-size: 11px;
-	color: var(--text-sub);
-	margin-bottom: 4px;
-}
-
 .comments-sidebar-text {
-	font-size: 12px;
+	font-size: 13px;
 	color: var(--text-main);
-	line-height: 1.5;
+	line-height: 1.6;
 	white-space: pre-wrap;
 	word-break: break-word;
 }
