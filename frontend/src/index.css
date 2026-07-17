@@ -21,6 +21,7 @@
 html {
 	background-color: #f0ebe3;
 	overscroll-behavior: none;
+	overflow-x: hidden;
 }
 
 body {
@@ -29,6 +30,7 @@ body {
 	background-color: #f0ebe3;
 	color: var(--text-main);
 	overscroll-behavior: none;
+	overflow-x: hidden;
 }
 
 /* ==================== レイアウト ==================== */
@@ -45,7 +47,7 @@ body {
 .app-header {
 	background-size: cover;
 	background-position: center;
-	padding-bottom: 20px;
+	padding-bottom: 8px;
 	position: relative;
 }
 
@@ -119,7 +121,7 @@ body {
 }
 
 .app-main {
-	padding: 16px 16px 0;
+	padding: 8px 16px 0;
 	flex: 1;
 	padding-bottom: env(safe-area-inset-bottom);
 }
@@ -787,19 +789,19 @@ body {
 	}
 
 	.app-header {
-		padding-bottom: 24px;
+		padding-bottom: 8px;
 	}
 
 	.menu {
 		display: grid;
-		grid-template-columns: repeat(2, 1fr);
+		grid-template-columns: repeat(3, 1fr);
 		gap: 16px;
 	}
 
 	.app-main {
 		max-width: 1200px;
 		margin: 0 auto;
-		padding: 24px 40px 0;
+		padding: 8px 40px 0;
 	}
 
 	.app-footer {
@@ -818,23 +820,103 @@ body {
 		margin: 0 auto;
 		padding: 16px 40px 8px;
 	}
+
+	/* シフト提出画面：カードが間延びしないよう最大幅を制限 */
+	.shift-block,
+	.submit-info-box,
+	.comment-area,
+	.block-submit-button,
+	.submit-note {
+		max-width: 640px;
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	.block-submit-button {
+		width: 100%;
+	}
+
+	.shift-row,
+	.shift-table-header {
+		grid-template-columns: 120px 1fr 1fr 90px;
+		padding: 10px 16px;
+	}
+
+	.time-select {
+		font-size: 15px;
+		padding: 8px 6px;
+	}
+
+	/* 提出済み確認画面 */
+	.submission-row {
+		max-width: 640px;
+		margin-left: auto;
+		margin-right: auto;
+		grid-template-columns: 140px 80px 1fr;
+		padding: 10px 16px;
+	}
+
+	/* 確定シフト確認画面（PDFビューア） */
+	.pdf-viewer-area {
+		max-width: 640px;
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	.pdf-iframe {
+		height: 80vh;
+	}
+
+	.empty-state {
+		max-width: 640px;
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	/* ユーザー管理画面 */
+	.user-mgmt-header,
+	.user-card,
+	.user-section {
+		max-width: 900px;
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	.user-name,
+	.user-name-input {
+		font-size: 16px;
+	}
 }
 
 /* ====================================================================
    確定シフト作成画面（AdminConfirmedShiftCreate.jsx）
    ==================================================================== */
 
+/* ---- 固定ツールバー：画面幅いっぱい・全ボタン常時表示 ---- */
 .confirmed-create-toolbar {
+	position: sticky;
+	top: 0;
+	width: 100vw;
+	margin-left: calc(50% - 50vw);
+	margin-right: calc(50% - 50vw);
+	box-sizing: border-box;
+	background: #f0ebe3;
+	border-bottom: 2px solid #333;
+	padding: 6px 16px;
+	margin-top: 0;
+	margin-bottom: 12px;
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	margin-bottom: 16px;
 	gap: 12px;
-	position: sticky;
-	top: 0;
-	background: #f0ebe3;
-	padding: 8px 0;
+	flex-wrap: wrap;
 	z-index: 10;
+}
+
+@media (min-width: 768px) {
+	.confirmed-create-toolbar {
+		padding: 6px 40px;
+	}
 }
 
 .confirmed-create-actions {
@@ -854,14 +936,39 @@ body {
 	font-size: 14px;
 }
 
+/* ---- 全員リセットボタン：デザイン ---- */
 .reset-all-button {
-	display: block;
-	margin-bottom: 16px;
-	padding: 6px 14px;
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	margin-bottom: 0;
+	padding: 10px 18px;
 	font-size: 13px;
+	font-weight: bold;
+	color: var(--brown);
+	background: var(--white);
+	border: 1.5px solid var(--brown-light);
+	border-radius: 20px;
 	cursor: pointer;
+	transition: background 0.15s, box-shadow 0.15s;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
+.reset-all-button::before {
+	content: "↺";
+	font-size: 14px;
+}
+
+.reset-all-button:hover {
+	background: #fdf6ee;
+}
+
+.reset-all-button:active {
+	background: #f5e9d8;
+	box-shadow: none;
+}
+
+/* ---- 前半/後半 週タブ ---- */
 .week-tabs {
 	display: flex;
 	gap: 8px;
@@ -894,6 +1001,18 @@ body {
 	overflow: hidden;
 	border: 1px solid var(--gray-border);
 	background: var(--white);
+}
+
+/* 表示中の週（前半/後半）ではない日は画面上は非表示。
+   ただし DOM からは消さない（PDF生成で個別に撮影するため） */
+.day-section.hidden-week {
+	display: none;
+}
+
+/* PDF生成中は、非表示週の日も含めて全部見えるようにする
+  （1日ずつ撮影するため） */
+.pdf-mode .day-section.hidden-week {
+	display: block;
 }
 
 .day-section-title {
@@ -1030,6 +1149,18 @@ body {
 	color: #bbb;
 }
 
+/* role-input を <select> 用に調整（4択：空欄・指導・仕込・研修） */
+select.role-input {
+	cursor: pointer;
+	appearance: none;
+	-webkit-appearance: none;
+	background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'><path fill='%23888' d='M0 0l5 6 5-6z'/></svg>");
+	background-repeat: no-repeat;
+	background-position: right 4px center;
+	background-size: 8px;
+	padding-right: 14px;
+}
+
 /* ---- 名前欄 ---- */
 
 .timeline-name {
@@ -1058,6 +1189,13 @@ body {
 	font-size: 10px;
 	color: var(--text-sub);
 	font-weight: normal;
+}
+
+.comment-icon {
+	display: inline-block;
+	margin-left: 4px;
+	font-size: 11px;
+	cursor: help;
 }
 
 /* ---- タイムライン（時間バーが乗るグリッド） ---- */
@@ -1449,176 +1587,8 @@ body {
 	display: none !important;
 }
 
-/* role-input を <select> 用に調整（4択：空欄・指導・仕込・研修） */
-select.role-input {
-	cursor: pointer;
-	appearance: none;
-	-webkit-appearance: none;
-	background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'><path fill='%23888' d='M0 0l5 6 5-6z'/></svg>");
-	background-repeat: no-repeat;
-	background-position: right 4px center;
-	background-size: 8px;
-	padding-right: 14px;
-}
-
-/* ====================================================================
-   PC未対応画面のレスポンシブ対応
-   （ホーム／シフト提出／提出済み確認／確定シフト確認／
-     希望シフト一覧／ユーザー管理）
-   ==================================================================== */
-
-@media (min-width: 768px) {
-
-	/* ---- ホーム画面：メニューを3列に ---- */
-	.menu {
-		grid-template-columns: repeat(3, 1fr);
-	}
-
-	/* ---- シフト提出画面：カードが間延びしないよう最大幅を制限 ---- */
-	.shift-block {
-		max-width: 640px;
-		margin-left: auto;
-		margin-right: auto;
-	}
-
-	.submit-info-box {
-		max-width: 640px;
-		margin-left: auto;
-		margin-right: auto;
-	}
-
-	.comment-area {
-		max-width: 640px;
-		margin-left: auto;
-		margin-right: auto;
-	}
-
-	.block-submit-button {
-		max-width: 640px;
-		margin-left: auto;
-		margin-right: auto;
-		width: 100%;
-	}
-
-	.submit-note {
-		max-width: 640px;
-		margin-left: auto;
-		margin-right: auto;
-	}
-
-	/* シフト提出の行間隔・文字サイズにも少し余裕を */
-	.shift-row,
-	.shift-table-header {
-		grid-template-columns: 120px 1fr 1fr 90px;
-		padding: 10px 16px;
-	}
-
-	.time-select {
-		font-size: 15px;
-		padding: 8px 6px;
-	}
-
-	/* ---- 提出済み確認画面：横幅を制限して見やすく ---- */
-	.submission-row {
-		max-width: 640px;
-		margin-left: auto;
-		margin-right: auto;
-		grid-template-columns: 140px 80px 1fr;
-		padding: 10px 16px;
-	}
-
-	/* ---- 確定シフト確認画面（PDFビューア）---- */
-	.pdf-viewer-area {
-		max-width: 640px;
-		margin-left: auto;
-		margin-right: auto;
-	}
-
-	.pdf-iframe {
-		height: 80vh;
-	}
-
-	/* ---- 希望シフト一覧・確定シフト確認共通：空状態 ---- */
-	.empty-state {
-		max-width: 640px;
-		margin-left: auto;
-		margin-right: auto;
-	}
-
-	/* ---- ユーザー管理画面：カードを2列に ---- */
-	.user-mgmt-header {
-		max-width: 900px;
-		margin-left: auto;
-		margin-right: auto;
-	}
-
-	.user-card {
-		max-width: 900px;
-		margin-left: auto;
-		margin-right: auto;
-	}
-
-	.user-section {
-		max-width: 900px;
-		margin-left: auto;
-		margin-right: auto;
-	}
-
-	.user-name,
-	.user-name-input {
-		font-size: 16px;
-	}
-}
-
-/* ---- 確定シフト作成：上部ツールバーに保存・PDFボタンを戻す ---- */
-/* （前回追加した .confirmed-create-bottom-actions は不要なので削除してOK） */
-
-.confirmed-create-toolbar {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: 12px;
-	flex-wrap: wrap;
-}
-
-/* ---- 全員リセットボタン：デザイン改善 ---- */
-.reset-all-button {
-	display: inline-flex;
-	align-items: center;
-	gap: 6px;
-	margin-bottom: 0;
-	padding: 10px 18px;
-	font-size: 13px;
-	font-weight: bold;
-	color: var(--brown);
-	background: var(--white);
-	border: 1.5px solid var(--brown-light);
-	border-radius: 20px;
-	cursor: pointer;
-	transition: background 0.15s, box-shadow 0.15s;
-	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-}
-
-.reset-all-button::before {
-	content: "↺";
-	font-size: 14px;
-}
-
-.reset-all-button:hover {
-	background: #fdf6ee;
-}
-
-.reset-all-button:active {
-	background: #f5e9d8;
-	box-shadow: none;
-}
-
-/* 固定ツールバーの下に境界線を追加（スクロール時にはっきり分かるように） */
-.confirmed-create-toolbar {
-	border-bottom: 2px solid #333;
-}
-
 /* ---- PDF生成中の進捗オーバーレイ ---- */
+
 .pdf-progress-overlay {
 	position: fixed;
 	inset: 0;
@@ -1667,54 +1637,13 @@ select.role-input {
 	color: var(--text-sub);
 }
 
-/* ---- 固定ツールバー：横幅を画面いっぱいにする ---- */
-.confirmed-create-toolbar {
-	position: sticky;
-	top: 0;
-	left: 50%;
-	transform: translateX(-50%);
-	width: 100vw;
-	box-sizing: border-box;
-	background: #f0ebe3;
-	border-bottom: 2px solid #333;
-	padding: 6px 16px;
-	margin: 0 0 12px;
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: 12px;
-	flex-wrap: wrap;
-	z-index: 10;
-}
-
-@media (min-width: 768px) {
-	.confirmed-create-toolbar {
-		padding: 6px 40px;
-	}
-}
-
-/* ---- ヘッダーとツールバーの間の余白を詰める（全体的に上へ） ---- */
-.app-header {
-	padding-bottom: 8px;
-}
-
-.app-main {
-	padding-top: 8px;
-}
-
-@media (min-width: 768px) {
-	.app-main {
-		padding-top: 8px;
-	}
-}
-
 /* ---- コメント一覧サイドパネル（画面右の余白を活用） ---- */
+
 .comments-sidebar {
 	display: none;
 }
 
-/* 十分な余白がある広い画面でのみ表示 */
-@media (min-width: 1500px) {
+@media (min-width: 1400px) {
 	.comments-sidebar {
 		display: block;
 		position: fixed;
@@ -1769,35 +1698,4 @@ select.role-input {
 	line-height: 1.5;
 	white-space: pre-wrap;
 	word-break: break-word;
-}
-
-/* ---- 固定ツールバー：正しい計算式で画面幅いっぱいにする ---- */
-/* 前回の left:50%+transform 方式はズレの原因になっていたため、
-   margin の calc() 方式に修正 */
-.confirmed-create-toolbar {
-	position: sticky;
-	top: 0;
-	left: auto;
-	transform: none;
-	width: 100vw;
-	margin-left: calc(50% - 50vw);
-	margin-right: calc(50% - 50vw);
-	box-sizing: border-box;
-	background: #f0ebe3;
-	border-bottom: 2px solid #333;
-	padding: 6px 16px;
-	margin-top: 0;
-	margin-bottom: 12px;
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: 12px;
-	flex-wrap: wrap;
-	z-index: 10;
-}
-
-@media (min-width: 768px) {
-	.confirmed-create-toolbar {
-		padding: 6px 40px;
-	}
 }

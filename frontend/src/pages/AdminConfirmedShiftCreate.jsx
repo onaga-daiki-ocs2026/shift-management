@@ -22,11 +22,6 @@ function AdminConfirmedShiftCreate() {
 	const [exportElapsed, setExportElapsed] = useState(0);
 	const [currentWeek, setCurrentWeek] = useState(0); // 0=前半, 1=後半
 	const [dayMemoMap, setDayMemoMap] = useState({});
-	const [dayNoteMap, setDayNoteMap] = useState({}); // { "2026-07-05": "10時オープン" }
-
-	const updateDayNote = (date, value) => {
-		setDayNoteMap((prev) => ({ ...prev, [date]: value }));
-	};
 
 	useEffect(() => {
 		const handleResize = () => setIsMobile(window.innerWidth < 768);
@@ -290,7 +285,8 @@ function AdminConfirmedShiftCreate() {
 		setExportProgress({ current: 0, total: dates.length });
 		setExportElapsed(0);
 
-		// exporting=true の再描画が画面に反映されるのを待つ
+		// exporting=true の再描画（非表示の週の日が一時的に見えるようになる）が
+		// 画面に反映されるのを待つ
 		await new Promise((resolve) =>
 			requestAnimationFrame(() => requestAnimationFrame(resolve)),
 		);
@@ -435,13 +431,23 @@ function AdminConfirmedShiftCreate() {
 			</div>
 
 			<div id="pdf-export-area">
-				{dates.map((date) => {
+				{dates.map((date, index) => {
 					const { label, isSun, isSat } = formatDisplayDate(date);
 					const hallList = getStaffList(date, "HALL");
 					const kitchenList = getStaffList(date, "KITCHEN");
 
+					// 前半(0〜6)/後半(7〜13)のうち、今表示していない週の日は
+					// DOM上には残す（PDF生成で個別に撮影するため）が、
+					// 画面には出さないようにする
+					const isInCurrentWeek =
+						currentWeek === 0 ? index < 7 : index >= 7;
+
 					return (
-						<div key={date} id={`day-section-${date}`} className="day-section">
+						<div
+							key={date}
+							id={`day-section-${date}`}
+							className={`day-section ${isInCurrentWeek ? "" : "hidden-week"}`}
+						>
 							<div
 								className={`day-section-title ${isSun ? "sun" : isSat ? "sat" : ""}`}
 							>
@@ -463,7 +469,6 @@ function AdminConfirmedShiftCreate() {
 								splitBlock={splitBlock}
 								deleteBlock={deleteBlock}
 								hourToLabel={hourToLabel}
-								exporting={exporting}
 							/>
 							<ShiftSection
 								title="キッチン"
@@ -480,7 +485,6 @@ function AdminConfirmedShiftCreate() {
 								splitBlock={splitBlock}
 								deleteBlock={deleteBlock}
 								hourToLabel={hourToLabel}
-								exporting={exporting}
 							/>
 
 							<div className="day-memo-area">
@@ -492,68 +496,6 @@ function AdminConfirmedShiftCreate() {
 									onChange={(e) => updateDayMemo(date, e.target.value)}
 								/>
 							</div>
-						</div>
-					);
-				})}
-			</div>
-
-			{/* PDF印刷用（非表示） */}
-			<div
-				id="pdf-print-area"
-				style={{
-					position: "fixed",
-					top: "-9999px",
-					left: "-9999px",
-					width: "1120px",
-					background: "#fff",
-					padding: "24px",
-				}}
-			>
-				{dates.map((date) => {
-					const { label } = formatDisplayDate(date);
-					const hallList = getStaffList(date, "HALL");
-					const kitchenList = getStaffList(date, "KITCHEN");
-					if (hallList.length === 0 && kitchenList.length === 0) return null;
-
-					return (
-						<div key={date} style={{ marginBottom: "16px" }}>
-							<h3 style={{ fontSize: "13px", margin: "0 0 4px 0" }}>
-								{label}
-							</h3>
-							{hallList.length > 0 && (
-								<ShiftSection
-									title="ホール"
-									position="HALL"
-									date={date}
-									staffList={hallList}
-									isMobile={false}
-									selected={null}
-									setSelected={() => {}}
-									updateBlocks={() => {}}
-									resetOne={() => {}}
-									removeRow={() => {}}
-									splitBlock={() => {}}
-									deleteBlock={() => {}}
-									hourToLabel={hourToLabel}
-								/>
-							)}
-							{kitchenList.length > 0 && (
-								<ShiftSection
-									title="キッチン"
-									position="KITCHEN"
-									date={date}
-									staffList={kitchenList}
-									isMobile={false}
-									selected={null}
-									setSelected={() => {}}
-									updateBlocks={() => {}}
-									resetOne={() => {}}
-									removeRow={() => {}}
-									splitBlock={() => {}}
-									deleteBlock={() => {}}
-									hourToLabel={hourToLabel}
-								/>
-							)}
 						</div>
 					);
 				})}
@@ -631,7 +573,6 @@ function ShiftSection({
 	splitBlock,
 	deleteBlock,
 	hourToLabel,
-	exporting,
 }) {
 	const totalHours = staffList.reduce((sum, staff) => {
 		const staffTotal = staff.blocks.reduce(
