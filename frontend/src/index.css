@@ -1627,6 +1627,12 @@ select.role-input {
 
 /* ---- 確定シフト作成：メインコンテンツ＋コメントパネルの横並び ---- */
 
+/* この画面はコメントパネルの分だけ横幅が必要なので、
+   app-mainの最大幅をこのページだけ広げる */
+.app-main:has(.confirmed-create-toolbar) {
+	max-width: 1700px;
+}
+
 .confirmed-create-body {
 	display: flex;
 	align-items: flex-start;
