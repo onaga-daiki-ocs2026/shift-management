@@ -18,6 +18,8 @@ function AdminConfirmedShiftCreate() {
 	const [selected, setSelected] = useState(null);
 	const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 	const [exporting, setExporting] = useState(false);
+	const [exportProgress, setExportProgress] = useState({ current: 0, total: 0 });
+	const [exportElapsed, setExportElapsed] = useState(0);
 	const [currentWeek, setCurrentWeek] = useState(0); // 0=前半, 1=後半
 	const [dayMemoMap, setDayMemoMap] = useState({});
 	const [dayNoteMap, setDayNoteMap] = useState({}); // { "2026-07-05": "10時オープン" }
@@ -35,6 +37,16 @@ function AdminConfirmedShiftCreate() {
 	useEffect(() => {
 		fetchPeriodAndShifts();
 	}, []);
+
+	// PDF生成中の経過時間を100ms毎に更新
+	useEffect(() => {
+		if (!exporting) return;
+		const start = Date.now();
+		const timer = setInterval(() => {
+			setExportElapsed(Date.now() - start);
+		}, 100);
+		return () => clearInterval(timer);
+	}, [exporting]);
 
 	const fetchPeriodAndShifts = async () => {
 		try {
@@ -275,20 +287,52 @@ function AdminConfirmedShiftCreate() {
 	const handleExportPdf = async () => {
 		setExporting(true);
 		setSelected(null);
-		const element = document.getElementById("pdf-export-area");
-		element.classList.add("pdf-mode");
-		try {
-			const canvas = await html2canvas(element, {
-				scale: 1,
-				useCORS: true,
-				backgroundColor: "#ffffff",
-			});
+		setExportProgress({ current: 0, total: dates.length });
+		setExportElapsed(0);
 
-			const imgData = canvas.toDataURL("image/png");
+		// exporting=true の再描画が画面に反映されるのを待つ
+		await new Promise((resolve) =>
+			requestAnimationFrame(() => requestAnimationFrame(resolve)),
+		);
+
+		const container = document.getElementById("pdf-export-area");
+		container.classList.add("pdf-mode");
+
+		try {
 			const pdf = new jsPDF("landscape", "mm", "a4");
 			const pdfWidth = pdf.internal.pageSize.getWidth();
-			const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-			pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+			const pdfHeight = pdf.internal.pageSize.getHeight();
+
+			for (let i = 0; i < dates.length; i++) {
+				const date = dates[i];
+				const dayElement = document.getElementById(`day-section-${date}`);
+				if (!dayElement) continue;
+
+				const canvas = await html2canvas(dayElement, {
+					scale: 1,
+					useCORS: true,
+					backgroundColor: "#ffffff",
+					windowWidth: dayElement.scrollWidth,
+				});
+
+				const imgData = canvas.toDataURL("image/png");
+
+				// ページ内に収まるよう、縦横比を保ったまま縮小
+				const ratio = Math.min(
+					pdfWidth / canvas.width,
+					pdfHeight / canvas.height,
+				);
+				const imgWidth = canvas.width * ratio;
+				const imgHeight = canvas.height * ratio;
+
+				if (i > 0) pdf.addPage();
+				pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
+
+				setExportProgress({ current: i + 1, total: dates.length });
+
+				// ブラウザに描画・progressバー更新の余裕を与える
+				await new Promise((resolve) => requestAnimationFrame(resolve));
+			}
 
 			const pdfBlob = pdf.output("blob");
 			const formData = new FormData();
@@ -298,12 +342,14 @@ function AdminConfirmedShiftCreate() {
 			await api.post("/api/pdfs/upload", formData, {
 				headers: { "Content-Type": "multipart/form-data" },
 			});
-			alert("PDFを保存しました！スタッフの確定シフト確認画面に反映されます。");
+			alert(
+				`PDFを保存しました！（${dates.length}日分・${(exportElapsed / 1000).toFixed(1)}秒）\nスタッフの確定シフト確認画面に反映されます。`,
+			);
 		} catch (error) {
 			console.error("PDF出力に失敗しました", error);
 			alert("PDF出力に失敗しました");
 		} finally {
-			element.classList.remove("pdf-mode");
+			container.classList.remove("pdf-mode");
 			setExporting(false);
 		}
 	};
@@ -337,6 +383,23 @@ function AdminConfirmedShiftCreate() {
 				>
 					全員リセット
 				</button>
+				<div className="confirmed-create-actions">
+					<button
+						type="button"
+						onClick={handleSubmit}
+						className="submit-button"
+					>
+						確定シフトを保存
+					</button>
+					<button
+						type="button"
+						className="pdf-export-button"
+						onClick={handleExportPdf}
+						disabled={exporting}
+					>
+						{exporting ? "PDF生成中..." : "📄 PDFを生成・公開"}
+					</button>
+				</div>
 			</div>
 
 			<div className="week-tabs">
@@ -363,7 +426,7 @@ function AdminConfirmedShiftCreate() {
 					const kitchenList = getStaffList(date, "KITCHEN");
 
 					return (
-						<div key={date} className="day-section">
+						<div key={date} id={`day-section-${date}`} className="day-section">
 							<div
 								className={`day-section-title ${isSun ? "sun" : isSat ? "sat" : ""}`}
 							>
@@ -385,6 +448,7 @@ function AdminConfirmedShiftCreate() {
 								splitBlock={splitBlock}
 								deleteBlock={deleteBlock}
 								hourToLabel={hourToLabel}
+								exporting={exporting}
 							/>
 							<ShiftSection
 								title="キッチン"
@@ -401,6 +465,7 @@ function AdminConfirmedShiftCreate() {
 								splitBlock={splitBlock}
 								deleteBlock={deleteBlock}
 								hourToLabel={hourToLabel}
+								exporting={exporting}
 							/>
 
 							<div className="day-memo-area">
@@ -478,24 +543,6 @@ function AdminConfirmedShiftCreate() {
 					);
 				})}
 			</div>
-
-			<div className="confirmed-create-bottom-actions">
-				<button
-					type="button"
-					onClick={handleSubmit}
-					className="submit-button"
-				>
-					確定シフトを保存
-				</button>
-				<button
-					type="button"
-					className="pdf-export-button"
-					onClick={handleExportPdf}
-					disabled={exporting}
-				>
-					{exporting ? "PDF生成中..." : "📄 PDFを生成・公開"}
-				</button>
-			</div>
 		</Layout>
 
 		{!isMobile && selected && selectedStaff && (
@@ -509,6 +556,30 @@ function AdminConfirmedShiftCreate() {
 				deleteBlock={deleteBlock}
 				setSelected={setSelected}
 			/>
+		)}
+
+		{exporting && (
+			<div className="pdf-progress-overlay">
+				<div className="pdf-progress-box">
+					<div className="pdf-progress-title">📄 PDFを生成しています…</div>
+					<div className="pdf-progress-bar-track">
+						<div
+							className="pdf-progress-bar-fill"
+							style={{
+								width: `${
+									exportProgress.total > 0
+										? (exportProgress.current / exportProgress.total) * 100
+										: 0
+								}%`,
+							}}
+						/>
+					</div>
+					<div className="pdf-progress-text">
+						{exportProgress.current} / {exportProgress.total} 日分　
+						経過時間：{(exportElapsed / 1000).toFixed(1)}秒
+					</div>
+				</div>
+			</div>
 		)}
 		</>
 	);
@@ -531,6 +602,7 @@ function ShiftSection({
 	splitBlock,
 	deleteBlock,
 	hourToLabel,
+	exporting,
 }) {
 	const totalHours = staffList.reduce((sum, staff) => {
 		const staffTotal = staff.blocks.reduce(
@@ -540,10 +612,7 @@ function ShiftSection({
 		return sum + staffTotal;
 	}, 0);
 
-	const emptyRowCount = Math.max(
-		0,
-		FIXED_ROWS_PER_SECTION - staffList.length,
-	);
+	const emptyRowCount = Math.max(0, FIXED_ROWS_PER_SECTION - staffList.length);
 
 	return (
 		<div
