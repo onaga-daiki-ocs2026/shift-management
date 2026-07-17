@@ -1625,6 +1625,19 @@ select.role-input {
 	color: var(--text-sub);
 }
 
+/* ---- 確定シフト作成：メインコンテンツ＋コメントパネルの横並び ---- */
+
+.confirmed-create-body {
+	display: flex;
+	align-items: flex-start;
+	gap: 20px;
+}
+
+.confirmed-create-main {
+	flex: 1;
+	min-width: 0;
+}
+
 /* ---- コメント一覧サイドパネル（画面右の余白を活用） ---- */
 
 .comments-sidebar {
@@ -1634,11 +1647,13 @@ select.role-input {
 @media (min-width: 1400px) {
 	.comments-sidebar {
 		display: block;
-		position: fixed;
-		top: 100px;
-		right: 20px;
+		flex-shrink: 0;
 		width: 340px;
-		max-height: calc(100vh - 120px);
+		/* 固定ツールバーと同じ「上までスクロールしたら張り付く」動き。
+		   ツールバーの高さ＋少し余白ぶんだけ下にずらして重ならないようにする */
+		position: sticky;
+		top: 68px;
+		max-height: calc(100vh - 88px);
 		overflow-y: auto;
 		background: #fff;
 		border: 1px solid var(--gray-border);

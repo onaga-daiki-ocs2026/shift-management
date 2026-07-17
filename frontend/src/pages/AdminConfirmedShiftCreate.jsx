@@ -424,110 +424,115 @@ function AdminConfirmedShiftCreate() {
 				</div>
 			</div>
 
-			<div className="week-tabs">
-				<button
-					type="button"
-					className={`week-tab ${currentWeek === 0 ? "active" : ""}`}
-					onClick={() => setCurrentWeek(0)}
-				>
-					前半（1〜7日目）
-				</button>
-				<button
-					type="button"
-					className={`week-tab ${currentWeek === 1 ? "active" : ""}`}
-					onClick={() => setCurrentWeek(1)}
-				>
-					後半（8〜14日目）
-				</button>
-			</div>
-
-			<div id="pdf-export-area">
-				{dates.map((date, index) => {
-					const { label, isSun, isSat } = formatDisplayDate(date);
-					const hallList = getStaffList(date, "HALL");
-					const kitchenList = getStaffList(date, "KITCHEN");
-
-					// 前半(0〜6)/後半(7〜13)のうち、今表示していない週の日は
-					// DOM上には残す（PDF生成で個別に撮影するため）が、
-					// 画面には出さないようにする
-					const isInCurrentWeek =
-						currentWeek === 0 ? index < 7 : index >= 7;
-
-					return (
-						<div
-							key={date}
-							id={`day-section-${date}`}
-							className={`day-section ${isInCurrentWeek ? "" : "hidden-week"}`}
+			<div className="confirmed-create-body">
+				<div className="confirmed-create-main">
+					<div className="week-tabs">
+						<button
+							type="button"
+							className={`week-tab ${currentWeek === 0 ? "active" : ""}`}
+							onClick={() => setCurrentWeek(0)}
 						>
-							<div
-								className={`day-section-title ${isSun ? "sun" : isSat ? "sat" : ""}`}
-							>
-								{label}
-							</div>
+							前半（1〜7日目）
+						</button>
+						<button
+							type="button"
+							className={`week-tab ${currentWeek === 1 ? "active" : ""}`}
+							onClick={() => setCurrentWeek(1)}
+						>
+							後半（8〜14日目）
+						</button>
+					</div>
 
-							<ShiftSection
-								title="ホール"
-								position="HALL"
-								date={date}
-								staffList={hallList}
-								isMobile={isMobile}
-								selected={selected}
-								setSelected={setSelected}
-								updateBlocks={updateBlocks}
-								updateRole={updateRole}
-								resetOne={resetOne}
-								removeRow={removeRow}
-								splitBlock={splitBlock}
-								deleteBlock={deleteBlock}
-								hourToLabel={hourToLabel}
-							/>
-							<ShiftSection
-								title="キッチン"
-								position="KITCHEN"
-								date={date}
-								staffList={kitchenList}
-								isMobile={isMobile}
-								selected={selected}
-								setSelected={setSelected}
-								updateBlocks={updateBlocks}
-								updateRole={updateRole}
-								resetOne={resetOne}
-								removeRow={removeRow}
-								splitBlock={splitBlock}
-								deleteBlock={deleteBlock}
-								hourToLabel={hourToLabel}
-							/>
+					<div id="pdf-export-area">
+						{dates.map((date, index) => {
+							const { label, isSun, isSat } = formatDisplayDate(date);
+							const hallList = getStaffList(date, "HALL");
+							const kitchenList = getStaffList(date, "KITCHEN");
 
-							<div className="day-memo-area">
-								<span className="day-memo-label">伝達事項</span>
-								<textarea
-									className="day-memo-textarea"
-									placeholder="この日の伝達事項を入力（例：10時オープン）"
-									value={dayMemoMap[date] || ""}
-									onChange={(e) => updateDayMemo(date, e.target.value)}
-								/>
+							// 前半(0〜6)/後半(7〜13)のうち、今表示していない週の日は
+							// DOM上には残す（PDF生成で個別に撮影するため）が、
+							// 画面には出さないようにする
+							const isInCurrentWeek =
+								currentWeek === 0 ? index < 7 : index >= 7;
+
+							return (
+								<div
+									key={date}
+									id={`day-section-${date}`}
+									className={`day-section ${isInCurrentWeek ? "" : "hidden-week"}`}
+								>
+									<div
+										className={`day-section-title ${isSun ? "sun" : isSat ? "sat" : ""}`}
+									>
+										{label}
+									</div>
+
+									<ShiftSection
+										title="ホール"
+										position="HALL"
+										date={date}
+										staffList={hallList}
+										isMobile={isMobile}
+										selected={selected}
+										setSelected={setSelected}
+										updateBlocks={updateBlocks}
+										updateRole={updateRole}
+										resetOne={resetOne}
+										removeRow={removeRow}
+										splitBlock={splitBlock}
+										deleteBlock={deleteBlock}
+										hourToLabel={hourToLabel}
+									/>
+									<ShiftSection
+										title="キッチン"
+										position="KITCHEN"
+										date={date}
+										staffList={kitchenList}
+										isMobile={isMobile}
+										selected={selected}
+										setSelected={setSelected}
+										updateBlocks={updateBlocks}
+										updateRole={updateRole}
+										resetOne={resetOne}
+										removeRow={removeRow}
+										splitBlock={splitBlock}
+										deleteBlock={deleteBlock}
+										hourToLabel={hourToLabel}
+									/>
+
+									<div className="day-memo-area">
+										<span className="day-memo-label">伝達事項</span>
+										<textarea
+											className="day-memo-textarea"
+											placeholder="この日の伝達事項を入力（例：10時オープン）"
+											value={dayMemoMap[date] || ""}
+											onChange={(e) => updateDayMemo(date, e.target.value)}
+										/>
+									</div>
+								</div>
+							);
+						})}
+					</div>
+				</div>
+
+				{!isMobile && commentsByUser.length > 0 && (
+					<aside className="comments-sidebar">
+						<div className="comments-sidebar-title">💬 コメント一覧（14日分）</div>
+						{commentsByUser.map((u) => (
+							<div key={u.userId} className="comments-sidebar-user-group">
+								<div className="comments-sidebar-user-name">{u.name}</div>
+								{u.entries.map((e) => (
+									<div key={e.key} className="comments-sidebar-item">
+										<div className="comments-sidebar-text">{e.comment}</div>
+									</div>
+								))}
 							</div>
-						</div>
-					);
-				})}
+						))}
+					</aside>
+				)}
 			</div>
 		</Layout>
 
-		{!isMobile && commentsByUser.length > 0 && (
-			<aside className="comments-sidebar">
-				<div className="comments-sidebar-title">💬 コメント一覧（14日分）</div>
-				{commentsByUser.map((u) => (
-					<div key={u.userId} className="comments-sidebar-user-group">
-						<div className="comments-sidebar-user-name">{u.name}</div>
-						{u.entries.map((e) => (
-							<div key={e.key} className="comments-sidebar-item">
-								<div className="comments-sidebar-text">{e.comment}</div>
-							</div>
-						))}
-					</div>
-				))}
-			</aside>
-		)}
 
 		{!isMobile && selected && selectedStaff && (
 			<EditModal
