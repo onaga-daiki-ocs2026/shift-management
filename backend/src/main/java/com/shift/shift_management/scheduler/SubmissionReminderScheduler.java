@@ -7,6 +7,7 @@ import com.shift.shift_management.repository.UserRepository;
 import com.shift.shift_management.service.LineNotificationService;
 import com.shift.shift_management.service.SubmissionPeriodService;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -15,6 +16,9 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 @Component
 public class SubmissionReminderScheduler {
+
+	// サーバーがUTC等で動いていても、日本時間基準で判定する
+	private static final ZoneId JST = ZoneId.of("Asia/Tokyo");
 
 	private final SubmissionPeriodService submissionPeriodService;
 	private final UserRepository userRepository;
@@ -26,7 +30,7 @@ public class SubmissionReminderScheduler {
 	public void sendDeadlineReminder() {
 		SubmissionPeriodResponse period = submissionPeriodService.getCurrentPeriod();
 
-		LocalDate today = LocalDate.now();
+		LocalDate today = LocalDate.now(JST);
 		long daysUntilDeadline = ChronoUnit.DAYS.between(today, period.deadline());
 
 		// 締切の前日だけ送る（毎日送られると鬱陶しいため）
@@ -40,8 +44,8 @@ public class SubmissionReminderScheduler {
 						+ "このままだと希望が反映されないまま確定してしまいます。\n"
 						+ "今すぐアプリから提出してください！";
 
+		// STAFF/ADMIN問わず、未提出の人全員にリマインドする
 		userRepository.findAll().stream()
-				.filter(user -> "STAFF".equals(user.getRole()))
 				.filter(user -> !hasSubmitted(user, period))
 				.forEach(user -> lineNotificationService.push(user.getLineUserId(), message));
 	}

@@ -70,8 +70,8 @@ public class ShiftPdfService {
 						+ periodEnd.format(DATE_FORMAT) + "のシフトを公開しました。\n"
 						+ "アプリの「確定シフト確認」からご確認ください。";
 
-		userRepository.findAll().stream()
-				.filter(user -> "STAFF".equals(user.getRole()))
+		// STAFF/ADMIN問わず、LINE連携しているユーザー全員に通知する
+		userRepository.findAll()
 				.forEach(user -> lineNotificationService.push(user.getLineUserId(), message));
 	}
 }
