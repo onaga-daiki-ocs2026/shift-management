@@ -67,6 +67,14 @@ function AdminUserManagement() {
 				position: user.position,
 				role: user.role,
 				sortOrder: user.sortOrder,
+				contractDays:
+					user.contractDays === "" || user.contractDays == null
+						? null
+						: Number(user.contractDays),
+				contractHours:
+					user.contractHours === "" || user.contractHours == null
+						? null
+						: Number(user.contractHours),
 			});
 			alert(`${user.displayName}さんの設定を保存しました`);
 			setEditingId(null);
@@ -262,6 +270,39 @@ function SortableUserRow({
 						<option value="STAFF">STAFF</option>
 						<option value="ADMIN">ADMIN</option>
 					</select>
+				</div>
+
+				<div className="user-card-contract">
+					<div className="user-card-contract-field">
+						<label>契約日数（週）</label>
+						<input
+							type="number"
+							min="0"
+							max="7"
+							className="user-contract-input"
+							placeholder="例：5"
+							value={user.contractDays ?? ""}
+							onChange={(e) =>
+								handleChange(user.id, "contractDays", e.target.value)
+							}
+						/>
+						<span className="user-contract-unit">日</span>
+					</div>
+					<div className="user-card-contract-field">
+						<label>契約時間（週）</label>
+						<input
+							type="number"
+							min="0"
+							step="0.5"
+							className="user-contract-input"
+							placeholder="例：30"
+							value={user.contractHours ?? ""}
+							onChange={(e) =>
+								handleChange(user.id, "contractHours", e.target.value)
+							}
+						/>
+						<span className="user-contract-unit">h</span>
+					</div>
 				</div>
 			</div>
 

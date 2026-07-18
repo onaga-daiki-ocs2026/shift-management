@@ -19,6 +19,8 @@ function AdminConfirmedShiftCreate() {
 	const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 	const [exporting, setExporting] = useState(false);
 	const [exportProgress, setExportProgress] = useState({ current: 0, total: 0 });
+	const [exportStage, setExportStage] = useState("capturing"); // "capturing" | "uploading"
+	const [uploadPercent, setUploadPercent] = useState(0);
 	const [exportElapsed, setExportElapsed] = useState(0);
 	const [currentWeek, setCurrentWeek] = useState(0); // 0=前半, 1=後半
 	const [dayMemoMap, setDayMemoMap] = useState({});
@@ -283,6 +285,8 @@ function AdminConfirmedShiftCreate() {
 		setExporting(true);
 		setSelected(null);
 		setExportProgress({ current: 0, total: dates.length });
+		setExportStage("capturing");
+		setUploadPercent(0);
 		setExportElapsed(0);
 
 		// exporting=true の再描画（非表示の週の日が一時的に見えるようになる）が
@@ -359,8 +363,19 @@ function AdminConfirmedShiftCreate() {
 			formData.append("file", pdfBlob, "shift.pdf");
 			formData.append("periodStart", periodStart);
 
+			setExportStage("uploading");
+			// 段階の切り替えが画面に反映されるのを待つ
+			await new Promise((resolve) => requestAnimationFrame(resolve));
+
 			await api.post("/api/pdfs/upload", formData, {
 				headers: { "Content-Type": "multipart/form-data" },
+				onUploadProgress: (progressEvent) => {
+					if (!progressEvent.total) return;
+					const percent = Math.round(
+						(progressEvent.loaded / progressEvent.total) * 100,
+					);
+					setUploadPercent(percent);
+				},
 			});
 			alert(
 				`PDFを保存しました！（${dates.length}日分・${pdfSizeMB.toFixed(1)}MB・${(exportElapsed / 1000).toFixed(1)}秒）\nスタッフの確定シフト確認画面に反映されます。`,
@@ -580,22 +595,30 @@ function AdminConfirmedShiftCreate() {
 		{exporting && (
 			<div className="pdf-progress-overlay">
 				<div className="pdf-progress-box">
-					<div className="pdf-progress-title">📄 PDFを生成しています…</div>
+					<div className="pdf-progress-title">
+						{exportStage === "uploading"
+							? "☁️ アップロードしています…"
+							: "📄 PDFを生成しています…"}
+					</div>
 					<div className="pdf-progress-bar-track">
 						<div
 							className="pdf-progress-bar-fill"
 							style={{
 								width: `${
-									exportProgress.total > 0
-										? (exportProgress.current / exportProgress.total) * 100
-										: 0
+									exportStage === "uploading"
+										? 85 + uploadPercent * 0.15
+										: exportProgress.total > 0
+											? (exportProgress.current / exportProgress.total) * 85
+											: 0
 								}%`,
 							}}
 						/>
 					</div>
 					<div className="pdf-progress-text">
-						{exportProgress.current} / {exportProgress.total} 日分　
-						経過時間：{(exportElapsed / 1000).toFixed(1)}秒
+						{exportStage === "uploading"
+							? `アップロード中 ${uploadPercent}%`
+							: `${exportProgress.current} / ${exportProgress.total} 日分`}
+						　経過時間：{(exportElapsed / 1000).toFixed(1)}秒
 					</div>
 				</div>
 			</div>

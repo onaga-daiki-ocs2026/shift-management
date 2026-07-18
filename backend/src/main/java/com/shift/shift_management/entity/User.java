@@ -19,7 +19,7 @@ public class User {
 	@Column(nullable = false, unique = true)
 	private String lineUserId;
 
-	// LINE表示吁E
+	// LINE表示名
 	private String displayName;
 
 	// STAFF / ADMIN
@@ -28,11 +28,17 @@ public class User {
 	// HALL / KITCHEN
 	private String position = "HALL";
 
-	// 登録日晁E
+	// 登録日時
 	private LocalDateTime createdAt;
 
 	private Integer sortOrder = 0;
-	
+
+	// 契約日数（週あたり、シフト作成の補助に使用）
+	private Integer contractDays;
+
+	// 契約時間（週あたりの時間数、シフト作成の補助に使用）
+	private Double contractHours;
+
 	@PrePersist
 	public void onCreate() {
 		createdAt = LocalDateTime.now();

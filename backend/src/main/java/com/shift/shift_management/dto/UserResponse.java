@@ -17,5 +17,11 @@ public class UserResponse {
 
 	private String position;
 
-		private Integer sortOrder;
+	private Integer sortOrder;
+
+	// 契約日数（週あたり）
+	private Integer contractDays;
+
+	// 契約時間（週あたり）
+	private Double contractHours;
 }

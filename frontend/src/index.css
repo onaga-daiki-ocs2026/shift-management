@@ -1832,3 +1832,40 @@ select.role-input {
 	line-height: 1.6;
 	margin-top: 4px;
 }
+
+/* ---- ユーザー管理：契約日数・契約時間 ---- */
+.user-card-contract {
+	display: flex;
+	gap: 12px;
+	margin-top: 4px;
+}
+
+.user-card-contract-field {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	flex: 1;
+}
+
+.user-card-contract-field label {
+	font-size: 11px;
+	color: var(--text-sub);
+	white-space: nowrap;
+}
+
+.user-contract-input {
+	width: 100%;
+	min-width: 0;
+	font-size: 13px;
+	padding: 6px 6px;
+	border: 1px solid var(--gray-border);
+	border-radius: 8px;
+	background: var(--white);
+	color: var(--text-main);
+	text-align: center;
+}
+
+.user-contract-unit {
+	font-size: 11px;
+	color: var(--text-sub);
+}

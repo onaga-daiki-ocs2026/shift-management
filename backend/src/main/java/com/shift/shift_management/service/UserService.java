@@ -59,6 +59,12 @@ public class UserService {
 		if (request.sortOrder() != null) {
 			user.setSortOrder(request.sortOrder());
 		}
+		if (request.contractDays() != null) {
+			user.setContractDays(request.contractDays());
+		}
+		if (request.contractHours() != null) {
+			user.setContractHours(request.contractHours());
+		}
 
 		User savedUser = userRepository.save(user);
 		return toResponse(savedUser);
@@ -72,6 +78,8 @@ public class UserService {
 		response.setRole(user.getRole());
 		response.setPosition(user.getPosition());
 		response.setSortOrder(user.getSortOrder());
+		response.setContractDays(user.getContractDays());
+		response.setContractHours(user.getContractHours());
 		return response;
 	}
 }

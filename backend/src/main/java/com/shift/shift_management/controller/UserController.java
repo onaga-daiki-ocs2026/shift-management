@@ -36,7 +36,7 @@ public class UserController {
 	public ResponseEntity<Void> updateSortOrder(
 			@RequestBody List<Long> userIds) {
 		for (int i = 0; i < userIds.size(); i++) {
-			UserUpdateRequest req = new UserUpdateRequest(null, null, null, i);
+			UserUpdateRequest req = new UserUpdateRequest(null, null, null, i, null, null);
 			userService.updateUser(userIds.get(i), req);
 		}
 		return ResponseEntity.ok().build();

@@ -3,6 +3,7 @@ import Layout from "../components/Layout";
 import api from "../api/api";
 
 const DAY_NAMES = ["日", "月", "火", "水", "木", "金", "土"];
+const MAX_BLOCKS = 5;
 
 function MySubmissions() {
 	const [shifts, setShifts] = useState([]);
@@ -47,7 +48,8 @@ function MySubmissions() {
 			const dates = sorted.slice(i, i + 14);
 			blocks.push({ dates });
 		}
-		return blocks;
+		// 新しい期間が上に来るよう並び替えて、直近5件までに絞る
+		return blocks.reverse().slice(0, MAX_BLOCKS);
 	};
 
 	const formatDisplayDate = (dateString) => {
@@ -83,6 +85,8 @@ function MySubmissions() {
 		<Layout>
 			{blocks.length > 0 ? (
 				<div>
+					<p className="pdf-note">提出済みシフト（直近5件）</p>
+
 					{blocks.map((block, blockIndex) => {
 						const isOpen = openBlockIndexes.has(blockIndex);
 						const availableCount = block.dates.filter((d) => d.available).length;
@@ -143,6 +147,10 @@ function MySubmissions() {
 							</div>
 						);
 					})}
+
+					<div className="pdf-inquiry-note">
+						これより前のシフトを確認したい場合は、店舗の管理者にお問い合わせください。
+					</div>
 				</div>
 			) : (
 				<div className="empty-state">
