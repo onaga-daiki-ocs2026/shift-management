@@ -7,7 +7,7 @@ const MAX_BLOCKS = 5;
 
 function MySubmissions() {
 	const [shifts, setShifts] = useState([]);
-	const [openBlockIndexes, setOpenBlockIndexes] = useState(new Set([0]));
+	const [openBlockIndexes, setOpenBlockIndexes] = useState(new Set());
 	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {

@@ -12,7 +12,7 @@ for (let h = 9; h <= 23; h++) {
 function ShiftSubmit() {
 	const [period, setPeriod] = useState(null);
 	const [shiftBlocks, setShiftBlocks] = useState([]);
-	const [openBlockIndexes, setOpenBlockIndexes] = useState(new Set([0]));
+	const [openBlockIndexes, setOpenBlockIndexes] = useState(new Set());
 	const [loading, setLoading] = useState(true);
 	const [selectedBlocks, setSelectedBlocks] = useState([0]);
 	const [submitting, setSubmitting] = useState(false);

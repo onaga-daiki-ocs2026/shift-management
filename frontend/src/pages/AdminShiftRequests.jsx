@@ -7,7 +7,7 @@ const DAY_NAMES = ["日", "月", "火", "水", "木", "金", "土"];
 function AdminShiftRequests() {
 	const [staffShifts, setStaffShifts] = useState([]);
 	const [loading, setLoading] = useState(true);
-	const [openIndexes, setOpenIndexes] = useState(new Set([0]));
+	const [openIndexes, setOpenIndexes] = useState(new Set());
 
 	useEffect(() => {
 		fetchAll();
