@@ -11,18 +11,14 @@ function formatDisplayDate(dateString) {
 }
 
 function ConfirmedShifts() {
-	const [pdfUrl, setPdfUrl] = useState(null);
-	const [periodStart, setPeriodStart] = useState(null);
-	const [periodEnd, setPeriodEnd] = useState(null);
+	const [pdfList, setPdfList] = useState([]);
 	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
 		api
-			.get("/api/pdfs/current")
+			.get("/api/pdfs/all")
 			.then((response) => {
-				setPdfUrl(response.data.url || null);
-				setPeriodStart(response.data.periodStart || null);
-				setPeriodEnd(response.data.periodEnd || null);
+				setPdfList(response.data || []);
 			})
 			.catch((error) => {
 				console.log(error);
@@ -40,41 +36,37 @@ function ConfirmedShifts() {
 		);
 	}
 
-	const periodLabel =
-		periodStart && periodEnd
-			? `${formatDisplayDate(periodStart)}〜${formatDisplayDate(periodEnd)}`
-			: null;
-
 	return (
 		<Layout>
-			{pdfUrl ? (
+			{pdfList.length > 0 ? (
 				<div className="pdf-viewer-area">
-					<p className="pdf-note">確定シフトのPDFが公開されています</p>
-					<a
-						href={pdfUrl}
-						target="_blank"
-						rel="noopener noreferrer"
-						className="pdf-download-button"
-					>
-						<span className="pdf-download-button-main">
-							📄 確定シフトを開く
-						</span>
-						{periodLabel && (
-							<span className="pdf-download-button-period">
-								{periodLabel}
+					<p className="pdf-note">公開されている確定シフト（直近5件）</p>
+					{pdfList.map((pdf) => (
+						<a
+							key={pdf.periodStart}
+							href={pdf.url}
+							target="_blank"
+							rel="noopener noreferrer"
+							className="pdf-download-button"
+						>
+							<span className="pdf-download-button-main">
+								📄 確定シフトを開く
 							</span>
-						)}
-					</a>
+							<span className="pdf-download-button-period">
+								{formatDisplayDate(pdf.periodStart)}〜
+								{formatDisplayDate(pdf.periodEnd)}
+							</span>
+						</a>
+					))}
+
+					<div className="pdf-inquiry-note">
+						これより前のシフトを確認したい場合は、店舗の管理者にお問い合わせください。
+					</div>
 				</div>
 			) : (
 				<div className="empty-state">
 					<p className="empty-icon">✅</p>
 					<p className="empty-text">確定シフトはまだ公開されていません</p>
-					{periodLabel && (
-						<p className="empty-sub-text">
-							対象期間：{periodLabel}
-						</p>
-					)}
 				</div>
 			)}
 		</Layout>

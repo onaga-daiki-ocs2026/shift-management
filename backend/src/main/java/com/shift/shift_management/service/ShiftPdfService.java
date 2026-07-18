@@ -7,6 +7,7 @@ import com.shift.shift_management.repository.UserRepository;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,11 +28,13 @@ public class ShiftPdfService {
 	public String uploadPdf(MultipartFile file, LocalDate periodStart) throws IOException {
 
 		// 期間の開始日をファイル名にすることで、
-		// 同じ期間のPDFは常に同じパスに上書き保存される
+		// 同じ期間のPDFは常に同じパスに上書き保存される。
+		// 期間が違えば別ファイルとして追加保存される。
 		String objectPath = periodStart.toString() + ".pdf";
 
 		String pdfUrl = supabaseStorageService.upload(file.getBytes(), objectPath);
 
+		// 同じ期間（periodStart）のレコードがあれば更新、無ければ新規追加
 		Optional<ShiftPdf> existing = shiftPdfRepository.findByPeriodStart(periodStart);
 		ShiftPdf shiftPdf = existing.orElseGet(ShiftPdf::new);
 		shiftPdf.setPeriodStart(periodStart);
@@ -51,6 +54,12 @@ public class ShiftPdfService {
 				.findByPeriodStart(periodStart)
 				.map(ShiftPdf::getPdfUrl)
 				.orElse(null);
+	}
+
+	// 公開済みのPDFを、新しい期間の順に直近5件だけ一覧取得
+	// （5件より前のものはDBには残っているが、ここでは返さない）
+	public List<ShiftPdf> findRecentPdfs() {
+		return shiftPdfRepository.findTop5ByOrderByPeriodStartDesc();
 	}
 
 	private void notifyStaffShiftConfirmed(LocalDate periodStart) {

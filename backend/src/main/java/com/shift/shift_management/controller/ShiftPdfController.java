@@ -4,6 +4,7 @@ import com.shift.shift_management.service.ShiftPdfService;
 import com.shift.shift_management.service.SubmissionPeriodService;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -52,4 +53,21 @@ public class ShiftPdfController {
 						"periodStart", periodStart.toString(),
 						"periodEnd", periodEnd.toString()));
 	}
+
+	// 公開済みPDFのうち、直近5件を新しい順に一覧取得
+	@GetMapping("/all")
+	public ResponseEntity<List<ShiftPdfListItem>> getAllPdfs() {
+		List<ShiftPdfListItem> list =
+				shiftPdfService.findRecentPdfs().stream()
+						.map(
+								pdf ->
+										new ShiftPdfListItem(
+												pdf.getPeriodStart().toString(),
+												pdf.getPeriodStart().plusDays(13).toString(),
+												pdf.getPdfUrl()))
+						.toList();
+		return ResponseEntity.ok(list);
+	}
+
+	public record ShiftPdfListItem(String periodStart, String periodEnd, String url) {}
 }

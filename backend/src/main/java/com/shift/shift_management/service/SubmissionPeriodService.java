@@ -2,6 +2,7 @@ package com.shift.shift_management.service;
 
 import com.shift.shift_management.dto.SubmissionPeriodResponse;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 
 import lombok.RequiredArgsConstructor;
@@ -13,8 +14,11 @@ public class SubmissionPeriodService {
 
 	private static final LocalDate BASE_DEADLINE = LocalDate.of(2026, 6, 20);
 
+	// サーバー（Render等）がUTCで動いていても、日本時間基準で「今日」を判定する
+	private static final ZoneId JST = ZoneId.of("Asia/Tokyo");
+
 	public SubmissionPeriodResponse getCurrentPeriod() {
-		LocalDate today = LocalDate.now();
+		LocalDate today = LocalDate.now(JST);
 
 		// 基準締切日から何日経過したか
 		long daysPassed = ChronoUnit.DAYS.between(BASE_DEADLINE, today);
