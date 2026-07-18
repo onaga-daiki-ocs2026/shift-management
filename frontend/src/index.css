@@ -436,6 +436,27 @@ body {
 	opacity: 0.85;
 }
 
+.block-submit-button:disabled {
+	opacity: 0.7;
+	cursor: not-allowed;
+}
+
+.submit-spinner {
+	display: inline-block;
+	width: 16px;
+	height: 16px;
+	border: 2px solid rgba(255, 255, 255, 0.4);
+	border-top-color: #fff;
+	border-radius: 50%;
+	animation: submit-spin 0.7s linear infinite;
+}
+
+@keyframes submit-spin {
+	to {
+		transform: rotate(360deg);
+	}
+}
+
 .submit-note {
 	text-align: center;
 	font-size: 11px;
@@ -1653,19 +1674,9 @@ select.role-input {
 	display: none !important;
 }
 
-/* ---- PDF出力時：重いグラデーション背景を軽量化（生成速度対策） ----
-   細かい縞模様のグラデーションは html2canvas での描画が非常に重く、
-   14日分×最大30行を撮影すると数分〜十分以上かかることがあったため、
-   PDF撮影の瞬間だけ背景をベタ塗りに一時的に差し替える。
-   画面上の通常表示（縞模様つき）には影響しない。 */
-.pdf-mode .timeline-track {
-	background-image: none !important;
-	background-color: #fafafa !important;
-}
-
-.pdf-mode .empty-row .timeline-track {
-	background-color: #fcfcfc !important;
-}
+/* PDF撮影時のグリッド線は、後日速度改善が必要になれば
+   ここに .pdf-mode .timeline-track { background-image: none; } の
+   ような上書きを再度追加する（現在はグリッドをそのまま撮影） */
 
 /* ---- PDF生成中の進捗オーバーレイ ---- */
 
@@ -1819,53 +1830,4 @@ select.role-input {
 	border-radius: 12px;
 	display: inline-block;
 	margin-bottom: 8px;
-}
-
-/* ---- 確定シフト確認画面：5件より前のお知らせ ---- */
-.pdf-inquiry-note {
-	font-size: 12px;
-	color: var(--text-sub);
-	background: var(--gray-light);
-	border-radius: 8px;
-	padding: 12px 14px;
-	text-align: center;
-	line-height: 1.6;
-	margin-top: 4px;
-}
-
-/* ---- ユーザー管理：契約日数・契約時間 ---- */
-.user-card-contract {
-	display: flex;
-	gap: 12px;
-	margin-top: 4px;
-}
-
-.user-card-contract-field {
-	display: flex;
-	align-items: center;
-	gap: 6px;
-	flex: 1;
-}
-
-.user-card-contract-field label {
-	font-size: 11px;
-	color: var(--text-sub);
-	white-space: nowrap;
-}
-
-.user-contract-input {
-	width: 100%;
-	min-width: 0;
-	font-size: 13px;
-	padding: 6px 6px;
-	border: 1px solid var(--gray-border);
-	border-radius: 8px;
-	background: var(--white);
-	color: var(--text-main);
-	text-align: center;
-}
-
-.user-contract-unit {
-	font-size: 11px;
-	color: var(--text-sub);
 }

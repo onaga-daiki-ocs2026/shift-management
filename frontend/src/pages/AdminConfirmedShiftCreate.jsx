@@ -316,7 +316,7 @@ function AdminConfirmedShiftCreate() {
 				if (!dayElement) continue;
 
 				const canvas = await html2canvas(dayElement, {
-					scale: 1,
+					scale: 2,
 					useCORS: true,
 					backgroundColor: "#ffffff",
 					windowWidth: dayElement.scrollWidth,
@@ -325,15 +325,17 @@ function AdminConfirmedShiftCreate() {
 
 				// Supabase Storageは50MBまで余裕があるので、
 				// 画質を上げつつJPEGで軽量化する
-				const imgData = canvas.toDataURL("image/jpeg", 0.85);
+				const imgData = canvas.toDataURL("image/jpeg", 0.95);
 
-				// ページ内に収まるよう、縦横比を保ったまま縮小
-				const ratio = Math.min(
-					pdfWidth / canvas.width,
-					pdfHeight / canvas.height,
-				);
-				const imgWidth = canvas.width * ratio;
-				const imgHeight = canvas.height * ratio;
+				// 横幅いっぱいに広げることを優先し（左右の余白をなくす）、
+				// それで縦がページからはみ出す場合だけ縦基準に切り替える
+				let imgWidth = pdfWidth;
+				let imgHeight = (canvas.height * pdfWidth) / canvas.width;
+
+				if (imgHeight > pdfHeight) {
+					imgHeight = pdfHeight;
+					imgWidth = (canvas.width * pdfHeight) / canvas.height;
+				}
 
 				// 余白が残る場合は中央に配置する
 				const offsetX = (pdfWidth - imgWidth) / 2;
@@ -618,7 +620,6 @@ function AdminConfirmedShiftCreate() {
 						{exportStage === "uploading"
 							? `アップロード中 ${uploadPercent}%`
 							: `${exportProgress.current} / ${exportProgress.total} 日分`}
-						　経過時間：{(exportElapsed / 1000).toFixed(1)}秒
 					</div>
 				</div>
 			</div>

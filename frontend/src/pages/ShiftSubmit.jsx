@@ -15,6 +15,7 @@ function ShiftSubmit() {
 	const [openBlockIndexes, setOpenBlockIndexes] = useState(new Set([0]));
 	const [loading, setLoading] = useState(true);
 	const [selectedBlocks, setSelectedBlocks] = useState([0]);
+	const [submitting, setSubmitting] = useState(false);
 
 	useEffect(() => {
 		fetchCurrentPeriod();
@@ -142,6 +143,7 @@ function ShiftSubmit() {
 			alert(`${label}の出勤時間が入力されていません。`);
 			return;
 		}
+		setSubmitting(true);
 		try {
 			await api.post("/api/shift-requests", {
 				userId: loginUser.id,
@@ -152,6 +154,8 @@ function ShiftSubmit() {
 		} catch (error) {
 			console.error("シフト提出に失敗しました", error);
 			alert("シフト提出に失敗しました");
+		} finally {
+			setSubmitting(false);
 		}
 	};
 
@@ -334,8 +338,18 @@ function ShiftSubmit() {
 				type="button"
 				className="block-submit-button"
 				onClick={handleSubmit}
+				disabled={submitting}
 			>
-				<span>✈</span> チェックした期間のシフトを提出する
+				{submitting ? (
+					<>
+						<span className="submit-spinner" />
+						送信中…
+					</>
+				) : (
+					<>
+						<span>✈</span> チェックした期間のシフトを提出する
+					</>
+				)}
 			</button>
 			<p className="submit-note">
 				※時間未入力の日がある場合は、提出できません。
