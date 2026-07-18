@@ -642,6 +642,18 @@ body {
 	text-align: center;
 }
 
+/* ---- 確定シフト確認・提出済み確認：5件より前のお知らせ ---- */
+.pdf-inquiry-note {
+	font-size: 12px;
+	color: var(--text-sub);
+	background: var(--gray-light);
+	border-radius: 8px;
+	padding: 12px 14px;
+	text-align: center;
+	line-height: 1.6;
+	margin-top: 4px;
+}
+
 .pdf-export-button {
 	width: 100%;
 	padding: 16px;

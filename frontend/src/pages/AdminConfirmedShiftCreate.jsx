@@ -316,7 +316,7 @@ function AdminConfirmedShiftCreate() {
 				if (!dayElement) continue;
 
 				const canvas = await html2canvas(dayElement, {
-					scale: 2,
+					scale: 3,
 					useCORS: true,
 					backgroundColor: "#ffffff",
 					windowWidth: dayElement.scrollWidth,
@@ -325,7 +325,7 @@ function AdminConfirmedShiftCreate() {
 
 				// Supabase Storageは50MBまで余裕があるので、
 				// 画質を上げつつJPEGで軽量化する
-				const imgData = canvas.toDataURL("image/jpeg", 0.95);
+				const imgData = canvas.toDataURL("image/jpeg", 1.0);
 
 				// 横幅いっぱいに広げることを優先し（左右の余白をなくす）、
 				// それで縦がページからはみ出す場合だけ縦基準に切り替える
