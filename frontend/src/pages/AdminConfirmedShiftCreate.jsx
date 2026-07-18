@@ -296,7 +296,9 @@ function AdminConfirmedShiftCreate() {
 
 		try {
 			const pdf = new jsPDF({
-				orientation: "landscape",
+				// 中身（表）が横長ではなく縦長の形なので、A4縦向きの方が
+				// ページいっぱいに収まり、右の余白が出にくい
+				orientation: "portrait",
 				unit: "mm",
 				format: "a4",
 				compress: true,
@@ -310,16 +312,16 @@ function AdminConfirmedShiftCreate() {
 				if (!dayElement) continue;
 
 				const canvas = await html2canvas(dayElement, {
-					scale: 0.75,
+					scale: 1,
 					useCORS: true,
 					backgroundColor: "#ffffff",
 					windowWidth: dayElement.scrollWidth,
 					logging: false,
 				});
 
-				// Cloudinary無料プランのアップロード上限（10MB）を超えないよう、
-				// PNGではなくJPEG（強めに圧縮）に変換する
-				const imgData = canvas.toDataURL("image/jpeg", 0.6);
+				// Supabase Storageは50MBまで余裕があるので、
+				// 画質を上げつつJPEGで軽量化する
+				const imgData = canvas.toDataURL("image/jpeg", 0.85);
 
 				// ページ内に収まるよう、縦横比を保ったまま縮小
 				const ratio = Math.min(
@@ -329,8 +331,12 @@ function AdminConfirmedShiftCreate() {
 				const imgWidth = canvas.width * ratio;
 				const imgHeight = canvas.height * ratio;
 
+				// 余白が残る場合は中央に配置する
+				const offsetX = (pdfWidth - imgWidth) / 2;
+				const offsetY = (pdfHeight - imgHeight) / 2;
+
 				if (i > 0) pdf.addPage();
-				pdf.addImage(imgData, "JPEG", 0, 0, imgWidth, imgHeight);
+				pdf.addImage(imgData, "JPEG", offsetX, offsetY, imgWidth, imgHeight);
 
 				setExportProgress({ current: i + 1, total: dates.length });
 
@@ -341,9 +347,9 @@ function AdminConfirmedShiftCreate() {
 			const pdfBlob = pdf.output("blob");
 			const pdfSizeMB = pdfBlob.size / 1024 / 1024;
 
-			if (pdfBlob.size > 10 * 1024 * 1024) {
+			if (pdfBlob.size > 50 * 1024 * 1024) {
 				alert(
-					`PDFのファイルサイズが大きすぎます（${pdfSizeMB.toFixed(1)}MB / 上限10MB）。\n` +
+					`PDFのファイルサイズが大きすぎます（${pdfSizeMB.toFixed(1)}MB / 上限50MB）。\n` +
 						`スタッフの人数や日数が多い場合に発生します。お手数ですが開発者に連絡してください。`,
 				);
 				return;

@@ -31,16 +31,25 @@ public class ShiftPdfController {
 		return ResponseEntity.ok(Map.of("url", url));
 	}
 
-	// 現在の期間のPDF URLを取得
+	// 現在の期間のPDF URLを取得（対象期間の開始日・終了日つき）
 	@GetMapping("/current")
 	public ResponseEntity<Map<String, String>> getCurrentPdf() {
 		var period = submissionPeriodService.getCurrentPeriod();
 		LocalDate periodStart = period.startDate();
+		LocalDate periodEnd = period.endDate();
 		String url = shiftPdfService.getCurrentPdfUrl(periodStart);
 
 		if (url == null) {
-			return ResponseEntity.ok(Map.of("url", ""));
+			return ResponseEntity.ok(
+					Map.of(
+							"url", "",
+							"periodStart", periodStart.toString(),
+							"periodEnd", periodEnd.toString()));
 		}
-		return ResponseEntity.ok(Map.of("url", url));
+		return ResponseEntity.ok(
+				Map.of(
+						"url", url,
+						"periodStart", periodStart.toString(),
+						"periodEnd", periodEnd.toString()));
 	}
 }

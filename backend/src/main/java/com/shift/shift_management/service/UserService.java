@@ -17,6 +17,8 @@ public class UserService {
 
 	public UserResponse loginOrRegister(UserRequest request) {
 
+		// 既存ユーザーがいればそのまま返す（表示名は上書きしない）。
+		// いなければLINEの表示名で新規登録する。
 		User user =
 				userRepository
 						.findByLineUserId(request.getLineUserId())
@@ -30,10 +32,7 @@ public class UserService {
 									return userRepository.save(newUser);
 								});
 
-		user.setDisplayName(request.getDisplayName());
-		User savedUser = userRepository.save(user);
-
-		return toResponse(savedUser);
+		return toResponse(user);
 	}
 
 	public List<UserResponse> findAll() {
