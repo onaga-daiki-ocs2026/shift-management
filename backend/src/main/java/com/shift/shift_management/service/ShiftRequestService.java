@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -22,6 +23,11 @@ public class ShiftRequestService {
 	private final ShiftRequestRepository shiftRequestRepository;
 	private final UserRepository userRepository;
 
+	// 14件バラバラに保存・コミットしていたのを、1回のトランザクションにまとめる。
+	// これにより「1件保存する度にDBへ確定処理を送る」回数が14回→1回に減り、
+	// 同時アクセスが多い時のDB接続の詰まり・待ち時間が大きく改善する。
+	// （途中で1件でも失敗した場合は、14件すべてが保存されずロールバックされる）
+	@Transactional
 	public void submit(ShiftRequestSubmitRequest request) {
 		for (ShiftRequestItemRequest item : request.requests()) {
 
@@ -68,7 +74,7 @@ public class ShiftRequestService {
 				.toList();
 	}
 
-	// 追加：特定の日付の全員分（ユーザー情報付き）を取得
+	// 特定の日付の全員分（ユーザー情報付き）を取得
 	public List<ShiftRequestWithUserResponse> findByWorkDate(LocalDate workDate) {
 		List<ShiftRequest> shifts = shiftRequestRepository.findByWorkDate(workDate);
 
