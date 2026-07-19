@@ -581,7 +581,7 @@ function AdminConfirmedShiftCreate() {
 		</Layout>
 
 
-		{!isMobile && selected && selectedStaff && (
+		{selected && selectedStaff && (
 			<EditModal
 				date={selected.date}
 				position={selected.position}
@@ -960,115 +960,6 @@ function StaffRow({
 					onClick={() => removeRow(date, position, staff.userId)}
 				>
 					✕
-				</button>
-			</div>
-
-			{isMobile && (
-				<MobilePanel
-					date={date}
-					position={position}
-					staff={staff}
-					selected={selected}
-					setSelected={setSelected}
-					updateBlocks={updateBlocks}
-					splitBlock={splitBlock}
-					deleteBlock={deleteBlock}
-				/>
-			)}
-		</div>
-	);
-}
-
-function MobilePanel({
-	date,
-	position,
-	staff,
-	selected,
-	setSelected,
-	updateBlocks,
-	splitBlock,
-	deleteBlock,
-}) {
-	const isThisRowSelected =
-		selected &&
-		selected.date === date &&
-		selected.position === position &&
-		selected.userId === staff.userId;
-
-	if (!isThisRowSelected) return null;
-
-	const blockIndex = selected.blockIndex;
-	const block = staff.blocks[blockIndex];
-
-	const hourOptions = [];
-	for (let h = RANGE_START; h <= RANGE_END; h += 0.5) {
-		hourOptions.push(h);
-	}
-
-	const handleStartChange = (value) => {
-		const newBlocks = [...staff.blocks];
-		newBlocks[blockIndex] = {
-			...newBlocks[blockIndex],
-			start: parseFloat(value),
-		};
-		updateBlocks(date, position, staff.userId, newBlocks);
-	};
-
-	const handleEndChange = (value) => {
-		const newBlocks = [...staff.blocks];
-		newBlocks[blockIndex] = {
-			...newBlocks[blockIndex],
-			end: parseFloat(value),
-		};
-		updateBlocks(date, position, staff.userId, newBlocks);
-	};
-
-	return (
-		<div className="mobile-panel">
-			<p>{staff.name}のシフト</p>
-			<div className="mobile-panel-time">
-				<select
-					value={block.start}
-					onChange={(e) => handleStartChange(e.target.value)}
-				>
-					{hourOptions.map((h) => (
-						<option key={h} value={h}>
-							{Math.floor(h)}:{h % 1 === 0 ? "00" : "30"}
-						</option>
-					))}
-				</select>
-				<span>〜</span>
-				<select
-					value={block.end}
-					onChange={(e) => handleEndChange(e.target.value)}
-				>
-					{hourOptions.map((h) => (
-						<option key={h} value={h}>
-							{Math.floor(h)}:{h % 1 === 0 ? "00" : "30"}
-						</option>
-					))}
-				</select>
-			</div>
-			<div className="mobile-panel-actions">
-				<button
-					type="button"
-					onClick={() =>
-						splitBlock(date, position, staff.userId, blockIndex)
-					}
-				>
-					分割
-				</button>
-				<button
-					type="button"
-					className="danger"
-					onClick={() =>
-						deleteBlock(date, position, staff.userId, blockIndex)
-					}
-				>
-					削除
-				</button>
-				<button type="button" onClick={() => setSelected(null)}>
-					閉じる
 				</button>
 			</div>
 		</div>
