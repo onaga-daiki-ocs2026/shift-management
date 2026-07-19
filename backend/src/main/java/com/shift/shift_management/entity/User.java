@@ -2,6 +2,8 @@ package com.shift.shift_management.entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -41,6 +43,6 @@ public class User {
 
 	@PrePersist
 	public void onCreate() {
-		createdAt = LocalDateTime.now();
+		createdAt = LocalDateTime.now(ZoneId.of("Asia/Tokyo"));
 	}
 }

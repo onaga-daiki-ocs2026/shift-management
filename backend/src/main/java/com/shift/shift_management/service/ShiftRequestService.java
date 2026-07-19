@@ -11,6 +11,7 @@ import com.shift.shift_management.repository.UserRepository;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -41,7 +42,7 @@ public class ShiftRequestService {
 			shiftRequest.setStartTime(item.startTime());
 			shiftRequest.setEndTime(item.endTime());
 			shiftRequest.setAvailable(item.available());
-			shiftRequest.setCreatedAt(LocalDateTime.now());
+			shiftRequest.setCreatedAt(LocalDateTime.now(ZoneId.of("Asia/Tokyo")));
 			shiftRequest.setComment(item.comment());
 
 			shiftRequestRepository.save(shiftRequest);
