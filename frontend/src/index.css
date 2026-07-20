@@ -1742,7 +1742,7 @@ select.role-input {
 }
 
 .edit-modal-btn-split {
-	background: #4a7c59;
+	background: #2980b9;
 	color: #fff;
 }
 
@@ -1751,9 +1751,9 @@ select.role-input {
 	color: #fff;
 }
 
-.edit-modal-btn-close {
-	background: #eee;
-	color: #333;
+.edit-modal-btn-save {
+	background: #4a7c59;
+	color: #fff;
 }
 
 .edit-modal-btn:hover {

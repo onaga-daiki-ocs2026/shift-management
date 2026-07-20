@@ -18,6 +18,7 @@ function AdminConfirmedShiftCreate() {
 	const [selected, setSelected] = useState(null);
 	const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 	const [exporting, setExporting] = useState(false);
+	const [saving, setSaving] = useState(false);
 	const [exportProgress, setExportProgress] = useState({ current: 0, total: 0 });
 	const [exportStage, setExportStage] = useState("capturing"); // "capturing" | "uploading"
 	const [uploadPercent, setUploadPercent] = useState(0);
@@ -272,12 +273,15 @@ function AdminConfirmedShiftCreate() {
 			return;
 		}
 
+		setSaving(true);
 		try {
 			await api.post("/api/confirmed-shifts", { periodId, requests });
 			alert("14日分の確定シフトを保存しました！");
 		} catch (error) {
 			console.error("保存に失敗しました", error);
 			alert("保存に失敗しました");
+		} finally {
+			setSaving(false);
 		}
 	};
 
@@ -465,8 +469,16 @@ function AdminConfirmedShiftCreate() {
 						type="button"
 						onClick={handleSubmit}
 						className="submit-button"
+						disabled={saving}
 					>
-						確定シフトを保存
+						{saving ? (
+							<>
+								<span className="submit-spinner" />
+								保存中…
+							</>
+						) : (
+							"一時保存"
+						)}
 					</button>
 					<button
 						type="button"
@@ -1082,10 +1094,10 @@ function EditModal({
 					</button>
 					<button
 						type="button"
-						className="edit-modal-btn edit-modal-btn-close"
+						className="edit-modal-btn edit-modal-btn-save"
 						onClick={() => setSelected(null)}
 					>
-						閉じる
+						保存
 					</button>
 				</div>
 			</div>
