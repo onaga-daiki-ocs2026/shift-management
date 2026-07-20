@@ -1083,163 +1083,6 @@ body {
 }
 
 /* ====================================================================
-   PC表示: シフト提出 / 提出済み確認 / 確定シフト確認 / ヘルプ
-   共通コンテンツの読みやすい幅に揃える + カードの質感を強化
-   ==================================================================== */
-@media (min-width: 768px) {
-	.submit-info-box,
-	.shift-block,
-	.view-toggle,
-	.pdf-viewer-area,
-	.pdf-inquiry-note,
-	.block-submit-button,
-	.submit-note,
-	.empty-state,
-	.help-section {
-		max-width: 760px;
-		margin-left: auto;
-		margin-right: auto;
-	}
-
-	/* ---- シフト提出・提出済み確認：アコーディオンカード ---- */
-	.shift-block {
-		border-radius: 14px;
-		box-shadow: 0 2px 10px rgba(92, 51, 23, 0.07);
-		transition: box-shadow 0.2s ease;
-	}
-
-	.shift-block:hover {
-		box-shadow: 0 6px 16px rgba(92, 51, 23, 0.1);
-	}
-
-	.block-header {
-		padding: 16px 20px;
-	}
-
-	.block-range {
-		font-size: 15px;
-	}
-
-	.accordion-toggle {
-		width: 28px;
-		height: 28px;
-		border-radius: 50%;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		transition: background 0.2s ease;
-	}
-
-	.accordion-toggle:hover {
-		background: #f7f1e8;
-	}
-
-	.shift-row,
-	.submission-row {
-		padding: 10px 20px;
-		transition: background 0.15s ease;
-	}
-
-	.shift-row:hover,
-	.submission-row:hover {
-		background: #faf7f0;
-	}
-
-	.time-select {
-		cursor: pointer;
-	}
-
-	.time-select:not(:disabled):hover {
-		border-color: var(--green);
-	}
-
-	.block-submit-button {
-		width: 100%;
-		cursor: pointer;
-	}
-
-	/* ---- 確定シフト確認：PDFリンクカード ---- */
-	.pdf-download-button {
-		border-radius: 14px;
-		box-shadow: 0 2px 10px rgba(92, 51, 23, 0.07);
-		transition: box-shadow 0.2s ease, transform 0.2s ease;
-	}
-
-	.pdf-download-button:hover {
-		box-shadow: 0 8px 20px rgba(92, 51, 23, 0.12);
-		transform: translateY(-2px);
-	}
-
-	/* ---- ヘルプ：セクションをカード化 ---- */
-	.help-section {
-		background: var(--white);
-		border-radius: 14px;
-		padding: 8px 20px;
-		box-shadow: 0 2px 10px rgba(92, 51, 23, 0.07);
-	}
-
-	.help-question {
-		cursor: pointer;
-		transition: color 0.15s ease;
-	}
-
-	.help-question:hover {
-		color: var(--brown);
-	}
-
-	/* ---- 提出済み確認：カレンダー表示（PCは大きく） ---- */
-	.calendar-area {
-		max-width: 900px;
-		margin-left: auto;
-		margin-right: auto;
-		padding: 24px;
-	}
-
-	.calendar-grid {
-		gap: 6px;
-	}
-
-	.calendar-cell {
-		height: 110px;
-		padding: 8px 6px;
-		border-radius: 8px;
-	}
-
-	.calendar-date-num {
-		font-size: 14px;
-		margin-bottom: 4px;
-	}
-
-	.calendar-shift-time {
-		font-size: 12px;
-		line-height: 1.5;
-	}
-
-	.calendar-shift-rest {
-		font-size: 11px;
-		padding: 2px 8px;
-		margin-top: 4px;
-	}
-
-	.calendar-month-label {
-		font-size: 18px;
-	}
-
-	.calendar-weekday {
-		font-size: 13px;
-	}
-
-	/* ---- 空の状態 ---- */
-	.empty-state {
-		padding: 48px 20px;
-	}
-
-	.empty-icon {
-		font-size: 40px;
-	}
-}
-
-/* ====================================================================
    確定シフト作成画面（AdminConfirmedShiftCreate.jsx）
    ==================================================================== */
 
@@ -2246,4 +2089,174 @@ select.role-input {
 
 .calendar-legend-dot.rest {
 	background: #999;
+}
+/* ====================================================================
+   PC表示: シフト提出 / 提出済み確認 / 確定シフト作成 / ヘルプ
+   共通コンテンツの読みやすい幅に揃える + カードの質感を強化
+   ファイル末尾に置くことで、後方の個別ページ用スタイルより
+   必ず後に評価され、確実に上書きされるようにしている
+   ==================================================================== */
+
+/* ====================================================================
+   PC表示: シフト提出 / 提出済み確認 / 確定シフト確認 / ヘルプ
+   共通コンテンツの読みやすい幅に揃える + カードの質感を強化
+   ==================================================================== */
+@media (min-width: 768px) {
+	.submit-info-box,
+	.shift-block,
+	.view-toggle,
+	.pdf-viewer-area,
+	.pdf-inquiry-note,
+	.block-submit-button,
+	.submit-note,
+	.empty-state,
+	.help-section {
+		max-width: 760px;
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	/* ---- シフト提出・提出済み確認：アコーディオンカード ---- */
+	.shift-block {
+		border-radius: 14px;
+		box-shadow: 0 2px 10px rgba(92, 51, 23, 0.07);
+		transition: box-shadow 0.2s ease;
+	}
+
+	.shift-block:hover {
+		box-shadow: 0 6px 16px rgba(92, 51, 23, 0.1);
+	}
+
+	.block-header {
+		padding: 16px 20px;
+	}
+
+	.block-range {
+		font-size: 15px;
+	}
+
+	.accordion-toggle {
+		width: 28px;
+		height: 28px;
+		border-radius: 50%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		transition: background 0.2s ease;
+	}
+
+	.accordion-toggle:hover {
+		background: #f7f1e8;
+	}
+
+	.shift-row,
+	.submission-row {
+		padding: 10px 20px;
+		transition: background 0.15s ease;
+	}
+
+	.shift-row:hover,
+	.submission-row:hover {
+		background: #faf7f0;
+	}
+
+	.time-select {
+		cursor: pointer;
+	}
+
+	.time-select:not(:disabled):hover {
+		border-color: var(--green);
+	}
+
+	.block-submit-button {
+		width: 100%;
+		cursor: pointer;
+	}
+
+	/* ---- 確定シフト確認：PDFリンクカード ---- */
+	.pdf-download-button {
+		border-radius: 14px;
+		box-shadow: 0 2px 10px rgba(92, 51, 23, 0.07);
+		transition: box-shadow 0.2s ease, transform 0.2s ease;
+	}
+
+	.pdf-download-button:hover {
+		box-shadow: 0 8px 20px rgba(92, 51, 23, 0.12);
+		transform: translateY(-2px);
+	}
+
+	/* ---- ヘルプ：セクションをカード化 ---- */
+	.help-section {
+		background: var(--white);
+		border-radius: 14px;
+		padding: 8px 20px;
+		box-shadow: 0 2px 10px rgba(92, 51, 23, 0.07);
+	}
+
+	.help-question {
+		cursor: pointer;
+		transition: color 0.15s ease;
+	}
+
+	.help-question:hover {
+		color: var(--brown);
+	}
+
+	/* ---- 提出済み確認：カレンダー表示（PCは大きく） ---- */
+	.calendar-area {
+		width: 100%;
+		box-sizing: border-box;
+		max-width: 900px;
+		margin-left: auto;
+		margin-right: auto;
+		padding: 24px;
+	}
+
+	.calendar-weekday-row,
+	.calendar-grid {
+		width: 100%;
+	}
+
+	.calendar-grid {
+		gap: 6px;
+	}
+
+	.calendar-cell {
+		height: 110px;
+		padding: 8px 6px;
+		border-radius: 8px;
+	}
+
+	.calendar-date-num {
+		font-size: 14px;
+		margin-bottom: 4px;
+	}
+
+	.calendar-shift-time {
+		font-size: 12px;
+		line-height: 1.5;
+	}
+
+	.calendar-shift-rest {
+		font-size: 11px;
+		padding: 2px 8px;
+		margin-top: 4px;
+	}
+
+	.calendar-month-label {
+		font-size: 18px;
+	}
+
+	.calendar-weekday {
+		font-size: 13px;
+	}
+
+	/* ---- 空の状態 ---- */
+	.empty-state {
+		padding: 48px 20px;
+	}
+
+	.empty-icon {
+		font-size: 40px;
+	}
 }
