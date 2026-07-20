@@ -71,6 +71,25 @@ function AdminConfirmedShiftCreate() {
 				),
 			);
 
+			// 既に一時保存された確定シフトがあれば、それを希望シフトより
+			// 優先して復元する（リロードで編集内容が消えてしまう問題への対策）
+			const confirmedMap = {};
+			try {
+				const confirmedRes = await api.get("/api/confirmed-shifts");
+				const dateSet = new Set(dateList);
+				confirmedRes.data.forEach((c) => {
+					if (!dateSet.has(c.workDate)) return;
+					const key = `${c.userId}_${c.workDate}`;
+					if (!confirmedMap[key]) confirmedMap[key] = [];
+					confirmedMap[key].push({
+						start: timeToHour(c.startTime),
+						end: timeToHour(c.endTime),
+					});
+				});
+			} catch (error) {
+				console.error("確定シフトの取得に失敗しました", error);
+			}
+
 			const map = {};
 			results.forEach(({ date, shifts }) => {
 				const toStaffList = (list) =>
@@ -78,13 +97,18 @@ function AdminConfirmedShiftCreate() {
 						const start = timeToHour(shift.startTime);
 						const end = timeToHour(shift.endTime);
 						const original = [{ start, end }];
+						const confirmedBlocks =
+							confirmedMap[`${shift.userId}_${date}`];
+						const blocks = confirmedBlocks
+							? JSON.parse(JSON.stringify(confirmedBlocks))
+							: JSON.parse(JSON.stringify(original));
 						return {
 							userId: shift.userId,
 							name: shift.displayName,
 							comment: shift.comment || "",
 							role: "",
 							original,
-							blocks: JSON.parse(JSON.stringify(original)),
+							blocks,
 						};
 					});
 
