@@ -854,9 +854,6 @@ function StaffRow({
 						</span>
 					)}
 				</span>
-				<span className="staff-position">
-					{position === "HALL" ? "ホール" : "キッチン"}
-				</span>
 			</div>
 
 			<div className="timeline-track">
