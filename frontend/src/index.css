@@ -1083,6 +1083,122 @@ body {
 }
 
 /* ====================================================================
+   PC表示: シフト提出 / 提出済み確認 / 確定シフト確認 / ヘルプ
+   共通コンテンツの読みやすい幅に揃える + カードの質感を強化
+   ==================================================================== */
+@media (min-width: 768px) {
+	.submit-info-box,
+	.shift-block,
+	.view-toggle,
+	.calendar-area,
+	.pdf-viewer-area,
+	.pdf-inquiry-note,
+	.block-submit-button,
+	.submit-note,
+	.empty-state,
+	.help-section {
+		max-width: 760px;
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	/* ---- シフト提出・提出済み確認：アコーディオンカード ---- */
+	.shift-block {
+		border-radius: 14px;
+		box-shadow: 0 2px 10px rgba(92, 51, 23, 0.07);
+		transition: box-shadow 0.2s ease;
+	}
+
+	.shift-block:hover {
+		box-shadow: 0 6px 16px rgba(92, 51, 23, 0.1);
+	}
+
+	.block-header {
+		padding: 16px 20px;
+	}
+
+	.block-range {
+		font-size: 15px;
+	}
+
+	.accordion-toggle {
+		width: 28px;
+		height: 28px;
+		border-radius: 50%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		transition: background 0.2s ease;
+	}
+
+	.accordion-toggle:hover {
+		background: #f7f1e8;
+	}
+
+	.shift-row,
+	.submission-row {
+		padding: 10px 20px;
+		transition: background 0.15s ease;
+	}
+
+	.shift-row:hover,
+	.submission-row:hover {
+		background: #faf7f0;
+	}
+
+	.time-select {
+		cursor: pointer;
+	}
+
+	.time-select:not(:disabled):hover {
+		border-color: var(--green);
+	}
+
+	.block-submit-button {
+		width: 100%;
+		cursor: pointer;
+	}
+
+	/* ---- 確定シフト確認：PDFリンクカード ---- */
+	.pdf-download-button {
+		border-radius: 14px;
+		box-shadow: 0 2px 10px rgba(92, 51, 23, 0.07);
+		transition: box-shadow 0.2s ease, transform 0.2s ease;
+	}
+
+	.pdf-download-button:hover {
+		box-shadow: 0 8px 20px rgba(92, 51, 23, 0.12);
+		transform: translateY(-2px);
+	}
+
+	/* ---- ヘルプ：セクションをカード化 ---- */
+	.help-section {
+		background: var(--white);
+		border-radius: 14px;
+		padding: 8px 20px;
+		box-shadow: 0 2px 10px rgba(92, 51, 23, 0.07);
+	}
+
+	.help-question {
+		cursor: pointer;
+		transition: color 0.15s ease;
+	}
+
+	.help-question:hover {
+		color: var(--brown);
+	}
+
+	/* ---- 空の状態 ---- */
+	.empty-state {
+		padding: 48px 20px;
+	}
+
+	.empty-icon {
+		font-size: 40px;
+	}
+}
+
+/* ====================================================================
    確定シフト作成画面（AdminConfirmedShiftCreate.jsx）
    ==================================================================== */
 
