@@ -75,6 +75,7 @@ function AdminConfirmedShiftCreate() {
 			// 既に一時保存された確定シフトがあれば、それを希望シフトより
 			// 優先して復元する（リロードで編集内容が消えてしまう問題への対策）
 			const confirmedMap = {};
+			const confirmedRoleMap = {};
 			try {
 				const confirmedRes = await api.get("/api/confirmed-shifts");
 				const dateSet = new Set(dateList);
@@ -86,6 +87,7 @@ function AdminConfirmedShiftCreate() {
 						start: timeToHour(c.startTime),
 						end: timeToHour(c.endTime),
 					});
+					if (c.role) confirmedRoleMap[key] = c.role;
 				});
 			} catch (error) {
 				console.error("確定シフトの取得に失敗しました", error);
@@ -121,7 +123,7 @@ function AdminConfirmedShiftCreate() {
 							userId: shift.userId,
 							name: shift.displayName,
 							comment: shift.comment || "",
-							role: "",
+							role: confirmedRoleMap[`${shift.userId}_${date}`] || "",
 							original,
 							blocks,
 						};
@@ -302,6 +304,7 @@ function AdminConfirmedShiftCreate() {
 						workDate: date,
 						startTime: hourToTime(b.start),
 						endTime: hourToTime(b.end),
+						role: staff.role || "",
 					});
 				});
 			});
@@ -566,13 +569,24 @@ function AdminConfirmedShiftCreate() {
 		<>
 		<Layout>
 			<div className="confirmed-create-toolbar">
-				<button
-					type="button"
-					onClick={resetAll}
-					className="reset-all-button"
-				>
-					全員リセット
-				</button>
+				<div className="confirmed-create-left-actions">
+					<button
+						type="button"
+						onClick={() =>
+							window.scrollTo({ top: 0, behavior: "smooth" })
+						}
+						className="scroll-top-button"
+					>
+						↑ 一番上に戻る
+					</button>
+					<button
+						type="button"
+						onClick={resetAll}
+						className="reset-all-button"
+					>
+						全員リセット
+					</button>
+				</div>
 				<div className="confirmed-create-actions">
 					<button
 						type="button"

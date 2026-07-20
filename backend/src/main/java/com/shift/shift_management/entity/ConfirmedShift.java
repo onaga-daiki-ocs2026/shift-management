@@ -27,6 +27,9 @@ public class ConfirmedShift {
 
 	private LocalTime endTime;
 
+	/* 指導・仕込・研修などの役割メモ（空欄可） */
+	private String role;
+
 	private boolean published;
 
 	private LocalDateTime createdAt;

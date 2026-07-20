@@ -34,6 +34,7 @@ public class ConfirmedShiftService {
 			confirmedShift.setWorkDate(item.workDate());
 			confirmedShift.setStartTime(item.startTime());
 			confirmedShift.setEndTime(item.endTime());
+			confirmedShift.setRole(item.role());
 
 			confirmedShiftRepository.save(confirmedShift);
 		}
@@ -50,7 +51,8 @@ public class ConfirmedShiftService {
 										null,
 										shift.getWorkDate(),
 										shift.getStartTime(),
-										shift.getEndTime()))
+										shift.getEndTime(),
+										shift.getRole()))
 				.toList();
 	}
 }
