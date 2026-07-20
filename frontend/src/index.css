@@ -1948,7 +1948,7 @@ select.role-input {
 }
 
 .hours-half-title {
-	font-size: 12px;
+	font-size: 14px;
 	font-weight: bold;
 	color: var(--brown);
 	margin-bottom: 8px;
@@ -1957,7 +1957,7 @@ select.role-input {
 .hours-table {
 	width: 100%;
 	border-collapse: collapse;
-	font-size: 12px;
+	font-size: 14px;
 }
 
 .hours-table th {
@@ -1969,7 +1969,7 @@ select.role-input {
 }
 
 .hours-table td {
-	padding: 6px 4px;
+	padding: 8px 4px;
 	border-bottom: 1px dashed var(--gray-border);
 	color: var(--text-main);
 	vertical-align: top;
@@ -1982,7 +1982,17 @@ select.role-input {
 .hours-table-diff {
 	display: block;
 	color: var(--text-sub);
-	font-size: 11px;
+	font-size: 13px;
+}
+
+.hours-table-diff-over {
+	color: var(--red);
+	font-weight: bold;
+}
+
+.hours-table-diff-under {
+	color: #2980b9;
+	font-weight: bold;
 }
 /* ---- 提出済み確認：リスト/カレンダー切り替え ---- */
 .view-toggle {

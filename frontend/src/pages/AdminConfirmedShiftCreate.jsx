@@ -604,54 +604,66 @@ function AdminConfirmedShiftCreate() {
 				{!isMobile && weeklyStatsByUser.length > 0 && (
 					<aside className="comments-sidebar hours-sidebar">
 						<div className="comments-sidebar-title">⏱ 契約との過不足</div>
-						{[
-							{ key: "first", label: "前半（1〜7日目）" },
-							{ key: "second", label: "後半（8〜14日目）" },
-						].map((half, idx) => (
-							<div
-								key={half.key}
-								className={`hours-half-block ${idx === 0 ? "" : "hours-half-block-second"}`}
-							>
-								<div className="hours-half-title">{half.label}</div>
-								<table className="hours-table">
-									<thead>
-										<tr>
-											<th>氏名</th>
-											<th>時間</th>
-											<th>日数</th>
-										</tr>
-									</thead>
-									<tbody>
-										{weeklyStatsByUser.map((u) => {
-											const entry = u[half.key];
-											return (
-												<tr key={u.userId}>
-													<td>{u.name}</td>
-													<td>
-														{entry.hours.toFixed(1)}時間
-														{entry.hoursDiff != null && (
-															<span className="hours-table-diff">
-																（{entry.hoursDiff >= 0 ? "+" : ""}
-																{entry.hoursDiff.toFixed(1)}）
-															</span>
-														)}
-													</td>
-													<td>
-														{entry.days}日
-														{entry.daysDiff != null && (
-															<span className="hours-table-diff">
-																（{entry.daysDiff >= 0 ? "+" : ""}
-																{entry.daysDiff}）
-															</span>
-														)}
-													</td>
-												</tr>
-											);
-										})}
-									</tbody>
-								</table>
-							</div>
-						))}
+						{(() => {
+							const half =
+								currentWeek === 0
+									? { key: "first", label: "前半（1〜7日目）" }
+									: { key: "second", label: "後半（8〜14日目）" };
+							return (
+								<div className="hours-half-block">
+									<div className="hours-half-title">{half.label}</div>
+									<table className="hours-table">
+										<thead>
+											<tr>
+												<th>氏名</th>
+												<th>時間</th>
+												<th>日数</th>
+											</tr>
+										</thead>
+										<tbody>
+											{weeklyStatsByUser.map((u) => {
+												const entry = u[half.key];
+												const diffClass = (d) =>
+													d == null
+														? ""
+														: d > 0
+															? "hours-table-diff-over"
+															: d < 0
+																? "hours-table-diff-under"
+																: "";
+												return (
+													<tr key={u.userId}>
+														<td>{u.name}</td>
+														<td>
+															{entry.hours.toFixed(1)}時間
+															{entry.hoursDiff != null && (
+																<span
+																	className={`hours-table-diff ${diffClass(entry.hoursDiff)}`}
+																>
+																	（{entry.hoursDiff >= 0 ? "+" : ""}
+																	{entry.hoursDiff.toFixed(1)}）
+																</span>
+															)}
+														</td>
+														<td>
+															{entry.days}日
+															{entry.daysDiff != null && (
+																<span
+																	className={`hours-table-diff ${diffClass(entry.daysDiff)}`}
+																>
+																	（{entry.daysDiff >= 0 ? "+" : ""}
+																	{entry.daysDiff}）
+																</span>
+															)}
+														</td>
+													</tr>
+												);
+											})}
+										</tbody>
+									</table>
+								</div>
+							);
+						})()}
 					</aside>
 				)}
 				<div className="confirmed-create-main">
