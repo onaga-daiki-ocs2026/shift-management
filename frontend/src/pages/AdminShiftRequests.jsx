@@ -1,58 +1,26 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import Layout from "../components/Layout";
 import api from "../api/api";
 
 const DAY_NAMES = ["日", "月", "火", "水", "木", "金", "土"];
 
 function AdminShiftRequests() {
-	const [staffShifts, setStaffShifts] = useState([]);
 	const [loading, setLoading] = useState(true);
-	const [openIndexes, setOpenIndexes] = useState(new Set());
+	const [periodId, setPeriodId] = useState(null);
+	const [dates, setDates] = useState([]);
+	const [staffList, setStaffList] = useState([]); // [{userId, name, position}]
+	const [matrix, setMatrix] = useState({}); // matrix[date][userId] = shift
 
 	useEffect(() => {
 		fetchAll();
 	}, []);
 
-	const fetchAll = async () => {
-		try {
-			const usersRes = await api.get("/api/users");
-			const users = usersRes.data;
-
-			const results = await Promise.all(
-				users.map(async (user) => {
-					const shiftsRes = await api
-						.get(`/api/shift-requests/user/${user.id}`)
-						.catch(() => ({ data: [] }));
-					return {
-						userId: user.id,
-						displayName: user.displayName,
-						position: user.position,
-						shifts: shiftsRes.data.sort((a, b) =>
-							a.workDate.localeCompare(b.workDate),
-						),
-					};
-				}),
-			);
-
-			// シフト提出がある人だけ表示
-			setStaffShifts(results.filter((s) => s.shifts.length > 0));
-		} catch (error) {
-			console.error("データの取得に失敗しました", error);
-		} finally {
-			setLoading(false);
-		}
-	};
-
-	const toggleIndex = (index) => {
-		setOpenIndexes((prev) => {
-			const next = new Set(prev);
-			if (next.has(index)) {
-				next.delete(index);
-			} else {
-				next.add(index);
-			}
-			return next;
-		});
+	const formatDate = (date) => {
+		const y = date.getFullYear();
+		const m = String(date.getMonth() + 1).padStart(2, "0");
+		const d = String(date.getDate()).padStart(2, "0");
+		return `${y}-${m}-${d}`;
 	};
 
 	const formatDisplayDate = (dateString) => {
@@ -72,11 +40,62 @@ function AdminShiftRequests() {
 		return timeString.slice(0, 5);
 	};
 
-	const formatBlockRange = (shifts) => {
-		if (shifts.length === 0) return "";
-		const start = new Date(shifts[0].workDate);
-		const end = new Date(shifts[shifts.length - 1].workDate);
-		return `${start.getMonth() + 1}月${start.getDate()}日〜${end.getMonth() + 1}月${end.getDate()}日`;
+	const fetchAll = async () => {
+		try {
+			const periodRes = await api.get("/api/submission-periods/current");
+			const period = periodRes.data;
+			setPeriodId(period.id);
+
+			const startDate = new Date(period.startDate);
+			const dateList = [];
+			for (let i = 0; i < 14; i++) {
+				const d = new Date(startDate);
+				d.setDate(startDate.getDate() + i);
+				dateList.push(formatDate(d));
+			}
+			setDates(dateList);
+
+			const results = await Promise.all(
+				dateList.map((date) =>
+					api
+						.get(`/api/shift-requests/date/${date}`)
+						.then((res) => ({ date, shifts: res.data }))
+						.catch(() => ({ date, shifts: [] })),
+				),
+			);
+
+			// スタッフ一覧を、初めて出てきた順（だいたいホール→キッチンの
+			// 登録順）で組み立てつつ、日付×ユーザーIDのマトリクスも作る
+			const staffMap = {};
+			const newMatrix = {};
+			results.forEach(({ date, shifts }) => {
+				newMatrix[date] = {};
+				shifts.forEach((shift) => {
+					if (!staffMap[shift.userId]) {
+						staffMap[shift.userId] = {
+							userId: shift.userId,
+							name: shift.displayName,
+							position: shift.position,
+						};
+					}
+					newMatrix[date][shift.userId] = shift;
+				});
+			});
+
+			const sortedStaff = Object.values(staffMap).sort((a, b) => {
+				if (a.position !== b.position) {
+					return a.position === "HALL" ? -1 : 1;
+				}
+				return a.name.localeCompare(b.name, "ja");
+			});
+
+			setStaffList(sortedStaff);
+			setMatrix(newMatrix);
+		} catch (error) {
+			console.error("データの取得に失敗しました", error);
+		} finally {
+			setLoading(false);
+		}
 	};
 
 	if (loading) {
@@ -89,89 +108,83 @@ function AdminShiftRequests() {
 
 	return (
 		<Layout>
-			{staffShifts.length > 0 ? (
-				<div>
-					{staffShifts.map((staff, index) => {
-						const isOpen = openIndexes.has(index);
-						const availableCount = staff.shifts.filter(
-							(s) => s.available,
-						).length;
+			{staffList.length > 0 ? (
+				<div className="requests-table-wrap">
+					<table className="requests-table">
+						<thead>
+							<tr>
+								<th className="requests-table-date-col">日付</th>
+								{staffList.map((s) => (
+									<th key={s.userId}>
+										<span className="requests-table-staff-name">
+											{s.name}
+										</span>
+										<span className="requests-table-staff-position">
+											{s.position === "HALL" ? "ホール" : "キッチン"}
+										</span>
+									</th>
+								))}
+							</tr>
+						</thead>
+						<tbody>
+							{dates.map((date) => {
+								const { label, isSun, isSat } = formatDisplayDate(date);
+								const dayShifts = matrix[date] || {};
+								const availableCount = staffList.filter(
+									(s) => dayShifts[s.userId]?.available,
+								).length;
+								const isThin = availableCount <= 1;
 
-						return (
-							<div key={staff.userId} className="shift-block">
-								<div className="block-header">
-									<div className="block-header-left">
-										<span className="block-calendar-icon">
-											{staff.position === "HALL" ? "🍽️" : "👨‍🍳"}
-										</span>
-										<div>
-											<div className="block-range">{staff.displayName}</div>
-											<div className="staff-shift-range">
-												{formatBlockRange(staff.shifts)}
-											</div>
-										</div>
-									</div>
-									<div className="block-header-right">
-										<span className="available-badge">
-											出勤可 {availableCount}日
-										</span>
-										<button
-											type="button"
-											className="accordion-toggle"
-											onClick={() => toggleIndex(index)}
+								return (
+									<tr
+										key={date}
+										className={isThin ? "requests-table-row-thin" : ""}
+									>
+										<td
+											className={`requests-table-date-col ${isSun ? "sun" : isSat ? "sat" : ""}`}
 										>
-											{isOpen ? "︿" : "﹀"}
-										</button>
-									</div>
-								</div>
-
-								{isOpen && (
-									<div className="accordion-content">
-										<div className="shift-table-header">
-											<span className="shift-date-col" />
-											<span className="shift-col-label">状態</span>
-											<span className="shift-col-label">時間</span>
-										</div>
-
-										{staff.shifts.map((shift) => {
-											const { label, isSun, isSat } =
-												formatDisplayDate(shift.workDate);
+											{label}
+											<span className="requests-table-count">
+												{availableCount}人
+											</span>
+										</td>
+										{staffList.map((s) => {
+											const shift = dayShifts[s.userId];
 											return (
-												<div
-													key={shift.workDate}
-													className="submission-row"
-												>
-													<div
-														className={`shift-date ${isSun ? "sun" : isSat ? "sat" : ""}`}
-													>
-														{label}
-													</div>
-													<div className="submission-status">
-														{shift.available ? (
-															<span className="status-available">出勤可</span>
-														) : (
-															<span className="status-rest">休み</span>
-														)}
-													</div>
-													<div className="submission-time">
-														{shift.available
-															? `${formatTime(shift.startTime)}〜${formatTime(shift.endTime)}`
-															: "－"}
-													</div>
-												</div>
+												<td key={s.userId}>
+													{!shift ? (
+														<span className="requests-table-empty">－</span>
+													) : shift.available ? (
+														<span className="requests-table-time">
+															{formatTime(shift.startTime)}
+															<br />〜{formatTime(shift.endTime)}
+														</span>
+													) : (
+														<span className="requests-table-rest">休み</span>
+													)}
+												</td>
 											);
 										})}
-									</div>
-								)}
-							</div>
-						);
-					})}
+									</tr>
+								);
+							})}
+						</tbody>
+					</table>
 				</div>
 			) : (
 				<div className="empty-state">
 					<p className="empty-icon">👥</p>
 					<p className="empty-text">希望シフトの提出はまだありません</p>
 				</div>
+			)}
+
+			{periodId && staffList.length > 0 && (
+				<Link
+					to="/admin/confirmed-shifts/create"
+					className="submit-button requests-table-cta"
+				>
+					この期間の確定シフトを作成する
+				</Link>
 			)}
 		</Layout>
 	);
