@@ -8,6 +8,7 @@ import com.shift.shift_management.repository.ConfirmedShiftRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -15,7 +16,13 @@ public class ConfirmedShiftService {
 
 	private final ConfirmedShiftRepository confirmedShiftRepository;
 
+	@Transactional
 	public void submit(ConfirmedShiftSubmitRequest request) {
+
+		// 「一時保存」は上書き保存の仕様。毎回追加していくと、保存するたびに
+		// 古いデータがDBに残り続けて重複表示されてしまうため、同じ期間の
+		// 既存データを一旦削除してから保存し直す。
+		confirmedShiftRepository.deleteByPeriodId(request.periodId());
 
 		for (ConfirmedShiftItemRequest item : request.requests()) {
 
