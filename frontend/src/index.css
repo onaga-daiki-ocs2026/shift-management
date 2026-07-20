@@ -1090,7 +1090,6 @@ body {
 	.submit-info-box,
 	.shift-block,
 	.view-toggle,
-	.calendar-area,
 	.pdf-viewer-area,
 	.pdf-inquiry-note,
 	.block-submit-button,
@@ -1186,6 +1185,48 @@ body {
 
 	.help-question:hover {
 		color: var(--brown);
+	}
+
+	/* ---- 提出済み確認：カレンダー表示（PCは大きく） ---- */
+	.calendar-area {
+		max-width: 900px;
+		margin-left: auto;
+		margin-right: auto;
+		padding: 24px;
+	}
+
+	.calendar-grid {
+		gap: 6px;
+	}
+
+	.calendar-cell {
+		height: 110px;
+		padding: 8px 6px;
+		border-radius: 8px;
+	}
+
+	.calendar-date-num {
+		font-size: 14px;
+		margin-bottom: 4px;
+	}
+
+	.calendar-shift-time {
+		font-size: 12px;
+		line-height: 1.5;
+	}
+
+	.calendar-shift-rest {
+		font-size: 11px;
+		padding: 2px 8px;
+		margin-top: 4px;
+	}
+
+	.calendar-month-label {
+		font-size: 18px;
+	}
+
+	.calendar-weekday {
+		font-size: 13px;
 	}
 
 	/* ---- 空の状態 ---- */
