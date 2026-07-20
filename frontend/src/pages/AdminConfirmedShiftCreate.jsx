@@ -864,7 +864,12 @@ function ShiftSection({
 						{ length: TOTAL_HOURS },
 						(_, i) => RANGE_START + i,
 					).map((h) => (
-						<span key={h}>{h}</span>
+						<span
+							key={h}
+							style={{ left: `${((h - RANGE_START) / TOTAL_HOURS) * 100}%` }}
+						>
+							{h}
+						</span>
 					))}
 				</div>
 				<div className="timeline-hours-time">計画</div>
