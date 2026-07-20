@@ -315,13 +315,21 @@ function AdminConfirmedShiftCreate() {
 				const dayElement = document.getElementById(`day-section-${date}`);
 				if (!dayElement) continue;
 
+				// 実際のウィンドウ幅に関わらず、A4比率に合わせて調整済みの
+				// 幅（965px）で必ずキャプチャする。ブラウザ幅によって余白の
+				// 出方が変わってしまう問題への対策。
+				const originalWidth = dayElement.style.width;
+				dayElement.style.width = "965px";
+
 				const canvas = await html2canvas(dayElement, {
 					scale: 3,
 					useCORS: true,
 					backgroundColor: "#ffffff",
-					windowWidth: dayElement.scrollWidth,
+					windowWidth: 965,
 					logging: false,
 				});
+
+				dayElement.style.width = originalWidth;
 
 				// Supabase Storageは50MBまで余裕があるので、
 				// 画質を上げつつJPEGで軽量化する

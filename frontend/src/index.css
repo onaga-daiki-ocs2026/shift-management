@@ -1238,7 +1238,7 @@ body {
 .timeline-header {
 	display: flex;
 	align-items: center;
-	min-width: 1400px;
+	min-width: 965px;
 	gap: 6px;
 	padding-bottom: 4px;
 	margin-bottom: 4px;
@@ -1288,7 +1288,7 @@ body {
 .timeline-row {
 	display: flex;
 	align-items: stretch;
-	min-width: 1400px;
+	min-width: 965px;
 	min-height: 28px;
 	border-bottom: 1px solid #ccc;
 	gap: 6px;
@@ -1503,10 +1503,10 @@ select.role-input {
 /* ---- 右端：戻す・削除アイコン ---- */
 
 .row-icon-actions {
-	width: 30px;
+	width: 50px;
 	flex-shrink: 0;
 	display: flex;
-	flex-direction: column;
+	flex-direction: row;
 	gap: 3px;
 	align-items: center;
 	justify-content: center;
@@ -1594,7 +1594,7 @@ select.role-input {
 /* ---- モバイル用：バー選択時の下部パネル ---- */
 
 .mobile-panel {
-	min-width: 1400px;
+	min-width: 965px;
 	padding: 10px 12px;
 	background: #f0f0f0;
 	border-top: 1px solid #ccc;
