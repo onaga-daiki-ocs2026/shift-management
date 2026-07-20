@@ -1279,7 +1279,7 @@ body {
 }
 
 .timeline-icon-spacer {
-	width: 50px;
+	width: 68px;
 	flex-shrink: 0;
 }
 
@@ -1371,9 +1371,10 @@ select.role-input {
 }
 
 .comment-icon {
-	display: inline-block;
-	margin-left: 4px;
-	font-size: 11px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 13px;
 	cursor: help;
 }
 
@@ -1503,7 +1504,7 @@ select.role-input {
 /* ---- 右端：戻す・削除アイコン ---- */
 
 .row-icon-actions {
-	width: 50px;
+	width: 68px;
 	flex-shrink: 0;
 	display: flex;
 	flex-direction: row;

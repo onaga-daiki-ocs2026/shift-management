@@ -851,17 +851,7 @@ function StaffRow({
 				</select>
 			</div>
 			<div className="timeline-name">
-				<span>
-					{staff.name}
-					{staff.comment && (
-						<span
-							className="comment-icon"
-							title={`コメント：${staff.comment}`}
-						>
-							💬
-						</span>
-					)}
-				</span>
+				<span>{staff.name}</span>
 			</div>
 
 			<div className="timeline-track">
@@ -951,6 +941,14 @@ function StaffRow({
 			</div>
 
 			<div className="row-icon-actions">
+				{staff.comment && (
+					<span
+						className="comment-icon"
+						title={`コメント：${staff.comment}`}
+					>
+						💬
+					</span>
+				)}
 				<button
 					type="button"
 					title="戻す"
