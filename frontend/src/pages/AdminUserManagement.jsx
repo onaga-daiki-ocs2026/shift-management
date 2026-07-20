@@ -304,16 +304,16 @@ function SortableUserRow({
 						<span className="user-contract-unit">h</span>
 					</div>
 				</div>
-			</div>
 
-			<button
-				type="button"
-				className="user-save-btn"
-				onClick={() => handleSave(user.id)}
-				disabled={savingId === user.id}
-			>
-				{savingId === user.id ? "..." : "保存"}
-			</button>
+				<button
+					type="button"
+					className="user-save-btn"
+					onClick={() => handleSave(user.id)}
+					disabled={savingId === user.id}
+				>
+					{savingId === user.id ? "..." : "保存"}
+				</button>
+			</div>
 		</div>
 	);
 }

@@ -782,7 +782,7 @@ body {
 
 .user-card {
 	display: flex;
-	align-items: center;
+	align-items: flex-start;
 	gap: 10px;
 	background: var(--white);
 	border-radius: 12px;
@@ -798,6 +798,7 @@ body {
 	cursor: grab;
 	padding: 4px;
 	touch-action: none;
+	margin-top: 4px;
 }
 
 .user-card-body {
@@ -894,7 +895,9 @@ body {
 }
 
 .user-save-btn {
-	padding: 8px 14px;
+	display: block;
+	margin: 10px 0 0 auto;
+	padding: 8px 20px;
 	font-size: 13px;
 	font-weight: bold;
 	background: var(--brown);
