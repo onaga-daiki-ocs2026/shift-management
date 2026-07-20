@@ -1835,7 +1835,9 @@ select.role-input {
 /* この画面はコメントパネルの分だけ横幅が必要なので、
    app-mainの最大幅をこのページだけ広げる */
 .app-main:has(.confirmed-create-toolbar) {
-	max-width: 1700px;
+	max-width: 2200px;
+	padding-left: 20px;
+	padding-right: 20px;
 }
 
 .confirmed-create-body {
@@ -1934,32 +1936,53 @@ select.role-input {
 	margin-bottom: 8px;
 }
 
-/* ---- 契約時間との過不足パネル ---- */
+/* ---- 契約との過不足パネル（前半／後半・表形式） ---- */
 
-.hours-sidebar-item {
-	padding: 8px 0;
-	border-bottom: 1px dashed var(--gray-border);
+.hours-half-block {
+	margin-bottom: 20px;
 }
 
-.hours-sidebar-item:last-child {
-	border-bottom: none;
-	padding-bottom: 0;
+.hours-half-block-second {
+	padding-top: 16px;
+	border-top: 2px solid var(--gray-border);
 }
 
-.hours-sidebar-name {
-	font-size: 13px;
+.hours-half-title {
+	font-size: 12px;
 	font-weight: bold;
 	color: var(--brown);
-	margin-bottom: 2px;
+	margin-bottom: 8px;
 }
 
-.hours-sidebar-numbers {
-	font-size: 13px;
-	color: var(--text-main);
+.hours-table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 12px;
 }
 
-.hours-sidebar-nocontract {
+.hours-table th {
+	text-align: left;
 	color: var(--text-sub);
+	font-weight: bold;
+	padding: 4px 4px;
+	border-bottom: 1px solid var(--gray-border);
+}
+
+.hours-table td {
+	padding: 6px 4px;
+	border-bottom: 1px dashed var(--gray-border);
+	color: var(--text-main);
+	vertical-align: top;
+}
+
+.hours-table tr:last-child td {
+	border-bottom: none;
+}
+
+.hours-table-diff {
+	display: block;
+	color: var(--text-sub);
+	font-size: 11px;
 }
 /* ---- 提出済み確認：リスト/カレンダー切り替え ---- */
 .view-toggle {

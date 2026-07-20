@@ -484,36 +484,71 @@ function AdminConfirmedShiftCreate() {
 		}));
 	})();
 
-	// 期間全体（14日分）の実働時間を集計し、契約時間（週あたり×2週分）と比較
-	const hoursByUser = (() => {
-		const map = {};
-		dates.forEach((date) => {
-			const hall = getStaffList(date, "HALL");
-			const kitchen = getStaffList(date, "KITCHEN");
-			[...hall, ...kitchen].forEach((s) => {
-				if (!map[s.userId]) {
-					map[s.userId] = { userId: s.userId, name: s.name, totalHours: 0 };
-				}
-				map[s.userId].totalHours += s.blocks.reduce(
-					(sum, b) => sum + (b.end - b.start),
-					0,
-				);
-			});
-		});
+	// 前半（1〜7日目）・後半（8〜14日目）それぞれで実働時間・出勤日数を集計し、
+	// 週あたりの契約時間・契約日数と比較する
+	const weeklyStatsByUser = (() => {
+		const halves = [dates.slice(0, 7), dates.slice(7, 14)];
 
-		return Object.values(map)
-			.map((u) => {
-				const contract = userContractMap[u.userId];
-				const contractHours =
-					contract?.contractHours != null ? contract.contractHours * 2 : null;
-				const diff =
-					contractHours != null ? u.totalHours - contractHours : null;
+		const buildHalf = (halfDates) => {
+			const map = {};
+			halfDates.forEach((date) => {
+				const hall = getStaffList(date, "HALL");
+				const kitchen = getStaffList(date, "KITCHEN");
+				[...hall, ...kitchen].forEach((s) => {
+					const hours = s.blocks.reduce(
+						(sum, b) => sum + (b.end - b.start),
+						0,
+					);
+					if (hours <= 0) return;
+					if (!map[s.userId]) {
+						map[s.userId] = {
+							userId: s.userId,
+							name: s.name,
+							totalHours: 0,
+							workedDays: 0,
+						};
+					}
+					map[s.userId].totalHours += hours;
+					map[s.userId].workedDays += 1;
+				});
+			});
+			return map;
+		};
+
+		const [firstMap, secondMap] = halves.map(buildHalf);
+		const userIds = new Set([
+			...Object.keys(firstMap),
+			...Object.keys(secondMap),
+		]);
+
+		return Array.from(userIds)
+			.map((userIdStr) => {
+				const userId = Number(userIdStr);
+				const first = firstMap[userId];
+				const second = secondMap[userId];
+				const name = first?.name ?? second?.name;
+				const contract = userContractMap[userId];
+
+				const buildEntry = (half) => ({
+					hours: half?.totalHours ?? 0,
+					hoursDiff:
+						contract?.contractHours != null
+							? (half?.totalHours ?? 0) - contract.contractHours
+							: null,
+					days: half?.workedDays ?? 0,
+					daysDiff:
+						contract?.contractDays != null
+							? (half?.workedDays ?? 0) - contract.contractDays
+							: null,
+				});
+
 				return {
-					userId: u.userId,
-					name: u.name,
-					totalHours: u.totalHours,
-					contractHours,
-					diff,
+					userId,
+					name,
+					contractHours: contract?.contractHours ?? null,
+					contractDays: contract?.contractDays ?? null,
+					first: buildEntry(first),
+					second: buildEntry(second),
 				};
 			})
 			.sort((a, b) => a.name.localeCompare(b.name, "ja"));
@@ -566,23 +601,55 @@ function AdminConfirmedShiftCreate() {
 			</div>
 
 			<div className="confirmed-create-body">
-				{!isMobile && hoursByUser.length > 0 && (
+				{!isMobile && weeklyStatsByUser.length > 0 && (
 					<aside className="comments-sidebar hours-sidebar">
-						<div className="comments-sidebar-title">⏱ 契約時間との過不足（14日分）</div>
-						{hoursByUser.map((u) => (
-							<div key={u.userId} className="hours-sidebar-item">
-								<div className="hours-sidebar-name">{u.name}</div>
-								{u.contractHours != null ? (
-									<div className="hours-sidebar-numbers">
-										{u.totalHours.toFixed(1)}h / {u.contractHours.toFixed(1)}h
-										（{u.diff >= 0 ? "+" : ""}
-										{u.diff.toFixed(1)}h）
-									</div>
-								) : (
-									<div className="hours-sidebar-numbers hours-sidebar-nocontract">
-										{u.totalHours.toFixed(1)}h（契約時間未設定）
-									</div>
-								)}
+						<div className="comments-sidebar-title">⏱ 契約との過不足</div>
+						{[
+							{ key: "first", label: "前半（1〜7日目）" },
+							{ key: "second", label: "後半（8〜14日目）" },
+						].map((half, idx) => (
+							<div
+								key={half.key}
+								className={`hours-half-block ${idx === 0 ? "" : "hours-half-block-second"}`}
+							>
+								<div className="hours-half-title">{half.label}</div>
+								<table className="hours-table">
+									<thead>
+										<tr>
+											<th>氏名</th>
+											<th>時間</th>
+											<th>日数</th>
+										</tr>
+									</thead>
+									<tbody>
+										{weeklyStatsByUser.map((u) => {
+											const entry = u[half.key];
+											return (
+												<tr key={u.userId}>
+													<td>{u.name}</td>
+													<td>
+														{entry.hours.toFixed(1)}時間
+														{entry.hoursDiff != null && (
+															<span className="hours-table-diff">
+																（{entry.hoursDiff >= 0 ? "+" : ""}
+																{entry.hoursDiff.toFixed(1)}）
+															</span>
+														)}
+													</td>
+													<td>
+														{entry.days}日
+														{entry.daysDiff != null && (
+															<span className="hours-table-diff">
+																（{entry.daysDiff >= 0 ? "+" : ""}
+																{entry.daysDiff}）
+															</span>
+														)}
+													</td>
+												</tr>
+											);
+										})}
+									</tbody>
+								</table>
 							</div>
 						))}
 					</aside>
