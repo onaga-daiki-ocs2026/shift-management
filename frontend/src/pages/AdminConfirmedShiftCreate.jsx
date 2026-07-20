@@ -14,6 +14,7 @@ function AdminConfirmedShiftCreate() {
 	const [periodStart, setPeriodStart] = useState(null);
 	const [dates, setDates] = useState([]);
 	const [dayStaffMap, setDayStaffMap] = useState({});
+	const [userContractMap, setUserContractMap] = useState({});
 	const [loading, setLoading] = useState(true);
 	const [selected, setSelected] = useState(null);
 	const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
@@ -88,6 +89,20 @@ function AdminConfirmedShiftCreate() {
 				});
 			} catch (error) {
 				console.error("確定シフトの取得に失敗しました", error);
+			}
+
+			try {
+				const usersRes = await api.get("/api/users");
+				const contractMap = {};
+				usersRes.data.forEach((u) => {
+					contractMap[u.id] = {
+						contractDays: u.contractDays,
+						contractHours: u.contractHours,
+					};
+				});
+				setUserContractMap(contractMap);
+			} catch (error) {
+				console.error("ユーザー情報の取得に失敗しました", error);
 			}
 
 			const map = {};
@@ -469,6 +484,41 @@ function AdminConfirmedShiftCreate() {
 		}));
 	})();
 
+	// 期間全体（14日分）の実働時間を集計し、契約時間（週あたり×2週分）と比較
+	const hoursByUser = (() => {
+		const map = {};
+		dates.forEach((date) => {
+			const hall = getStaffList(date, "HALL");
+			const kitchen = getStaffList(date, "KITCHEN");
+			[...hall, ...kitchen].forEach((s) => {
+				if (!map[s.userId]) {
+					map[s.userId] = { userId: s.userId, name: s.name, totalHours: 0 };
+				}
+				map[s.userId].totalHours += s.blocks.reduce(
+					(sum, b) => sum + (b.end - b.start),
+					0,
+				);
+			});
+		});
+
+		return Object.values(map)
+			.map((u) => {
+				const contract = userContractMap[u.userId];
+				const contractHours =
+					contract?.contractHours != null ? contract.contractHours * 2 : null;
+				const diff =
+					contractHours != null ? u.totalHours - contractHours : null;
+				return {
+					userId: u.userId,
+					name: u.name,
+					totalHours: u.totalHours,
+					contractHours,
+					diff,
+				};
+			})
+			.sort((a, b) => a.name.localeCompare(b.name, "ja"));
+	})();
+
 	if (loading) {
 		return (
 			<Layout>
@@ -516,6 +566,27 @@ function AdminConfirmedShiftCreate() {
 			</div>
 
 			<div className="confirmed-create-body">
+				{!isMobile && hoursByUser.length > 0 && (
+					<aside className="comments-sidebar hours-sidebar">
+						<div className="comments-sidebar-title">⏱ 契約時間との過不足（14日分）</div>
+						{hoursByUser.map((u) => (
+							<div key={u.userId} className="hours-sidebar-item">
+								<div className="hours-sidebar-name">{u.name}</div>
+								{u.contractHours != null ? (
+									<div className="hours-sidebar-numbers">
+										{u.totalHours.toFixed(1)}h / {u.contractHours.toFixed(1)}h
+										（{u.diff >= 0 ? "+" : ""}
+										{u.diff.toFixed(1)}h）
+									</div>
+								) : (
+									<div className="hours-sidebar-numbers hours-sidebar-nocontract">
+										{u.totalHours.toFixed(1)}h（契約時間未設定）
+									</div>
+								)}
+							</div>
+						))}
+					</aside>
+				)}
 				<div className="confirmed-create-main">
 					<div className="week-tabs">
 						<button
