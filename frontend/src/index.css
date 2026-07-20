@@ -2066,6 +2066,12 @@ select.role-input {
 	margin-top: 2px;
 }
 
+.calendar-shift-empty {
+	font-size: 11px;
+	color: #ccc;
+	margin-top: 4px;
+}
+
 .calendar-legend {
 	display: flex;
 	justify-content: center;
@@ -2241,6 +2247,11 @@ select.role-input {
 		font-size: 11px;
 		padding: 2px 8px;
 		margin-top: 4px;
+	}
+
+	.calendar-shift-empty {
+		font-size: 13px;
+		margin-top: 6px;
 	}
 
 	.calendar-month-label {

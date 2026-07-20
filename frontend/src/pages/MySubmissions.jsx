@@ -192,15 +192,20 @@ function MySubmissions() {
 									>
 										{date.getDate()}
 									</div>
-									{shift &&
-										(shift.available ? (
+									{shift ? (
+										shift.available ? (
 											<div className="calendar-shift-time">
 												{formatTime(shift.startTime)}
 												<br />〜{formatTime(shift.endTime)}
 											</div>
 										) : (
 											<div className="calendar-shift-rest">休み</div>
-										))}
+										)
+									) : (
+										isCurrentMonth && (
+											<div className="calendar-shift-empty">―</div>
+										)
+									)}
 								</div>
 							);
 						})}
