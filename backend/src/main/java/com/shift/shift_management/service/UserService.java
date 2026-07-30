@@ -92,7 +92,8 @@ public class UserService {
 		return toResponse(savedUser);
 	}
 
-	public void requireAdmin(String callerLineUserId) {
+	// 検証成功時は呼び出し元のUserを返す（表示名など、呼び出し元側で追加情報が必要な場合に再取得を省ける）
+	public User requireAdmin(String callerLineUserId) {
 		if (callerLineUserId == null || callerLineUserId.isBlank()) {
 			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "呼び出し元を特定できません");
 		}
@@ -104,6 +105,8 @@ public class UserService {
 		if (!"ADMIN".equals(caller.getRole())) {
 			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "管理者権限が必要です");
 		}
+
+		return caller;
 	}
 
 	private UserResponse toResponse(User user) {

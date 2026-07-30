@@ -1,7 +1,9 @@
 package com.shift.shift_management.controller;
 
+import com.shift.shift_management.entity.User;
 import com.shift.shift_management.service.ShiftPdfService;
 import com.shift.shift_management.service.SubmissionPeriodService;
+import com.shift.shift_management.service.UserService;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
@@ -19,16 +21,19 @@ public class ShiftPdfController {
 
 	private final ShiftPdfService shiftPdfService;
 	private final SubmissionPeriodService submissionPeriodService;
+	private final UserService userService;
 
-	// PDFアップロード
+	// PDFアップロード（ADMINのみ）
 	@PostMapping("/upload")
 	public ResponseEntity<Map<String, String>> uploadPdf(
 			@RequestParam("file") MultipartFile file,
 			@RequestParam("periodStart")
-			@DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate periodStart)
+			@DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate periodStart,
+			@RequestHeader(value = "X-Line-User-Id", required = false) String callerLineUserId)
 			throws IOException {
 
-		String url = shiftPdfService.uploadPdf(file, periodStart);
+		User caller = userService.requireAdmin(callerLineUserId);
+		String url = shiftPdfService.uploadPdf(file, periodStart, caller.getDisplayName());
 		return ResponseEntity.ok(Map.of("url", url));
 	}
 
