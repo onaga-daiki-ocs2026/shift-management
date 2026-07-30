@@ -71,7 +71,6 @@ public class ShiftPdfService {
 						+ "アプリの「確定シフト確認」からご確認ください。";
 
 		// STAFF/ADMIN問わず、LINE連携しているユーザー全員に通知する
-		userRepository.findAll()
-				.forEach(user -> lineNotificationService.push(user.getLineUserId(), message));
+		lineNotificationService.notifyBatch(userRepository.findAll(), message, "シフト確定");
 	}
 }

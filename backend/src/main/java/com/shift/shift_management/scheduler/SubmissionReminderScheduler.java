@@ -9,6 +9,7 @@ import com.shift.shift_management.service.SubmissionPeriodService;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -45,9 +46,11 @@ public class SubmissionReminderScheduler {
 						+ "今すぐアプリから提出してください！";
 
 		// STAFF/ADMIN問わず、未提出の人全員にリマインドする
-		userRepository.findAll().stream()
-				.filter(user -> !hasSubmitted(user, period))
-				.forEach(user -> lineNotificationService.push(user.getLineUserId(), message));
+		List<User> targets =
+				userRepository.findAll().stream()
+						.filter(user -> !hasSubmitted(user, period))
+						.toList();
+		lineNotificationService.notifyBatch(targets, message, "提出リマインダー");
 	}
 
 	// 必須ブロック（期間の初日）に提出済みかどうかで判定
