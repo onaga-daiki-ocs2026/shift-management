@@ -109,6 +109,18 @@ public class UserService {
 		return caller;
 	}
 
+	// ADMIN権限までは要求せず、呼び出し元が誰であるかだけを特定する。
+	// ヘッダーが無い/DBに存在しない場合は401（「あなたが誰か分からない」）で拒否する。
+	public User resolveCaller(String callerLineUserId) {
+		if (callerLineUserId == null || callerLineUserId.isBlank()) {
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "認証情報がありません");
+		}
+
+		return userRepository
+				.findByLineUserId(callerLineUserId)
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "認証情報がありません"));
+	}
+
 	private UserResponse toResponse(User user) {
 		UserResponse response = new UserResponse();
 		response.setId(user.getId());

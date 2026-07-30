@@ -1,5 +1,6 @@
 package com.shift.shift_management.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -86,5 +87,35 @@ class UserServiceTest {
 		when(userRepository.findByLineUserId("U_admin")).thenReturn(Optional.of(admin));
 
 		assertThatCode(() -> userService().requireAdmin("U_admin")).doesNotThrowAnyException();
+	}
+
+	@Test
+	void resolveCaller_nullCallerId_rejectedWithUnauthorized() {
+		assertThatThrownBy(() -> userService().resolveCaller(null))
+				.isInstanceOf(ResponseStatusException.class)
+				.extracting(e -> ((ResponseStatusException) e).getStatusCode())
+				.isEqualTo(HttpStatus.UNAUTHORIZED);
+
+		verifyNoInteractions(userRepository);
+	}
+
+	@Test
+	void resolveCaller_unknownCallerId_rejectedWithUnauthorized() {
+		when(userRepository.findByLineUserId("U_unknown")).thenReturn(Optional.empty());
+
+		assertThatThrownBy(() -> userService().resolveCaller("U_unknown"))
+				.isInstanceOf(ResponseStatusException.class)
+				.extracting(e -> ((ResponseStatusException) e).getStatusCode())
+				.isEqualTo(HttpStatus.UNAUTHORIZED);
+	}
+
+	@Test
+	void resolveCaller_staffCaller_returnsUserWithoutRoleCheck() {
+		User staff = new User();
+		staff.setLineUserId("U_staff");
+		staff.setRole("STAFF");
+		when(userRepository.findByLineUserId("U_staff")).thenReturn(Optional.of(staff));
+
+		assertThat(userService().resolveCaller("U_staff")).isSameAs(staff);
 	}
 }

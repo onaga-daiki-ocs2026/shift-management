@@ -49,9 +49,14 @@ public class ShiftRequestService {
 		}
 	}
 
-	public List<ShiftRequestResponse> findAll() {
+	// STAFFは自分自身の希望シフトのみ、ADMINは全体を把握する必要があるため全件を返す。
+	public List<ShiftRequestResponse> findAll(User caller) {
 
 		List<ShiftRequest> shifts = shiftRequestRepository.findAll();
+
+		if (!"ADMIN".equals(caller.getRole())) {
+			shifts = shifts.stream().filter(shift -> shift.getUserId().equals(caller.getId())).toList();
+		}
 
 		return shifts.stream()
 				.map(
@@ -75,9 +80,14 @@ public class ShiftRequestService {
 				.toList();
 	}
 
-	// 特定の日付の全員分（ユーザー情報付き）を取得
-	public List<ShiftRequestWithUserResponse> findByWorkDate(LocalDate workDate) {
+	// 特定の日付の全員分（ユーザー情報付き）を取得。
+	// STAFFは自分自身の分のみ、ADMINは全員分を返す。
+	public List<ShiftRequestWithUserResponse> findByWorkDate(LocalDate workDate, User caller) {
 		List<ShiftRequest> shifts = shiftRequestRepository.findByWorkDate(workDate);
+
+		if (!"ADMIN".equals(caller.getRole())) {
+			shifts = shifts.stream().filter(shift -> shift.getUserId().equals(caller.getId())).toList();
+		}
 
 		return shifts.stream()
 				.filter(ShiftRequest::isAvailable)
