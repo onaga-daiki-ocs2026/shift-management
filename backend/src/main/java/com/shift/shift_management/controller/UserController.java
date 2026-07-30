@@ -3,6 +3,7 @@ package com.shift.shift_management.controller;
 import com.shift.shift_management.dto.UserRequest;
 import com.shift.shift_management.dto.UserResponse;
 import com.shift.shift_management.dto.UserRoleUpdateRequest;
+import com.shift.shift_management.dto.UserSummaryResponse;
 import com.shift.shift_management.dto.UserUpdateRequest;
 import com.shift.shift_management.service.UserService;
 import java.util.List;
@@ -24,8 +25,9 @@ public class UserController {
 	}
 
 	@GetMapping
-	public List<UserResponse> getAllUsers() {
-		return userService.findAll();
+	public List<UserSummaryResponse> getAllUsers(
+			@RequestHeader(value = "X-Line-User-Id", required = false) String callerLineUserId) {
+		return userService.findAll(callerLineUserId);
 	}
 
 	@PutMapping("/{id}")

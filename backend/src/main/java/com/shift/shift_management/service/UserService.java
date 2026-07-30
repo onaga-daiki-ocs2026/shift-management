@@ -3,6 +3,7 @@ package com.shift.shift_management.service;
 import com.shift.shift_management.dto.UserRequest;
 import com.shift.shift_management.dto.UserResponse;
 import com.shift.shift_management.dto.UserRoleUpdateRequest;
+import com.shift.shift_management.dto.UserSummaryResponse;
 import com.shift.shift_management.dto.UserUpdateRequest;
 import com.shift.shift_management.entity.User;
 import com.shift.shift_management.repository.UserRepository;
@@ -39,10 +40,13 @@ public class UserService {
 		return toResponse(user);
 	}
 
-	public List<UserResponse> findAll() {
+	// 一覧表示はADMIN限定。lineUserIdは含めない（UserSummaryResponse参照）。
+	public List<UserSummaryResponse> findAll(String callerLineUserId) {
+		requireAdmin(callerLineUserId);
+
 		return userRepository.findAllByOrderBySortOrderAsc()
 				.stream()
-				.map(this::toResponse)
+				.map(this::toSummaryResponse)
 				.toList();
 	}
 
@@ -119,6 +123,17 @@ public class UserService {
 		return userRepository
 				.findByLineUserId(callerLineUserId)
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "認証情報がありません"));
+	}
+
+	private UserSummaryResponse toSummaryResponse(User user) {
+		return new UserSummaryResponse(
+				user.getId(),
+				user.getDisplayName(),
+				user.getRole(),
+				user.getPosition(),
+				user.getSortOrder(),
+				user.getContractDays(),
+				user.getContractHours());
 	}
 
 	private UserResponse toResponse(User user) {
