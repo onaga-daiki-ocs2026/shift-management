@@ -342,6 +342,13 @@ function AdminConfirmedShiftCreate() {
 		);
 
 		const container = document.getElementById("pdf-export-area");
+		if (!container) {
+			alert(
+				"PDF出力用の描画エリアが見つかりませんでした。\nページを再読み込みしてからもう一度お試しください。",
+			);
+			setExporting(false);
+			return;
+		}
 		container.classList.add("pdf-mode");
 
 		try {
