@@ -31,7 +31,13 @@ public class ShiftRequestController {
 	private final UserService userService;
 
 	@PostMapping
-	public void submitShiftRequests(@RequestBody ShiftRequestSubmitRequest request) {
+	public void submitShiftRequests(
+			@RequestBody ShiftRequestSubmitRequest request,
+			@RequestHeader(value = "X-Line-User-Id", required = false) String callerLineUserId) {
+		User caller = userService.resolveCaller(callerLineUserId);
+		if (!caller.getId().equals(request.userId())) {
+			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "他ユーザーの希望シフトは提出できません");
+		}
 		shiftRequestService.submit(request);
 	}
 
