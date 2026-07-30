@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Navigate } from "react-router-dom";
 import Layout from "../components/Layout";
 import api from "../api/api";
 import {
@@ -35,10 +36,6 @@ function AdminUserManagement() {
 		}),
 	);
 
-	useEffect(() => {
-		fetchUsers();
-	}, []);
-
 	const fetchUsers = async () => {
 		try {
 			const response = await api.get("/api/users");
@@ -49,6 +46,21 @@ function AdminUserManagement() {
 			setLoading(false);
 		}
 	};
+
+	useEffect(() => {
+		fetchUsers();
+	}, []);
+
+	// フックは必ず条件分岐の前に呼び終える必要があるため、権限ガードはここに置く。
+	let loginUser;
+	try {
+		loginUser = JSON.parse(localStorage.getItem("loginUser"));
+	} catch {
+		loginUser = null;
+	}
+	if (loginUser?.role !== "ADMIN") {
+		return <Navigate to="/" replace />;
+	}
 
 	const handleChange = (userId, field, value) => {
 		setUsers((prev) =>
@@ -65,7 +77,6 @@ function AdminUserManagement() {
 			await api.put(`/api/users/${userId}`, {
 				displayName: user.displayName,
 				position: user.position,
-				role: user.role,
 				sortOrder: user.sortOrder,
 				contractDays:
 					user.contractDays === "" || user.contractDays == null
@@ -76,6 +87,8 @@ function AdminUserManagement() {
 						? null
 						: Number(user.contractHours),
 			});
+			// role変更は権限昇格に直結するため、専用エンドポイントに分けて送る。
+			await api.put(`/api/users/${userId}/role`, { role: user.role });
 			alert(`${user.displayName}さんの設定を保存しました`);
 			setEditingId(null);
 		} catch (error) {
