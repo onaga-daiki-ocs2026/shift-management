@@ -1942,11 +1942,15 @@ select.role-input {
 	display: none;
 }
 
-@media (min-width: 1400px) {
+/* 1300×900程度のモニターでもパネルが見えるよう、最小の表示幅を1280pxに
+   下げている。この幅では中央ガントチャートの取り分が少ないため、
+   パネル自体の横幅も340pxではなく280pxに絞って確保している
+   （1280px時点の中央幅 ≒ 640px。従来の1400px時点の中央幅と同程度） */
+@media (min-width: 1280px) {
 	.comments-sidebar {
 		display: block;
 		flex-shrink: 0;
-		width: 340px;
+		width: 280px;
 		/* 固定ツールバーと同じ「上までスクロールしたら張り付く」動き。
 		   ツールバーの高さ＋少し余白ぶんだけ下にずらして重ならないようにする */
 		position: sticky;
@@ -1959,6 +1963,12 @@ select.role-input {
 		padding: 18px;
 		box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
 		z-index: 5;
+	}
+}
+
+@media (min-width: 1400px) {
+	.comments-sidebar {
+		width: 340px;
 	}
 }
 
