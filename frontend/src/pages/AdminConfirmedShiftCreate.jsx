@@ -768,54 +768,58 @@ function AdminConfirmedShiftCreate() {
 									className={`day-section ${isInCurrentWeek ? "" : "hidden-week"}`}
 								>
 									<div
-										className={`day-section-title ${isSun ? "sun" : isSat ? "sat" : ""}`}
+										className={`confirmed-day-card ${isSun ? "sun" : isSat ? "sat" : ""}`}
 									>
-										{label}
-									</div>
+										<div
+											className={`day-section-title ${isSun ? "sun" : isSat ? "sat" : ""}`}
+										>
+											{label}
+										</div>
 
-									<ShiftSection
-										title="ホール"
-										position="HALL"
-										hidden={position !== "HALL"}
-										date={date}
-										staffList={hallList}
-										isMobile={isMobile}
-										selected={selected}
-										setSelected={setSelected}
-										updateBlocks={updateBlocks}
-										updateRole={updateRole}
-										resetOne={resetOne}
-										removeRow={removeRow}
-										splitBlock={splitBlock}
-										deleteBlock={deleteBlock}
-										hourToLabel={hourToLabel}
-									/>
-									<ShiftSection
-										title="キッチン"
-										position="KITCHEN"
-										hidden={position !== "KITCHEN"}
-										date={date}
-										staffList={kitchenList}
-										isMobile={isMobile}
-										selected={selected}
-										setSelected={setSelected}
-										updateBlocks={updateBlocks}
-										updateRole={updateRole}
-										resetOne={resetOne}
-										removeRow={removeRow}
-										splitBlock={splitBlock}
-										deleteBlock={deleteBlock}
-										hourToLabel={hourToLabel}
-									/>
-
-									<div className="day-memo-area">
-										<span className="day-memo-label">伝達事項</span>
-										<textarea
-											className="day-memo-textarea"
-											placeholder="この日の伝達事項を入力（例：10時オープン）"
-											value={dayMemoMap[date] || ""}
-											onChange={(e) => updateDayMemo(date, e.target.value)}
+										<ShiftSection
+											title="ホール"
+											position="HALL"
+											hidden={position !== "HALL"}
+											date={date}
+											staffList={hallList}
+											isMobile={isMobile}
+											selected={selected}
+											setSelected={setSelected}
+											updateBlocks={updateBlocks}
+											updateRole={updateRole}
+											resetOne={resetOne}
+											removeRow={removeRow}
+											splitBlock={splitBlock}
+											deleteBlock={deleteBlock}
+											hourToLabel={hourToLabel}
 										/>
+										<ShiftSection
+											title="キッチン"
+											position="KITCHEN"
+											hidden={position !== "KITCHEN"}
+											date={date}
+											staffList={kitchenList}
+											isMobile={isMobile}
+											selected={selected}
+											setSelected={setSelected}
+											updateBlocks={updateBlocks}
+											updateRole={updateRole}
+											resetOne={resetOne}
+											removeRow={removeRow}
+											splitBlock={splitBlock}
+											deleteBlock={deleteBlock}
+											hourToLabel={hourToLabel}
+										/>
+
+										<div className="day-memo-area">
+											<span className="day-memo-label">伝達事項</span>
+											<textarea
+												className="day-memo-textarea"
+												placeholder="この日の伝達事項を入力（例：10時オープン）"
+												value={dayMemoMap[date] || ""}
+												onChange={(e) => updateDayMemo(date, e.target.value)}
+											/>
+										</div>
 									</div>
 								</div>
 							);

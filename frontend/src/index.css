@@ -1212,12 +1212,35 @@ body {
 
 /* ---- 日ごとのセクション ---- */
 
+/* キャプチャ対象（=PDFの1ページ）そのもの。薄いグレーの「ページ背景」を
+   持たせ、内側の.confirmed-day-cardとの間に余白を作る。1日ごとに個別の
+   ページとして撮影されるため、この内側パディングがPDF上で見える唯一の
+   「カード同士の余白」になる（day-section間のmargin-bottomはPDFには
+   反映されない）
+   ※クラス名はconfirmed-day-card（AdminShiftRequests.jsx側の
+   .day-cardと名前が衝突しないよう別名にしている） */
 .day-section {
 	margin-bottom: 20px;
+	padding: 14px;
+	border-radius: 12px;
+	background: var(--gray-light);
+}
+
+/* box-shadowはhtml2canvasのPDF撮影で描画されない（検証済み）ため、
+   カードの輪郭は影ではなくborderのみで表現する */
+.confirmed-day-card {
 	border-radius: 10px;
 	overflow: hidden;
-	border: 1px solid var(--gray-border);
+	border: 2px solid #c9c9c9;
 	background: var(--white);
+}
+
+.confirmed-day-card.sun {
+	border: 2px solid var(--red);
+}
+
+.confirmed-day-card.sat {
+	border: 2px solid #2980b9;
 }
 
 /* 表示中の週（前半/後半）ではない日は画面上は非表示。
