@@ -778,6 +778,7 @@ function AdminConfirmedShiftCreate() {
 
 										<ShiftSection
 											title="ホール"
+											badge="H"
 											position="HALL"
 											hidden={position !== "HALL"}
 											date={date}
@@ -795,6 +796,7 @@ function AdminConfirmedShiftCreate() {
 										/>
 										<ShiftSection
 											title="キッチン"
+											badge="K"
 											position="KITCHEN"
 											hidden={position !== "KITCHEN"}
 											date={date}
@@ -897,6 +899,7 @@ const FIXED_ROWS_PER_SECTION = 15;
 
 function ShiftSection({
 	title,
+	badge,
 	position,
 	hidden,
 	date,
@@ -926,7 +929,10 @@ function ShiftSection({
 		<div
 			className={`shift-section ${position === "KITCHEN" ? "kitchen" : ""} ${hidden ? "position-hidden" : ""}`}
 		>
-			<h3>{title}</h3>
+			<h3>
+				<span className="shift-section-badge">{badge}</span>
+				{title}
+			</h3>
 
 			<div className="timeline-header">
 				<div className="timeline-role-spacer">役割</div>

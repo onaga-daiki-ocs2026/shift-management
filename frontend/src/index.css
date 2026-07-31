@@ -1212,24 +1212,25 @@ body {
 
 /* ---- 日ごとのセクション ---- */
 
-/* キャプチャ対象（=PDFの1ページ）そのもの。薄いグレーの「ページ背景」を
-   持たせ、内側の.confirmed-day-cardとの間に余白を作る。1日ごとに個別の
-   ページとして撮影されるため、この内側パディングがPDF上で見える唯一の
-   「カード同士の余白」になる（day-section間のmargin-bottomはPDFには
-   反映されない）
+/* キャプチャ対象（=PDFの1ページ）そのもの。アプリ全体の背景色と同じ
+   温かみのあるベージュ（#f0ebe3）を「ページ背景」として持たせ、内側の
+   .confirmed-day-cardとの間に余白を作る。1日ごとに個別のページとして
+   撮影されるため、この内側パディングがPDF上で見える唯一の「カード同士の
+   余白」になる（day-section間のmargin-bottomはPDFには反映されない）。
+   余白は以前より広めに取り、白いカードとの明暗差をはっきりさせている。
    ※クラス名はconfirmed-day-card（AdminShiftRequests.jsx側の
    .day-cardと名前が衝突しないよう別名にしている） */
 .day-section {
-	margin-bottom: 20px;
-	padding: 14px;
-	border-radius: 12px;
-	background: var(--gray-light);
+	margin-bottom: 24px;
+	padding: 22px;
+	border-radius: 14px;
+	background: #f0ebe3;
 }
 
 /* box-shadowはhtml2canvasのPDF撮影で描画されない（検証済み）ため、
    カードの輪郭は影ではなくborderのみで表現する */
 .confirmed-day-card {
-	border-radius: 10px;
+	border-radius: 12px;
 	overflow: hidden;
 	border: 2px solid #c9c9c9;
 	background: var(--white);
@@ -1266,21 +1267,23 @@ body {
 	display: block;
 }
 
+/* 日付見出しはベタ塗りの色帯（バナー）にして、外側カードの枠線とは
+   別の強い区切りとして視認できるようにする。平日はやよい軒の緑、
+   日曜/土曜は既存の赤/青を踏襲する */
 .day-section-title {
-	padding: 8px 12px;
-	font-size: 16px;
+	padding: 12px 16px;
+	font-size: 22px;
 	font-weight: bold;
-	color: var(--brown);
-	background: var(--gray-light);
-	border-bottom: 1px solid var(--gray-border);
+	color: var(--white);
+	background: var(--green);
 }
 
 .day-section-title.sun {
-	color: var(--red);
+	background: var(--red);
 }
 
 .day-section-title.sat {
-	color: #2980b9;
+	background: #2980b9;
 }
 
 /* ---- ホール／キッチンのセクション ---- */
@@ -1290,13 +1293,37 @@ body {
 	overflow-x: auto;
 }
 
+/* 日付カードの「箱」表現と衝突しないよう、枠で囲まず
+   アイコン+ラベル+薄い下線だけの軽い区切りにする */
 .shift-section h3 {
-	font-size: 16px;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	font-size: 15px;
 	font-weight: bold;
+	color: var(--brown);
 	margin: 0 0 8px 0;
-	padding: 4px 8px;
-	background: #eee;
-	border-left: 4px solid #555;
+	padding: 4px 4px 8px;
+	background: none;
+	border-left: none;
+	border-bottom: 2px solid var(--beige-dark);
+}
+
+/* ホール/キッチンを表す文字バッジ。日付バナーと同じ緑系のブランドカラーを
+   薄く使い、円形の軽いアクセントとして表示する（絵文字はhtml2canvasで
+   正しく描画されないため使わない） */
+.shift-section-badge {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 22px;
+	height: 22px;
+	flex-shrink: 0;
+	border-radius: 50%;
+	background: rgba(74, 124, 89, 0.15);
+	color: var(--green);
+	font-size: 12px;
+	font-weight: bold;
 }
 
 /* ---- ヘッダー行（時間の目盛り） ---- */
