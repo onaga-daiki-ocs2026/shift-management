@@ -8,6 +8,9 @@ const RANGE_START = 0;
 const RANGE_END = 24;
 const TOTAL_HOURS = RANGE_END - RANGE_START;
 const DAY_NAMES = ["日", "月", "火", "水", "木", "金", "土"];
+const POSITION_STORAGE_KEY = "adminConfirmedShiftPosition";
+const POSITIONS = ["HALL", "KITCHEN"];
+const POSITION_LABEL = { HALL: "ホール", KITCHEN: "キッチン" };
 
 function AdminConfirmedShiftCreate() {
 	const [periodId, setPeriodId] = useState(null);
@@ -26,6 +29,10 @@ function AdminConfirmedShiftCreate() {
 	const [exportElapsed, setExportElapsed] = useState(0);
 	const [currentWeek, setCurrentWeek] = useState(0); // 0=前半, 1=後半
 	const [dayMemoMap, setDayMemoMap] = useState({});
+	const [position, setPosition] = useState(() => {
+		const stored = localStorage.getItem(POSITION_STORAGE_KEY);
+		return POSITIONS.includes(stored) ? stored : null;
+	});
 
 	useEffect(() => {
 		const handleResize = () => setIsMobile(window.innerWidth < 768);
@@ -212,6 +219,11 @@ function AdminConfirmedShiftCreate() {
 
 	const updateDayMemo = (date, memo) => {
 		setDayMemoMap((prev) => ({ ...prev, [date]: memo }));
+	};
+
+	const selectPosition = (value) => {
+		setPosition(value);
+		localStorage.setItem(POSITION_STORAGE_KEY, value);
 	};
 
 	const resetOne = (date, position, userId) => {
@@ -469,12 +481,11 @@ function AdminConfirmedShiftCreate() {
 		: null;
 
 	// 期間全体（14日分）のコメントを、スタッフごとに「同じ文言は1つにまとめて」表示
+	// （選択中の担当のみを対象にする）
 	const commentsByUser = (() => {
 		const map = {};
 		dates.forEach((date) => {
-			const hall = getStaffList(date, "HALL");
-			const kitchen = getStaffList(date, "KITCHEN");
-			[...hall, ...kitchen]
+			getStaffList(date, position)
 				.filter((s) => s.comment && s.comment.trim() !== "")
 				.forEach((s) => {
 					if (!map[s.userId]) {
@@ -495,16 +506,14 @@ function AdminConfirmedShiftCreate() {
 	})();
 
 	// 前半（1〜7日目）・後半（8〜14日目）それぞれで実働時間・出勤日数を集計し、
-	// 週あたりの契約時間・契約日数と比較する
+	// 週あたりの契約時間・契約日数と比較する（選択中の担当のみを対象にする）
 	const weeklyStatsByUser = (() => {
 		const halves = [dates.slice(0, 7), dates.slice(7, 14)];
 
 		const buildHalf = (halfDates) => {
 			const map = {};
 			halfDates.forEach((date) => {
-				const hall = getStaffList(date, "HALL");
-				const kitchen = getStaffList(date, "KITCHEN");
-				[...hall, ...kitchen].forEach((s) => {
+				getStaffList(date, position).forEach((s) => {
 					const hours = s.blocks.reduce(
 						(sum, b) => sum + (b.end - b.start),
 						0,
@@ -564,6 +573,29 @@ function AdminConfirmedShiftCreate() {
 			.sort((a, b) => a.name.localeCompare(b.name, "ja"));
 	})();
 
+	// 担当未選択（初回アクセス）は、データ取得を待たずに選択画面を出す
+	if (!position) {
+		return (
+			<Layout>
+				<div className="position-picker">
+					<p className="position-picker-title">どちらの担当ですか？</p>
+					<div className="position-picker-buttons">
+						{POSITIONS.map((p) => (
+							<button
+								key={p}
+								type="button"
+								className="position-picker-btn"
+								onClick={() => selectPosition(p)}
+							>
+								{POSITION_LABEL[p]}
+							</button>
+						))}
+					</div>
+				</div>
+			</Layout>
+		);
+	}
+
 	if (loading) {
 		return (
 			<Layout>
@@ -575,6 +607,18 @@ function AdminConfirmedShiftCreate() {
 	return (
 		<>
 		<Layout>
+			<div className="view-toggle">
+				{POSITIONS.map((p) => (
+					<button
+						key={p}
+						type="button"
+						className={`view-toggle-btn ${position === p ? "active" : ""}`}
+						onClick={() => selectPosition(p)}
+					>
+						{POSITION_LABEL[p]}
+					</button>
+				))}
+			</div>
 			<div className="confirmed-create-toolbar">
 				<div className="confirmed-create-left-actions">
 					<button
@@ -732,6 +776,7 @@ function AdminConfirmedShiftCreate() {
 									<ShiftSection
 										title="ホール"
 										position="HALL"
+										hidden={position !== "HALL"}
 										date={date}
 										staffList={hallList}
 										isMobile={isMobile}
@@ -748,6 +793,7 @@ function AdminConfirmedShiftCreate() {
 									<ShiftSection
 										title="キッチン"
 										position="KITCHEN"
+										hidden={position !== "KITCHEN"}
 										date={date}
 										staffList={kitchenList}
 										isMobile={isMobile}
@@ -848,6 +894,7 @@ const FIXED_ROWS_PER_SECTION = 15;
 function ShiftSection({
 	title,
 	position,
+	hidden,
 	date,
 	staffList,
 	isMobile,
@@ -873,7 +920,7 @@ function ShiftSection({
 
 	return (
 		<div
-			className={`shift-section ${position === "KITCHEN" ? "kitchen" : ""}`}
+			className={`shift-section ${position === "KITCHEN" ? "kitchen" : ""} ${hidden ? "position-hidden" : ""}`}
 		>
 			<h3>{title}</h3>
 

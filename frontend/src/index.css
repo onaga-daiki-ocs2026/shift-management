@@ -1232,6 +1232,17 @@ body {
 	display: block;
 }
 
+/* 選択中でない担当（ホール/キッチン）のセクションは画面上は非表示。
+   ただし DOM からは消さない（PDF生成では両方の担当を含める必要があるため） */
+.shift-section.position-hidden {
+	display: none;
+}
+
+/* PDF生成中は、選択中でない担当も含めて全部見えるようにする */
+.pdf-mode .shift-section.position-hidden {
+	display: block;
+}
+
 .day-section-title {
 	padding: 8px 12px;
 	font-size: 16px;
