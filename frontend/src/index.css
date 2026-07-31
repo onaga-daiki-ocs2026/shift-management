@@ -1374,7 +1374,7 @@ body {
 }
 
 .timeline-icon-spacer {
-	width: 68px;
+	width: 72px;
 	flex-shrink: 0;
 }
 
@@ -1469,6 +1469,8 @@ select.role-input {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
+	width: 16px;
+	flex-shrink: 0;
 	font-size: 13px;
 	cursor: help;
 }
@@ -1591,7 +1593,7 @@ select.role-input {
 /* ---- 右端：戻す・削除アイコン ---- */
 
 .row-icon-actions {
-	width: 68px;
+	width: 72px;
 	flex-shrink: 0;
 	display: flex;
 	flex-direction: row;
@@ -1603,6 +1605,7 @@ select.role-input {
 .row-icon-actions button {
 	width: 22px;
 	height: 22px;
+	flex-shrink: 0;
 	font-size: 12px;
 	line-height: 1;
 	padding: 0;
