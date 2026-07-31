@@ -41,9 +41,11 @@ public class SubmissionPeriodService {
 		LocalDate displayDeadline =
 				currentDeadline.isBefore(today) ? currentDeadline.plusDays(14) : currentDeadline;
 
-		// 必須ブロックの開始日（締切日の15日後）と終了日（28日後＝14日間）
-		LocalDate startDate = currentDeadline.plusDays(15);
-		LocalDate endDate = currentDeadline.plusDays(28);
+		// 必須ブロックの開始日（締切日の15日後）と終了日（28日後＝14日間）。
+		// 表示中の締切（displayDeadline）を基準にする。currentDeadline基準のままだと、
+		// 締切を過ぎて表示だけ1サイクル先送りした場合に対象期間が古いままズレてしまう。
+		LocalDate startDate = displayDeadline.plusDays(15);
+		LocalDate endDate = displayDeadline.plusDays(28);
 
 		return new SubmissionPeriodResponse(1L, startDate, endDate, displayDeadline, true);
 	}
