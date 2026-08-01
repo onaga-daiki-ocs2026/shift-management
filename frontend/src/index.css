@@ -1455,7 +1455,11 @@ body {
 }
 
 .timeline-role-spacer {
-	width: 70px;
+	/* データ行の.timeline-role(62px)と幅を揃える。ここがズレると
+	   ヘッダーの目盛り(.timeline-hours)とバー(.timeline-track)の
+	   基準コンテナの幅・開始位置が食い違い、目盛りとバーの位置が
+	   ズレて見える */
+	width: 62px;
 	flex-shrink: 0;
 	font-size: 11px;
 	font-weight: bold;
