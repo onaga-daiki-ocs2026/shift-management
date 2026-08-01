@@ -2690,6 +2690,70 @@ select.role-input {
 	margin: 4px 0;
 }
 
+/* ---- 希望シフト一覧：週間表ビュー ---- */
+
+.requests-table-wrap {
+	overflow-x: auto;
+	margin-bottom: 20px;
+	border: 1px solid var(--gray-border);
+	border-radius: 10px;
+}
+
+.requests-table {
+	width: 100%;
+	min-width: 640px;
+	border-collapse: collapse;
+	font-size: 13px;
+	white-space: nowrap;
+}
+
+.requests-table th,
+.requests-table td {
+	padding: 8px 10px;
+	text-align: center;
+	border-bottom: 1px solid var(--gray-border);
+}
+
+.requests-table thead th {
+	background: #fafafa;
+	font-size: 12px;
+	color: var(--text-sub);
+	position: sticky;
+	top: 0;
+}
+
+.requests-table thead th.sun {
+	color: var(--red);
+}
+
+.requests-table thead th.sat {
+	color: #2980b9;
+}
+
+.requests-table-name-col {
+	text-align: left;
+	font-weight: bold;
+	color: var(--brown);
+	white-space: nowrap;
+}
+
+.requests-table-diff-col {
+	font-size: 12px;
+}
+
+.requests-table-empty {
+	color: #ccc;
+	padding: 16px;
+}
+
+.requests-table tfoot td {
+	background: #fafafa;
+	font-weight: bold;
+	color: var(--text-sub);
+	border-bottom: none;
+	border-top: 2px solid var(--gray-border);
+}
+
 .requests-cta {
 	display: block;
 	text-align: center;
