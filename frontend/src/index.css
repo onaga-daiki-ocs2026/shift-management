@@ -1917,7 +1917,10 @@ select.role-input {
 	display: flex;
 	flex-wrap: wrap;
 	gap: 8px;
-	padding: 0 16px 16px;
+	/* 氏名クリック時(row-onlyモード)は.edit-modal-bodyが描画されず
+	   上側の余白(20px)が丸ごと無くなるため、ヘッダーとの間隔を
+	   ここでも確保しておく */
+	padding: 16px 16px;
 }
 
 .edit-modal-btn {
