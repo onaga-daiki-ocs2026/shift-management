@@ -1406,7 +1406,7 @@ function EditModal({
 				)}
 
 				<div className="edit-modal-actions">
-					{block && (
+					{block ? (
 						<>
 							<button
 								type="button"
@@ -1427,28 +1427,24 @@ function EditModal({
 								ブロック削除
 							</button>
 						</>
+					) : (
+						<>
+							<button
+								type="button"
+								className="edit-modal-btn edit-modal-btn-reset"
+								onClick={() => resetOne(date, position, staff.userId)}
+							>
+								戻す
+							</button>
+							<button
+								type="button"
+								className="edit-modal-btn edit-modal-btn-delete"
+								onClick={() => removeRow(date, position, staff.userId)}
+							>
+								この人を外す
+							</button>
+						</>
 					)}
-					<button
-						type="button"
-						className="edit-modal-btn edit-modal-btn-reset"
-						onClick={() => resetOne(date, position, staff.userId)}
-					>
-						戻す
-					</button>
-					<button
-						type="button"
-						className="edit-modal-btn edit-modal-btn-delete"
-						onClick={() => removeRow(date, position, staff.userId)}
-					>
-						この人を外す
-					</button>
-					<button
-						type="button"
-						className="edit-modal-btn edit-modal-btn-save"
-						onClick={() => setSelected(null)}
-					>
-						保存
-					</button>
 				</div>
 			</div>
 		</div>
