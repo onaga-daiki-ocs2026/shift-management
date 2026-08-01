@@ -1092,21 +1092,73 @@ function StaffRow({
 		selected.userId === staff.userId &&
 		selected.blockIndex === blockIndex;
 
+	// ホールは1マスの文字列に"A/T"のようにスラッシュ区切りで2役割まで詰めて保持する
+	// （バックエンドのroleカラムは単なる自由文字列なのでDTO/エンティティの変更は不要）。
+	// キッチンの既存データ（"指導"等、スラッシュを含まない値）は
+	// split("/")しても単に長さ1の配列になるだけで問題なく動く。
+	const hallRoleSlots = (staff.role || "").split("/");
+	const hallRoleSlot0 = hallRoleSlots[0] || "";
+	const hallRoleSlot1 = hallRoleSlots[1] || "";
+
+	const updateHallRoleSlot = (slotIndex, value) => {
+		const slots = [hallRoleSlot0, hallRoleSlot1];
+		slots[slotIndex] = value;
+		// 2マス目が空欄のままなら末尾の"/"を残さない（1人1役の人は従来通り単一の値になる）
+		updateRole(date, position, staff.userId, slots.filter(Boolean).join("/"));
+	};
+
 	return (
 		<div className="timeline-row">
 			<div className="timeline-role">
-				<select
-					className="role-input"
-					value={staff.role || ""}
-					onChange={(e) =>
-						updateRole(date, position, staff.userId, e.target.value)
-					}
-				>
-					<option value=""></option>
-					<option value="指導">指導</option>
-					<option value="仕込">仕込</option>
-					<option value="研修">研修</option>
-				</select>
+				{position === "HALL" ? (
+					<>
+						<select
+							className="role-input"
+							value={hallRoleSlot0}
+							onChange={(e) => updateHallRoleSlot(0, e.target.value)}
+						>
+							<option value=""></option>
+							<option value="A" disabled={hallRoleSlot1 === "A"}>
+								A
+							</option>
+							<option value="T" disabled={hallRoleSlot1 === "T"}>
+								T
+							</option>
+							<option value="D" disabled={hallRoleSlot1 === "D"}>
+								D
+							</option>
+						</select>
+						<select
+							className="role-input"
+							value={hallRoleSlot1}
+							onChange={(e) => updateHallRoleSlot(1, e.target.value)}
+						>
+							<option value=""></option>
+							<option value="A" disabled={hallRoleSlot0 === "A"}>
+								A
+							</option>
+							<option value="T" disabled={hallRoleSlot0 === "T"}>
+								T
+							</option>
+							<option value="D" disabled={hallRoleSlot0 === "D"}>
+								D
+							</option>
+						</select>
+					</>
+				) : (
+					<select
+						className="role-input"
+						value={staff.role || ""}
+						onChange={(e) =>
+							updateRole(date, position, staff.userId, e.target.value)
+						}
+					>
+						<option value=""></option>
+						<option value="指導">指導</option>
+						<option value="仕込">仕込</option>
+						<option value="研修">研修</option>
+					</select>
+				)}
 			</div>
 			<div
 				className="timeline-name"

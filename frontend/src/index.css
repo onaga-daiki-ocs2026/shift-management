@@ -1402,6 +1402,14 @@ body {
 	flex-shrink: 0;
 	display: flex;
 	align-items: center;
+	gap: 2px;
+}
+
+/* ホールは1マス70pxを2分割（案内/提供/デシャップを2つまで兼任表示） */
+.timeline-role select.role-input {
+	min-width: 0;
+	padding-left: 2px;
+	padding-right: 12px;
 }
 
 .role-input {
