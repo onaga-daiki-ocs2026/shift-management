@@ -18,8 +18,11 @@ public class SubmissionPeriodService {
 	private static final ZoneId JST = ZoneId.of("Asia/Tokyo");
 
 	public SubmissionPeriodResponse getCurrentPeriod() {
-		LocalDate today = LocalDate.now(JST);
+		return getCurrentPeriod(LocalDate.now(JST));
+	}
 
+	// today切り出し版：境界日（締切当日・翌日など）をテストで固定して検証できるようにするため分離
+	SubmissionPeriodResponse getCurrentPeriod(LocalDate today) {
 		// 基準締切日から何日経過したか
 		long daysPassed = ChronoUnit.DAYS.between(BASE_DEADLINE, today);
 
@@ -31,22 +34,15 @@ public class SubmissionPeriodService {
 		//   ここは今まで通りで、変更していない）
 		LocalDate currentDeadline = BASE_DEADLINE.plusDays(cycle * 14);
 
-		// 画面に表示する締切日：
-		// currentDeadline は「今日か、今日より前」の日付にしかならない
-		// （もう過ぎている場合がほとんど）ため、そのまま見せると
-		// スタッフには「もう終わった締切」しか見えず、次の締切がいつかが
-		// 分からないまま当日になって初めて表示される、という状態になっていた。
-		// すでに過ぎている場合は、次の締切日（14日後）を表示することで、
-		// 事前に余裕を持って告知できるようにする。
-		LocalDate displayDeadline =
-				currentDeadline.isBefore(today) ? currentDeadline.plusDays(14) : currentDeadline;
-
 		// 必須ブロックの開始日（締切日の15日後）と終了日（28日後＝14日間）。
-		// 表示中の締切（displayDeadline）を基準にする。currentDeadline基準のままだと、
-		// 締切を過ぎて表示だけ1サイクル先送りした場合に対象期間が古いままズレてしまう。
-		LocalDate startDate = displayDeadline.plusDays(15);
-		LocalDate endDate = displayDeadline.plusDays(28);
+		// currentDeadline は floorDiv により「今日以前の直近の締切日」として
+		// 一意に定まるため、これをそのまま表示・計算の基準にすればよい。
+		// （以前は「今日より前なら+14日進める」ガードがあったが、cycle計算の
+		//   性質上そのガードは締切当日を除き常に発火してしまい、対象期間が
+		//   常に1サイクル先送りされるバグの原因だった。削除して修正。）
+		LocalDate startDate = currentDeadline.plusDays(15);
+		LocalDate endDate = currentDeadline.plusDays(28);
 
-		return new SubmissionPeriodResponse(1L, startDate, endDate, displayDeadline, true);
+		return new SubmissionPeriodResponse(1L, startDate, endDate, currentDeadline, true);
 	}
 }
