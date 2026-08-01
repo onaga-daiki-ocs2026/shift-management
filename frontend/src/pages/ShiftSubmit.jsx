@@ -313,6 +313,30 @@ function ShiftSubmit() {
 												))}
 											</select>
 
+											<button
+												type="button"
+												className="shift-quick-btn shift-quick-btn-toclose"
+												disabled={!shift.available}
+												onClick={() =>
+													handleQuickFill(blockIndex, dateIndex, "toClose")
+												}
+											>
+												ラストまで
+											</button>
+										</div>
+
+										<div className="shift-quick-actions">
+											<span />
+											<button
+												type="button"
+												className="shift-quick-btn shift-quick-btn-fullday"
+												disabled={!shift.available}
+												onClick={() =>
+													handleQuickFill(blockIndex, dateIndex, "full")
+												}
+											>
+												終日OK
+											</button>
 											<div className="shift-rest">
 												<input
 													type="checkbox"
@@ -330,29 +354,6 @@ function ShiftSubmit() {
 												<span className="rest-label">休み</span>
 											</div>
 										</div>
-
-										{shift.available && (
-											<div className="shift-quick-actions">
-												<button
-													type="button"
-													className="shift-quick-btn"
-													onClick={() =>
-														handleQuickFill(blockIndex, dateIndex, "full")
-													}
-												>
-													どの時間でもOK
-												</button>
-												<button
-													type="button"
-													className="shift-quick-btn"
-													onClick={() =>
-														handleQuickFill(blockIndex, dateIndex, "toClose")
-													}
-												>
-													ラストまで
-												</button>
-											</div>
-										)}
 										</div>
 									);
 								})}

@@ -366,16 +366,19 @@ body {
 	gap: 8px;
 }
 
-/* 「どの時間でもOK」「ラストまで」ボタン。時間入力欄(開始/終了の2列)の
-   真下に来るよう、日付列(100px)ぶんだけ左に余白を入れて位置を揃える */
+/* 「終日OK」ボタン＋休みチェック行。上のshift-rowと同じ列幅
+   (日付100px/開始1fr/終了1fr/70px)を共有し、終日OKは開始・終了の
+   2列ぶんに広げて表示、休みは右端70px列でshift-rowの「ラストまで」
+   ボタンと縦に揃う */
 .shift-quick-actions {
-	display: flex;
-	gap: 6px;
-	padding: 0 14px 8px 100px;
+	display: grid;
+	grid-template-columns: 100px 1fr 1fr 70px;
+	align-items: center;
+	gap: 8px;
+	padding: 0 14px 8px;
 }
 
 .shift-quick-btn {
-	flex: 1;
 	min-width: 0;
 	padding: 5px 4px;
 	font-size: 11px;
@@ -390,6 +393,21 @@ body {
 
 .shift-quick-btn:active {
 	background: #eef6f0;
+}
+
+.shift-quick-btn:disabled {
+	border-color: var(--gray-border);
+	color: #bbb;
+	cursor: default;
+	background: #f7f7f7;
+}
+
+.shift-quick-btn-fullday {
+	grid-column: 2 / 4;
+}
+
+.shift-quick-btn-toclose {
+	width: 100%;
 }
 
 .shift-date {
@@ -1079,7 +1097,8 @@ body {
 	}
 
 	.shift-quick-actions {
-		padding: 0 16px 10px 120px;
+		grid-template-columns: 120px 1fr 1fr 90px;
+		padding: 0 16px 10px;
 	}
 
 	.time-select {
