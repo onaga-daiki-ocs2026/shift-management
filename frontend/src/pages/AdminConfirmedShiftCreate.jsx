@@ -413,23 +413,24 @@ function AdminConfirmedShiftCreate() {
 				if (!dayElement) continue;
 
 				// 実際のウィンドウ幅に関わらず、A4比率に合わせて調整済みの
-				// 幅（980px）で必ずキャプチャする。ブラウザ幅によって余白の
+				// 幅（976px）で必ずキャプチャする。ブラウザ幅によって余白の
 				// 出方が変わってしまう問題への対策。
 				// 各セクションの行数はFIXED_ROWS_PER_SECTION(15行)で常に
 				// 固定されるため、カードの高さは人数に依らずほぼ一定
-				// （実測で約1373〜1389px）。その高さにA4比率(210:297)を
-				// 適用すると 1381px(中心値) × 210/297 ≈ 980px になる
+				// （.pdf-mode .day-memo-areaの下余白除去後で実測約1380px）。
+				// その高さにA4比率(210:297)を適用すると
+				// 1380px × 210/297 ≈ 976px になる
 				// （1ポジション15人を超える想定外のケースのみ縦長になり、
 				// 下のoffsetX/offsetYによる中央寄せでわずかな余白が出るが、
 				// ページ背景・カード背景とも白なので目立たない）。
 				const originalWidth = dayElement.style.width;
-				dayElement.style.width = "980px";
+				dayElement.style.width = "976px";
 
 				const canvas = await html2canvas(dayElement, {
 					scale: 3,
 					useCORS: true,
 					backgroundColor: "#ffffff",
-					windowWidth: 980,
+					windowWidth: 976,
 					logging: false,
 				});
 

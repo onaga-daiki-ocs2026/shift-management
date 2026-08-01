@@ -1232,6 +1232,24 @@ body {
 	background: transparent;
 }
 
+/* .day-memo-area(伝達事項欄)はconfirmed-day-cardの最後の子要素で、
+   カード側のoverflow:hiddenによりmargin-bottom(4px)が外に相殺されず
+   カード内部にそのまま残ってしまう（=キャプチャ画像に焼き込まれる）。
+   PDF撮影時だけこの下余白を消し、カードの枠ぎりぎりまで詰める */
+.pdf-mode .day-memo-area {
+	margin-bottom: 0;
+	/* 自身のborder-radius(8px)も、margin-bottom除去でカード下端に
+	   密着した結果、あたかもconfirmed-day-cardの角が丸いかのように
+	   見えてしまうため、PDF撮影時はあわせて直角にする */
+	border-radius: 0;
+}
+
+/* PDF撮影時だけ、confirmed-day-cardの角丸を直角にする
+   （画面表示のカード風デザインは変更しない） */
+.pdf-mode .confirmed-day-card {
+	border-radius: 0;
+}
+
 /* box-shadowはhtml2canvasのPDF撮影で描画されない（検証済み）ため、
    カードの輪郭は影ではなくborderのみで表現する */
 .confirmed-day-card {
