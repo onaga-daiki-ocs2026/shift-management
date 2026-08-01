@@ -354,13 +354,42 @@ body {
 	text-align: center;
 }
 
+.shift-row-wrapper {
+	border-bottom: 1px solid #f0f0f0;
+}
+
 .shift-row {
 	display: grid;
 	grid-template-columns: 100px 1fr 1fr 70px;
 	align-items: center;
 	padding: 8px 14px;
-	border-bottom: 1px solid #f0f0f0;
 	gap: 8px;
+}
+
+/* 「どの時間でもOK」「ラストまで」ボタン。時間入力欄(開始/終了の2列)の
+   真下に来るよう、日付列(100px)ぶんだけ左に余白を入れて位置を揃える */
+.shift-quick-actions {
+	display: flex;
+	gap: 6px;
+	padding: 0 14px 8px 100px;
+}
+
+.shift-quick-btn {
+	flex: 1;
+	min-width: 0;
+	padding: 5px 4px;
+	font-size: 11px;
+	font-weight: bold;
+	border: 1px solid var(--green);
+	border-radius: 6px;
+	background: var(--white);
+	color: var(--green);
+	cursor: pointer;
+	white-space: nowrap;
+}
+
+.shift-quick-btn:active {
+	background: #eef6f0;
 }
 
 .shift-date {
@@ -1047,6 +1076,10 @@ body {
 	.shift-table-header {
 		grid-template-columns: 120px 1fr 1fr 90px;
 		padding: 10px 16px;
+	}
+
+	.shift-quick-actions {
+		padding: 0 16px 10px 120px;
 	}
 
 	.time-select {

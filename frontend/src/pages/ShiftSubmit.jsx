@@ -8,6 +8,10 @@ for (let h = 9; h <= 23; h++) {
 	const hh = String(h).padStart(2, "0");
 	TIME_OPTIONS.push(`${hh}:00`);
 }
+// 開店・閉店時間は店舗設定を持つ仕組みが無いため、TIME_OPTIONSの
+// 両端をそのまま参照する（9時・23時をここ以外に書かない）
+const OPEN_TIME = TIME_OPTIONS[0];
+const CLOSE_TIME = TIME_OPTIONS[TIME_OPTIONS.length - 1];
 
 function ShiftSubmit() {
 	const [period, setPeriod] = useState(null);
@@ -111,6 +115,21 @@ function ShiftSubmit() {
 		if (field === "available" && value === false) {
 			newBlocks[blockIndex].dates[dateIndex].startTime = "";
 			newBlocks[blockIndex].dates[dateIndex].endTime = "";
+		}
+		setShiftBlocks(newBlocks);
+	};
+
+	// 「どの時間でもOK」「ラストまで」ボタン共通処理。
+	// 通常のhandleChangeと同じstate更新経路を通すだけなので、
+	// 自動入力後もセレクトボックスでそのまま個別に修正できる。
+	const handleQuickFill = (blockIndex, dateIndex, mode) => {
+		const newBlocks = [...shiftBlocks];
+		const target = newBlocks[blockIndex].dates[dateIndex];
+		if (mode === "full") {
+			target.startTime = OPEN_TIME;
+			target.endTime = CLOSE_TIME;
+		} else if (mode === "toClose") {
+			target.endTime = CLOSE_TIME;
 		}
 		setShiftBlocks(newBlocks);
 	};
@@ -244,7 +263,8 @@ function ShiftSubmit() {
 										shift.workDate,
 									);
 									return (
-										<div key={shift.workDate} className="shift-row">
+										<div key={shift.workDate} className="shift-row-wrapper">
+										<div className="shift-row">
 											<div
 												className={`shift-date ${isSun ? "sun" : isWeekend ? "sat" : ""}`}
 											>
@@ -309,6 +329,30 @@ function ShiftSubmit() {
 												/>
 												<span className="rest-label">休み</span>
 											</div>
+										</div>
+
+										{shift.available && (
+											<div className="shift-quick-actions">
+												<button
+													type="button"
+													className="shift-quick-btn"
+													onClick={() =>
+														handleQuickFill(blockIndex, dateIndex, "full")
+													}
+												>
+													どの時間でもOK
+												</button>
+												<button
+													type="button"
+													className="shift-quick-btn"
+													onClick={() =>
+														handleQuickFill(blockIndex, dateIndex, "toClose")
+													}
+												>
+													ラストまで
+												</button>
+											</div>
+										)}
 										</div>
 									);
 								})}
