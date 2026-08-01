@@ -302,7 +302,10 @@ function AdminConfirmedShiftCreate() {
 		setSelected(null);
 	};
 
-	const handleSubmit = async () => {
+	// 一時保存とPDF生成（生成前の自動保存）の両方から呼ばれる共通処理。
+	// alert文言は呼び出し元ごとに変えたいので、ここではalertを出さず
+	// 結果だけを返す（呼び出し元がsetSaving等のUI状態も管理する）。
+	const saveConfirmedShifts = async () => {
 		const requests = [];
 		dates.forEach((date) => {
 			const allStaff = [
@@ -323,23 +326,52 @@ function AdminConfirmedShiftCreate() {
 		});
 
 		if (requests.length === 0) {
-			alert("確定するシフトがありません。");
-			return;
+			return { ok: false, reason: "empty" };
 		}
 
-		setSaving(true);
 		try {
 			await api.post("/api/confirmed-shifts", { periodId, requests });
-			alert("14日分の確定シフトを保存しました！");
+			return { ok: true };
 		} catch (error) {
 			console.error("保存に失敗しました", error);
-			alert("保存に失敗しました");
-		} finally {
-			setSaving(false);
+			return { ok: false, reason: "error", error };
 		}
 	};
 
+	const handleSubmit = async () => {
+		setSaving(true);
+		const result = await saveConfirmedShifts();
+		setSaving(false);
+
+		if (!result.ok) {
+			alert(
+				result.reason === "empty"
+					? "確定するシフトがありません。"
+					: "保存に失敗しました",
+			);
+			return;
+		}
+		alert("14日分の確定シフトを保存しました！");
+	};
+
 	const handleExportPdf = async () => {
+		// PDFは画面表示中の内容をキャプチャするだけなので、まず確定シフトとして
+		// 保存してから（＝一時保存ボタンと同じ処理を通してから）生成する。
+		// 保存に失敗した状態で古い内容のPDFが公開されてしまうのを防ぐため、
+		// 保存が成功するまではPDF生成に進まない。
+		setSaving(true);
+		const saveResult = await saveConfirmedShifts();
+		setSaving(false);
+
+		if (!saveResult.ok) {
+			alert(
+				saveResult.reason === "empty"
+					? "確定するシフトがありません。"
+					: "保存に失敗したため、PDFは生成されていません。\nネットワーク状況を確認し、再度お試しください。",
+			);
+			return;
+		}
+
 		setExporting(true);
 		setSelected(null);
 		setExportProgress({ current: 0, total: dates.length });
@@ -650,7 +682,7 @@ function AdminConfirmedShiftCreate() {
 						type="button"
 						onClick={handleSubmit}
 						className="submit-button"
-						disabled={saving}
+						disabled={saving || exporting}
 					>
 						{saving ? (
 							<>
@@ -665,9 +697,9 @@ function AdminConfirmedShiftCreate() {
 						type="button"
 						className="pdf-export-button"
 						onClick={handleExportPdf}
-						disabled={exporting}
+						disabled={saving || exporting}
 					>
-						{exporting ? "PDF生成中..." : "📄 PDFを生成・公開"}
+						{exporting ? "PDF生成中..." : saving ? "保存中..." : "📄 PDFを生成・公開"}
 					</button>
 				</div>
 			</div>
