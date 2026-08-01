@@ -1212,12 +1212,9 @@ body {
 
 /* ---- 日ごとのセクション ---- */
 
-/* キャプチャ対象（=PDFの1ページ）そのもの。アプリ全体の背景色と同じ
-   温かみのあるベージュ（#f0ebe3）を「ページ背景」として持たせ、内側の
-   .confirmed-day-cardとの間に余白を作る。1日ごとに個別のページとして
-   撮影されるため、この内側パディングがPDF上で見える唯一の「カード同士の
-   余白」になる（day-section間のmargin-bottomはPDFには反映されない）。
-   余白は以前より広めに取り、白いカードとの明暗差をはっきりさせている。
+/* キャプチャ対象（=PDFの1ページ）そのもの。画面上はアプリ全体の背景色と
+   同じ温かみのあるベージュ（#f0ebe3）を「ページ背景」として持たせ、内側の
+   .confirmed-day-cardとの間に余白を作り、カードらしい見た目にしている。
    ※クラス名はconfirmed-day-card（AdminShiftRequests.jsx側の
    .day-cardと名前が衝突しないよう別名にしている） */
 .day-section {
@@ -1225,6 +1222,14 @@ body {
 	padding: 22px;
 	border-radius: 14px;
 	background: #f0ebe3;
+}
+
+/* PDF撮影時は、このpadding/背景ごとページになってしまうため、
+   赤枠等のカード(.confirmed-day-card)ぴったりの範囲だけがPDFの
+   1ページになるよう、キャプチャ中だけ余白を消す（画面表示には影響しない） */
+.pdf-mode .day-section {
+	padding: 0;
+	background: transparent;
 }
 
 /* box-shadowはhtml2canvasのPDF撮影で描画されない（検証済み）ため、
@@ -1398,18 +1403,22 @@ body {
 /* ---- 役割入力欄（名前の左隣：指導・仕込み・研修など） ---- */
 
 .timeline-role {
-	width: 70px;
+	width: 62px;
 	flex-shrink: 0;
 	display: flex;
 	align-items: center;
-	gap: 2px;
+	gap: 1px;
 }
 
-/* ホールは1マス70pxを2分割（案内/提供/デシャップを2つまで兼任表示） */
+/* ホールは1マスを2分割（案内/提供/デシャップを2つまで兼任表示）。
+   キッチンの単一セレクトと矢印サイズを合わせつつ、2分割で幅が
+   半分になる分、矢印の余白（padding-right）も比例して詰める。 */
 .timeline-role select.role-input {
 	min-width: 0;
-	padding-left: 2px;
-	padding-right: 12px;
+	padding-left: 1px;
+	padding-right: 9px;
+	background-position: right 1px center;
+	background-size: 6px;
 }
 
 .role-input {
