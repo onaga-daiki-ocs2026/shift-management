@@ -97,7 +97,7 @@ function Home() {
 					<span className="home-section-deco">／／</span>
 				</div>
 
-				<div className="menu">
+				<div className="menu menu-staff">
 					{STAFF_MENUS.map((item) => (
 						<Link key={item.to} to={item.to} className="menu-button">
 							<span className="menu-icon">{item.icon}</span>
@@ -114,11 +114,11 @@ function Home() {
 					<>
 						<div className="home-section-title" style={{ marginTop: "24px" }}>
 							<span className="home-section-deco">＼＼</span>
-							オーナーメニュー
+							管理者メニュー
 							<span className="home-section-deco">／／</span>
 						</div>
 
-						<div className="menu">
+						<div className="menu menu-admin">
 							{ADMIN_MENUS.map((item) => (
 								<Link key={item.to} to={item.to} className="menu-button">
 									<span className="menu-icon">{item.icon}</span>
