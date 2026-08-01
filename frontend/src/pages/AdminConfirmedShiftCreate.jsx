@@ -677,29 +677,22 @@ function AdminConfirmedShiftCreate() {
 							return (
 								<div className="hours-half-block">
 									<div className="hours-half-title">{half.label}</div>
-									<table className="hours-table">
-										<thead>
-											<tr>
-												<th>氏名</th>
-												<th>時間</th>
-												<th>日数</th>
-											</tr>
-										</thead>
-										<tbody>
-											{weeklyStatsByUser.map((u) => {
-												const entry = u[half.key];
-												const diffClass = (d) =>
-													d == null
-														? ""
-														: d > 0
-															? "hours-table-diff-over"
-															: d < 0
-																? "hours-table-diff-under"
-																: "";
-												return (
-													<tr key={u.userId}>
-														<td>{u.name}</td>
-														<td>
+									<div className="hours-list">
+										{weeklyStatsByUser.map((u) => {
+											const entry = u[half.key];
+											const diffClass = (d) =>
+												d == null
+													? ""
+													: d > 0
+														? "hours-table-diff-over"
+														: d < 0
+															? "hours-table-diff-under"
+															: "";
+											return (
+												<div key={u.userId} className="hours-row">
+													<div className="hours-row-name">{u.name}</div>
+													<div className="hours-row-stats">
+														<span className="hours-row-stat">
 															{entry.hours.toFixed(1)}時間
 															{entry.hoursDiff != null && (
 																<span
@@ -709,8 +702,8 @@ function AdminConfirmedShiftCreate() {
 																	{entry.hoursDiff.toFixed(1)}）
 																</span>
 															)}
-														</td>
-														<td>
+														</span>
+														<span className="hours-row-stat">
 															{entry.days}日
 															{entry.daysDiff != null && (
 																<span
@@ -720,12 +713,12 @@ function AdminConfirmedShiftCreate() {
 																	{entry.daysDiff}）
 																</span>
 															)}
-														</td>
-													</tr>
-												);
-											})}
-										</tbody>
-									</table>
+														</span>
+													</div>
+												</div>
+											);
+										})}
+									</div>
 								</div>
 							);
 						})()}
@@ -788,8 +781,6 @@ function AdminConfirmedShiftCreate() {
 											setSelected={setSelected}
 											updateBlocks={updateBlocks}
 											updateRole={updateRole}
-											resetOne={resetOne}
-											removeRow={removeRow}
 											splitBlock={splitBlock}
 											deleteBlock={deleteBlock}
 											hourToLabel={hourToLabel}
@@ -806,8 +797,6 @@ function AdminConfirmedShiftCreate() {
 											setSelected={setSelected}
 											updateBlocks={updateBlocks}
 											updateRole={updateRole}
-											resetOne={resetOne}
-											removeRow={removeRow}
 											splitBlock={splitBlock}
 											deleteBlock={deleteBlock}
 											hourToLabel={hourToLabel}
@@ -857,6 +846,8 @@ function AdminConfirmedShiftCreate() {
 				updateBlocks={updateBlocks}
 				splitBlock={splitBlock}
 				deleteBlock={deleteBlock}
+				resetOne={resetOne}
+				removeRow={removeRow}
 				setSelected={setSelected}
 			/>
 		)}
@@ -909,8 +900,6 @@ function ShiftSection({
 	setSelected,
 	updateBlocks,
 	updateRole,
-	resetOne,
-	removeRow,
 	splitBlock,
 	deleteBlock,
 	hourToLabel,
@@ -951,7 +940,6 @@ function ShiftSection({
 					))}
 				</div>
 				<div className="timeline-hours-time">計画</div>
-				<div className="timeline-icon-spacer" />
 			</div>
 
 			{staffList.map((staff) => (
@@ -965,8 +953,6 @@ function ShiftSection({
 					setSelected={setSelected}
 					updateBlocks={updateBlocks}
 					updateRole={updateRole}
-					resetOne={resetOne}
-					removeRow={removeRow}
 					splitBlock={splitBlock}
 					deleteBlock={deleteBlock}
 					hourToLabel={hourToLabel}
@@ -991,7 +977,6 @@ function EmptyRow() {
 			<div className="timeline-name" />
 			<div className="timeline-track" />
 			<div className="timeline-hours-time" />
-			<div className="row-icon-actions" />
 		</div>
 	);
 }
@@ -1005,8 +990,6 @@ function StaffRow({
 	setSelected,
 	updateBlocks,
 	updateRole,
-	resetOne,
-	removeRow,
 	splitBlock,
 	deleteBlock,
 	hourToLabel,
@@ -1023,6 +1006,12 @@ function StaffRow({
 
 	const handleBarClick = (blockIndex) => {
 		setSelected({ date, position, userId: staff.userId, blockIndex });
+	};
+
+	// ブロックが1つも無い行でも「戻す」「この人を外す」に到達できるよう、
+	// 氏名クリックでも同じモーダルを開く（blockIndex: nullは行レベル操作のみ表示）
+	const handleNameClick = () => {
+		setSelected({ date, position, userId: staff.userId, blockIndex: null });
 	};
 
 	const handleDoubleClick = (blockIndex) => {
@@ -1119,8 +1108,21 @@ function StaffRow({
 					<option value="研修">研修</option>
 				</select>
 			</div>
-			<div className="timeline-name">
+			<div
+				className="timeline-name"
+				onClick={handleNameClick}
+				title="クリックで戻す・この人を外す"
+			>
 				<span>{staff.name}</span>
+				{staff.comment && (
+					<span
+						className="comment-icon"
+						title={`コメント：${staff.comment}`}
+						onClick={(e) => e.stopPropagation()}
+					>
+						💬
+					</span>
+				)}
 			</div>
 
 			<div className="timeline-track">
@@ -1208,32 +1210,6 @@ function StaffRow({
 					.toFixed(1)}
 				h
 			</div>
-
-			<div className="row-icon-actions">
-				{staff.comment && (
-					<span
-						className="comment-icon"
-						title={`コメント：${staff.comment}`}
-					>
-						💬
-					</span>
-				)}
-				<button
-					type="button"
-					title="戻す"
-					onClick={() => resetOne(date, position, staff.userId)}
-				>
-					↺
-				</button>
-				<button
-					type="button"
-					className="danger"
-					title="削除"
-					onClick={() => removeRow(date, position, staff.userId)}
-				>
-					✕
-				</button>
-			</div>
 		</div>
 	);
 }
@@ -1246,9 +1222,14 @@ function EditModal({
 	updateBlocks,
 	splitBlock,
 	deleteBlock,
+	resetOne,
+	removeRow,
 	setSelected,
 }) {
-	const block = staff.blocks[blockIndex];
+	// 氏名クリックで開いた場合はblockIndexがnullになり、
+	// ブロック単位の操作（時刻編集・分割・削除）は表示せず、
+	// 行レベルの操作（戻す・この人を外す）のみ表示する
+	const block = blockIndex != null ? staff.blocks[blockIndex] : null;
 
 	const hourOptions = [];
 	for (let h = RANGE_START; h <= RANGE_END; h += 0.5) {
@@ -1298,56 +1279,76 @@ function EditModal({
 					</button>
 				</div>
 
-				<div className="edit-modal-body">
-					<div className="edit-modal-time">
-						<div className="edit-modal-time-group">
-							<label>開始時刻</label>
-							<select
-								value={block.start}
-								onChange={(e) => handleStartChange(e.target.value)}
-							>
-								{hourOptions.map((h) => (
-									<option key={h} value={h}>
-										{hourToLabel(h)}
-									</option>
-								))}
-							</select>
-						</div>
-						<span className="edit-modal-tilde">〜</span>
-						<div className="edit-modal-time-group">
-							<label>終了時刻</label>
-							<select
-								value={block.end}
-								onChange={(e) => handleEndChange(e.target.value)}
-							>
-								{hourOptions.map((h) => (
-									<option key={h} value={h}>
-										{hourToLabel(h)}
-									</option>
-								))}
-							</select>
+				{block && (
+					<div className="edit-modal-body">
+						<div className="edit-modal-time">
+							<div className="edit-modal-time-group">
+								<label>開始時刻</label>
+								<select
+									value={block.start}
+									onChange={(e) => handleStartChange(e.target.value)}
+								>
+									{hourOptions.map((h) => (
+										<option key={h} value={h}>
+											{hourToLabel(h)}
+										</option>
+									))}
+								</select>
+							</div>
+							<span className="edit-modal-tilde">〜</span>
+							<div className="edit-modal-time-group">
+								<label>終了時刻</label>
+								<select
+									value={block.end}
+									onChange={(e) => handleEndChange(e.target.value)}
+								>
+									{hourOptions.map((h) => (
+										<option key={h} value={h}>
+											{hourToLabel(h)}
+										</option>
+									))}
+								</select>
+							</div>
 						</div>
 					</div>
-				</div>
+				)}
 
 				<div className="edit-modal-actions">
+					{block && (
+						<>
+							<button
+								type="button"
+								className="edit-modal-btn edit-modal-btn-split"
+								onClick={() =>
+									splitBlock(date, position, staff.userId, blockIndex)
+								}
+							>
+								分割
+							</button>
+							<button
+								type="button"
+								className="edit-modal-btn edit-modal-btn-delete"
+								onClick={() =>
+									deleteBlock(date, position, staff.userId, blockIndex)
+								}
+							>
+								ブロック削除
+							</button>
+						</>
+					)}
 					<button
 						type="button"
-						className="edit-modal-btn edit-modal-btn-split"
-						onClick={() =>
-							splitBlock(date, position, staff.userId, blockIndex)
-						}
+						className="edit-modal-btn edit-modal-btn-reset"
+						onClick={() => resetOne(date, position, staff.userId)}
 					>
-						分割
+						戻す
 					</button>
 					<button
 						type="button"
 						className="edit-modal-btn edit-modal-btn-delete"
-						onClick={() =>
-							deleteBlock(date, position, staff.userId, blockIndex)
-						}
+						onClick={() => removeRow(date, position, staff.userId)}
 					>
-						削除
+						この人を外す
 					</button>
 					<button
 						type="button"
