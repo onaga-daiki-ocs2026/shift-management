@@ -2036,6 +2036,12 @@ select.role-input {
 	padding-right: 8px;
 }
 
+/* ---- 希望シフト一覧：週間表(表形式ビュー)は7日分+氏名列+差分列で
+   横幅が必要なため、表示中だけ900pxの共通幅制限から除外する ---- */
+.app-main:has(.requests-table-wrap) {
+	max-width: 1100px;
+}
+
 .confirmed-create-body {
 	display: flex;
 	align-items: flex-start;
