@@ -2343,6 +2343,12 @@ select.role-input {
 	opacity: 0.3;
 }
 
+/* 休みの日は背景を明確に変えて、出勤可能な日(白系のまま)と
+   パッと見で区別できるようにする */
+.calendar-cell.is-rest {
+	background: #e2e2e2;
+}
+
 .calendar-date-num {
 	font-size: 11px;
 	font-weight: bold;

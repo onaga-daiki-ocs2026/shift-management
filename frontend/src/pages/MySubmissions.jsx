@@ -181,11 +181,12 @@ function MySubmissions() {
 								date.getMonth() === calendarMonth.getMonth();
 							const shift = shiftsByDate[dateKey];
 							const dayOfWeek = date.getDay();
+							const isRest = shift && !shift.available;
 
 							return (
 								<div
 									key={dateKey}
-									className={`calendar-cell ${isCurrentMonth ? "" : "outside-month"}`}
+									className={`calendar-cell ${isCurrentMonth ? "" : "outside-month"} ${isRest ? "is-rest" : ""}`}
 								>
 									<div
 										className={`calendar-date-num ${dayOfWeek === 0 ? "sun" : dayOfWeek === 6 ? "sat" : ""}`}
