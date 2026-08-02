@@ -76,21 +76,11 @@ const FAQ_SECTIONS = [
 	},
 ];
 
-const sectionId = (sectionIndex) => `help-section-${sectionIndex}`;
-
 function Help() {
 	const [openKey, setOpenKey] = useState(null);
 
 	const toggle = (key) => {
 		setOpenKey((prev) => (prev === key ? null : key));
-	};
-
-	// PC幅(1024px以上)の左サイドバー目次から、該当セクションへスムーズスクロール。
-	// app-headerはposition:relative(stickyではない)なので、オフセット補正は不要
-	const scrollToSection = (sectionIndex) => {
-		document
-			.getElementById(sectionId(sectionIndex))
-			?.scrollIntoView({ behavior: "smooth", block: "start" });
 	};
 
 	return (
@@ -105,55 +95,31 @@ function Help() {
 				</div>
 			</div>
 
-			<div className="help-layout">
-				<nav className="help-toc">
-					<div className="help-toc-title">目次</div>
-					{FAQ_SECTIONS.map((section, sectionIndex) => (
-						<button
-							key={sectionIndex}
-							type="button"
-							className="help-toc-link"
-							onClick={() => scrollToSection(sectionIndex)}
-						>
-							{section.title}
-						</button>
-					))}
-				</nav>
+			{FAQ_SECTIONS.map((section, sectionIndex) => (
+				<div key={sectionIndex} className="help-section">
+					<h3 className="help-section-title">{section.title}</h3>
 
-				<div className="help-content">
-					{FAQ_SECTIONS.map((section, sectionIndex) => (
-						<div
-							key={sectionIndex}
-							id={sectionId(sectionIndex)}
-							className="help-section"
-						>
-							<h3 className="help-section-title">{section.title}</h3>
-
-							{section.items.map((item, itemIndex) => {
-								const key = `${sectionIndex}-${itemIndex}`;
-								const isOpen = openKey === key;
-								return (
-									<div key={key} className="help-item">
-										<button
-											type="button"
-											className="help-question"
-											onClick={() => toggle(key)}
-										>
-											<span>{item.q}</span>
-											<span className="help-toggle-icon">
-												{isOpen ? "︿" : "﹀"}
-											</span>
-										</button>
-										{isOpen && (
-											<div className="help-answer">{item.a}</div>
-										)}
-									</div>
-								);
-							})}
-						</div>
-					))}
+					{section.items.map((item, itemIndex) => {
+						const key = `${sectionIndex}-${itemIndex}`;
+						const isOpen = openKey === key;
+						return (
+							<div key={key} className="help-item">
+								<button
+									type="button"
+									className="help-question"
+									onClick={() => toggle(key)}
+								>
+									<span>{item.q}</span>
+									<span className="help-toggle-icon">
+										{isOpen ? "︿" : "﹀"}
+									</span>
+								</button>
+								{isOpen && <div className="help-answer">{item.a}</div>}
+							</div>
+						);
+					})}
 				</div>
-			</div>
+			))}
 		</Layout>
 	);
 }
