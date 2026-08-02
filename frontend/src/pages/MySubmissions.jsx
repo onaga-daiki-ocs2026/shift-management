@@ -149,8 +149,14 @@ function MySubmissions() {
 				</button>
 			</div>
 
-			{viewMode === "calendar" ? (
-				<div className="calendar-area">
+			{/* リスト⇔カレンダー切り替え時に高さが変わって画面がガタつかないよう、
+			    両方を常にマウントしたままCSS Gridで同じセルに重ね、
+			    非表示側はvisibility:hiddenにする（display:noneにすると
+			    そちらの高さがコンテナのサイズ計算から除外されてしまう） */}
+			<div className="submission-view-area">
+				<div
+					className={`calendar-area ${viewMode === "calendar" ? "" : "view-hidden"}`}
+				>
 					<div className="calendar-nav">
 						<button type="button" onClick={goToPrevMonth}>
 							‹
@@ -223,81 +229,99 @@ function MySubmissions() {
 						</span>
 					</div>
 				</div>
-			) : blocks.length > 0 ? (
-				<div>
-					<p className="pdf-note">提出済みシフト（直近5件）</p>
 
-					{blocks.map((block, blockIndex) => {
-						const isOpen = openBlockIndexes.has(blockIndex);
-						const availableCount = block.dates.filter((d) => d.available).length;
+				<div
+					className={`submission-list-area ${viewMode === "list" ? "" : "view-hidden"}`}
+				>
+					{blocks.length > 0 ? (
+						<div>
+							<p className="pdf-note">提出済みシフト（直近5件）</p>
 
-						return (
-							<div key={blockIndex} className="shift-block">
-								<div className="block-header">
-									<div className="block-header-left">
-										<span className="block-calendar-icon">📅</span>
-										<span className="block-range">{formatBlockRange(block.dates)}</span>
-									</div>
-									<div className="block-header-right">
-										<span className="available-badge">
-											出勤可能 {availableCount}日
-										</span>
-										<button
-											type="button"
-											className="accordion-toggle"
-											onClick={() => toggleBlock(blockIndex)}
-										>
-											{isOpen ? "︿" : "﹀"}
-										</button>
-									</div>
-								</div>
+							{blocks.map((block, blockIndex) => {
+								const isOpen = openBlockIndexes.has(blockIndex);
+								const availableCount = block.dates.filter(
+									(d) => d.available,
+								).length;
 
-								{isOpen && (
-									<div className="accordion-content">
-										<div className="shift-table-header">
-											<span className="shift-date-col" />
-											<span className="shift-col-label">状態</span>
-											<span className="shift-col-label">時間</span>
+								return (
+									<div key={blockIndex} className="shift-block">
+										<div className="block-header">
+											<div className="block-header-left">
+												<span className="block-calendar-icon">📅</span>
+												<span className="block-range">
+													{formatBlockRange(block.dates)}
+												</span>
+											</div>
+											<div className="block-header-right">
+												<span className="available-badge">
+													出勤可能 {availableCount}日
+												</span>
+												<button
+													type="button"
+													className="accordion-toggle"
+													onClick={() => toggleBlock(blockIndex)}
+												>
+													{isOpen ? "︿" : "﹀"}
+												</button>
+											</div>
 										</div>
 
-										{block.dates.map((shift) => {
-											const { label, isSun, isSat } = formatDisplayDate(shift.workDate);
-											return (
-												<div key={shift.workDate} className="submission-row">
-													<div className={`shift-date ${isSun ? "sun" : isSat ? "sat" : ""}`}>
-														{label}
-													</div>
-													<div className="submission-status">
-														{shift.available ? (
-															<span className="status-available">出勤可</span>
-														) : (
-															<span className="status-rest">休み</span>
-														)}
-													</div>
-													<div className="submission-time">
-														{shift.available
-															? `${formatTime(shift.startTime)}〜${formatTime(shift.endTime)}`
-															: "－"}
-													</div>
+										{isOpen && (
+											<div className="accordion-content">
+												<div className="shift-table-header">
+													<span className="shift-date-col" />
+													<span className="shift-col-label">状態</span>
+													<span className="shift-col-label">時間</span>
 												</div>
-											);
-										})}
-									</div>
-								)}
-							</div>
-						);
-					})}
 
-					<div className="pdf-inquiry-note">
-						これより前のシフトを確認したい場合は、店舗の管理者にお問い合わせください。
-					</div>
+												{block.dates.map((shift) => {
+													const { label, isSun, isSat } =
+														formatDisplayDate(shift.workDate);
+													return (
+														<div
+															key={shift.workDate}
+															className="submission-row"
+														>
+															<div
+																className={`shift-date ${isSun ? "sun" : isSat ? "sat" : ""}`}
+															>
+																{label}
+															</div>
+															<div className="submission-status">
+																{shift.available ? (
+																	<span className="status-available">
+																		出勤可
+																	</span>
+																) : (
+																	<span className="status-rest">休み</span>
+																)}
+															</div>
+															<div className="submission-time">
+																{shift.available
+																	? `${formatTime(shift.startTime)}〜${formatTime(shift.endTime)}`
+																	: "－"}
+															</div>
+														</div>
+													);
+												})}
+											</div>
+										)}
+									</div>
+								);
+							})}
+
+							<div className="pdf-inquiry-note">
+								これより前のシフトを確認したい場合は、店舗の管理者にお問い合わせください。
+							</div>
+						</div>
+					) : (
+						<div className="empty-state">
+							<p className="empty-icon">📋</p>
+							<p className="empty-text">提出済みシフトはありません</p>
+						</div>
+					)}
 				</div>
-			) : (
-				<div className="empty-state">
-					<p className="empty-icon">📋</p>
-					<p className="empty-text">提出済みシフトはありません</p>
-				</div>
-			)}
+			</div>
 		</Layout>
 	);
 }

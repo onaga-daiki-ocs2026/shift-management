@@ -2263,6 +2263,25 @@ select.role-input {
 	background: #fdf6ee;
 }
 
+/* ---- リスト⇔カレンダーの切り替え時にガタつかないようにする ----
+   両方を常にマウントしたまま同じグリッドセルに重ね、非表示側は
+   visibility:hidden（display:noneにすると高さの計算から除外され、
+   結局コンテナの高さがどちらか一方に合わせて変動してしまう）。
+   Gridの仕様上、セルの高さは中の要素のうち一番背の高いものに
+   自動的に揃うため、min-heightを数値で決め打ちする必要がない */
+.submission-view-area {
+	display: grid;
+}
+
+.submission-view-area > * {
+	grid-area: 1 / 1;
+}
+
+.view-hidden {
+	visibility: hidden;
+	pointer-events: none;
+}
+
 /* ---- カレンダー本体 ---- */
 .calendar-area {
 	background: var(--white);
