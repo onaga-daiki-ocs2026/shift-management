@@ -707,7 +707,7 @@ body {
 	padding: 16px;
 	font-size: 15px;
 	font-weight: bold;
-	background: #2980b9;
+	background: var(--brown-light);
 	color: var(--white);
 	border: none;
 	border-radius: 30px;
@@ -1054,7 +1054,7 @@ body {
 
 	.app-main {
 		width: 100%;
-		max-width: 1200px;
+		max-width: 900px;
 		margin: 0 auto;
 		padding: 8px 40px 0;
 	}
@@ -1065,24 +1065,24 @@ body {
 	}
 
 	.footer-copy {
-		max-width: 1200px;
+		max-width: 900px;
 		margin: 0 auto;
 		padding: 0 40px 16px;
 	}
 
 	.footer-logo-area {
-		max-width: 1200px;
+		max-width: 900px;
 		margin: 0 auto;
 		padding: 16px 40px 8px;
 	}
 
-	/* シフト提出画面：カードが間延びしないよう最大幅を制限 */
+	/* シフト提出画面：カードが間延びしないよう最大幅を制限（全画面共通の900pxに統一） */
 	.shift-block,
 	.submit-info-box,
 	.comment-area,
 	.block-submit-button,
 	.submit-note {
-		max-width: 640px;
+		max-width: 900px;
 		margin-left: auto;
 		margin-right: auto;
 	}
@@ -1109,7 +1109,7 @@ body {
 
 	/* 提出済み確認画面 */
 	.submission-row {
-		max-width: 640px;
+		max-width: 900px;
 		margin-left: auto;
 		margin-right: auto;
 		grid-template-columns: 140px 80px 1fr;
@@ -1118,7 +1118,7 @@ body {
 
 	/* 確定シフト確認画面（PDFビューア） */
 	.pdf-viewer-area {
-		max-width: 640px;
+		max-width: 900px;
 		margin-left: auto;
 		margin-right: auto;
 	}
@@ -1128,7 +1128,7 @@ body {
 	}
 
 	.empty-state {
-		max-width: 640px;
+		max-width: 900px;
 		margin-left: auto;
 		margin-right: auto;
 	}
@@ -1153,7 +1153,7 @@ body {
    他ページの.app-main(max-width:1200px)には影響しない */
 @media (min-width: 1024px) {
 	.app-main:has(.menu) {
-		max-width: 1600px;
+		max-width: 900px;
 	}
 
 	.menu-button {
@@ -1940,12 +1940,12 @@ select.role-input {
 }
 
 .edit-modal-btn-split {
-	background: #2980b9;
+	background: var(--brown-light);
 	color: #fff;
 }
 
 .edit-modal-btn-delete {
-	background: #ff6b6b;
+	background: var(--red);
 	color: #fff;
 }
 
@@ -1955,7 +1955,7 @@ select.role-input {
 }
 
 .edit-modal-btn-save {
-	background: #4a7c59;
+	background: var(--green);
 	color: #fff;
 }
 
@@ -2014,7 +2014,7 @@ select.role-input {
 
 .pdf-progress-bar-fill {
 	height: 100%;
-	background: linear-gradient(to right, #2980b9, #4a7c59);
+	background: linear-gradient(to right, var(--brown-light), var(--green));
 	border-radius: 6px;
 	transition: width 0.15s ease-out;
 }
@@ -2452,7 +2452,7 @@ select.role-input {
 	.submit-note,
 	.empty-state,
 	.help-section {
-		max-width: 760px;
+		max-width: 900px;
 		margin-left: auto;
 		margin-right: auto;
 	}
@@ -2607,14 +2607,12 @@ select.role-input {
 	}
 }
 
-/* ---- ヘルプ画面：PC幅ではコンテンツ自体を横幅いっぱいに大きく表示 ----
-   すぐ上の768pxブロックで.help-section(max-width:760px)が
-   共通ルールとして効いているため、より広い1024px以上では
-   ヘルプ画面だけ幅を広げ、文字サイズ・カード内余白もバランスよく
-   拡大する。同じセレクタでもこちらが後に来るため上書きされる */
+/* ---- ヘルプ画面：1024px以上では文字サイズ・カード内余白のみ拡大 ----
+   幅は他画面と統一するため900pxのまま変更しない
+   (すぐ上の768pxブロックの.help-section max-width:900pxが引き続き有効) */
 @media (min-width: 1024px) {
 	.help-section {
-		max-width: 1100px;
+		max-width: 900px;
 	}
 
 	.help-section-title {
@@ -2828,7 +2826,7 @@ select.role-input {
 
 @media (min-width: 768px) {
 	.requests-cta {
-		max-width: 760px;
+		max-width: 900px;
 		margin-left: auto;
 		margin-right: auto;
 	}
