@@ -1150,10 +1150,10 @@ body {
 
 /* ---- ホーム画面：デスクトップ幅ではカードをさらに大きく ----
    .app-main:has(.menu) はホーム画面にしか無い.menuクラスを目印にしており、
-   他ページの.app-main(max-width:1200px)には影響しない */
+   他ページの.app-main(max-width:900px)には影響しない */
 @media (min-width: 1024px) {
 	.app-main:has(.menu) {
-		max-width: 900px;
+		max-width: 1600px;
 	}
 
 	.menu-button {
