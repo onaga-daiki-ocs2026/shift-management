@@ -25,6 +25,10 @@ const FAQ_SECTIONS = [
 				q: "一度提出した内容はあとから変更できますか？",
 				a: "はい、同じ期間をもう一度提出すると、前の内容が上書きされます。提出期限内であれば、何度でも修正して再提出できます。",
 			},
+			{
+				q: "「終日OK」「ラストまで」ボタンは何ですか？",
+				a: "「終日OK」を押すと、開店から閉店までのすべての時間帯で勤務可能として入力されます。「ラストまで」は、開始時刻はそのままに、終了時刻だけ閉店時間まで自動で入力されます。どちらも入力後に個別で時刻を変更することもできます。",
+			},
 		],
 	},
 	{
@@ -51,6 +55,10 @@ const FAQ_SECTIONS = [
 				q: "シフト提出の締め切りが近づくと知らせてくれますか？",
 				a: "はい、提出期限の前日になっても、まだ提出必須期間のシフトを提出していない場合は、LINEでリマインド通知が届きます。",
 			},
+			{
+				q: "確定シフトのPDFはどこで見られますか？",
+				a: "「確定シフト確認」画面からいつでも確認できます。LINEにも公開時に通知が届きます。",
+			},
 		],
 	},
 	{
@@ -68,11 +76,21 @@ const FAQ_SECTIONS = [
 	},
 ];
 
+const sectionId = (sectionIndex) => `help-section-${sectionIndex}`;
+
 function Help() {
 	const [openKey, setOpenKey] = useState(null);
 
 	const toggle = (key) => {
 		setOpenKey((prev) => (prev === key ? null : key));
+	};
+
+	// PC幅(1024px以上)の左サイドバー目次から、該当セクションへスムーズスクロール。
+	// app-headerはposition:relative(stickyではない)なので、オフセット補正は不要
+	const scrollToSection = (sectionIndex) => {
+		document
+			.getElementById(sectionId(sectionIndex))
+			?.scrollIntoView({ behavior: "smooth", block: "start" });
 	};
 
 	return (
@@ -87,31 +105,55 @@ function Help() {
 				</div>
 			</div>
 
-			{FAQ_SECTIONS.map((section, sectionIndex) => (
-				<div key={sectionIndex} className="help-section">
-					<h3 className="help-section-title">{section.title}</h3>
+			<div className="help-layout">
+				<nav className="help-toc">
+					<div className="help-toc-title">目次</div>
+					{FAQ_SECTIONS.map((section, sectionIndex) => (
+						<button
+							key={sectionIndex}
+							type="button"
+							className="help-toc-link"
+							onClick={() => scrollToSection(sectionIndex)}
+						>
+							{section.title}
+						</button>
+					))}
+				</nav>
 
-					{section.items.map((item, itemIndex) => {
-						const key = `${sectionIndex}-${itemIndex}`;
-						const isOpen = openKey === key;
-						return (
-							<div key={key} className="help-item">
-								<button
-									type="button"
-									className="help-question"
-									onClick={() => toggle(key)}
-								>
-									<span>{item.q}</span>
-									<span className="help-toggle-icon">
-										{isOpen ? "︿" : "﹀"}
-									</span>
-								</button>
-								{isOpen && <div className="help-answer">{item.a}</div>}
-							</div>
-						);
-					})}
+				<div className="help-content">
+					{FAQ_SECTIONS.map((section, sectionIndex) => (
+						<div
+							key={sectionIndex}
+							id={sectionId(sectionIndex)}
+							className="help-section"
+						>
+							<h3 className="help-section-title">{section.title}</h3>
+
+							{section.items.map((item, itemIndex) => {
+								const key = `${sectionIndex}-${itemIndex}`;
+								const isOpen = openKey === key;
+								return (
+									<div key={key} className="help-item">
+										<button
+											type="button"
+											className="help-question"
+											onClick={() => toggle(key)}
+										>
+											<span>{item.q}</span>
+											<span className="help-toggle-icon">
+												{isOpen ? "︿" : "﹀"}
+											</span>
+										</button>
+										{isOpen && (
+											<div className="help-answer">{item.a}</div>
+										)}
+									</div>
+								);
+							})}
+						</div>
+					))}
 				</div>
-			))}
+			</div>
 		</Layout>
 	);
 }
