@@ -730,31 +730,36 @@ function AdminConfirmedShiftCreate() {
 															: "";
 											return (
 												<div key={u.userId} className="hours-row">
-													<div className="hours-row-name">{u.name}</div>
-													<div className="hours-row-stats">
-														<span className="hours-row-stat">
-															{entry.hours.toFixed(1)}時間
-															{entry.hoursDiff != null && (
-																<span
-																	className={`hours-table-diff ${diffClass(entry.hoursDiff)}`}
-																>
-																	（{entry.hoursDiff >= 0 ? "+" : ""}
-																	{entry.hoursDiff.toFixed(1)}）
-																</span>
-															)}
-														</span>
-														<span className="hours-row-stat">
-															{entry.days}日
-															{entry.daysDiff != null && (
-																<span
-																	className={`hours-table-diff ${diffClass(entry.daysDiff)}`}
-																>
-																	（{entry.daysDiff >= 0 ? "+" : ""}
-																	{entry.daysDiff}）
-																</span>
-															)}
-														</span>
-													</div>
+													<span className="hours-row-name">{u.name}</span>
+													<span className="hours-row-stats">
+														{entry.hours.toFixed(1)}時間/{entry.days}日
+														{(entry.hoursDiff != null ||
+															entry.daysDiff != null) && (
+															<span className="hours-row-diffs">
+																{" ("}
+																{entry.hoursDiff != null && (
+																	<span
+																		className={`hours-table-diff ${diffClass(entry.hoursDiff)}`}
+																	>
+																		{entry.hoursDiff >= 0 ? "+" : ""}
+																		{entry.hoursDiff.toFixed(1)}
+																	</span>
+																)}
+																{entry.hoursDiff != null &&
+																	entry.daysDiff != null &&
+																	"/"}
+																{entry.daysDiff != null && (
+																	<span
+																		className={`hours-table-diff ${diffClass(entry.daysDiff)}`}
+																	>
+																		{entry.daysDiff >= 0 ? "+" : ""}
+																		{entry.daysDiff}
+																	</span>
+																)}
+																{")"}
+															</span>
+														)}
+													</span>
 												</div>
 											);
 										})}
@@ -863,10 +868,14 @@ function AdminConfirmedShiftCreate() {
 						<div className="comments-sidebar-title">💬 コメント一覧（14日分）</div>
 						{commentsByUser.map((u) => (
 							<div key={u.userId} className="comments-sidebar-user-group">
-								<div className="comments-sidebar-user-name">{u.name}</div>
 								{u.entries.map((e) => (
 									<div key={e.key} className="comments-sidebar-item">
-										<div className="comments-sidebar-text">{e.comment}</div>
+										<span className="comments-sidebar-user-name">
+											{u.name}:
+										</span>{" "}
+										<span className="comments-sidebar-text">
+											{e.comment}
+										</span>
 									</div>
 								))}
 							</div>

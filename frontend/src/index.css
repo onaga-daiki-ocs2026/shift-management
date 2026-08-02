@@ -1444,11 +1444,16 @@ body {
 
 /* 常時表示していた戻す/削除アイコン列(72px)を廃止し、EditModalに統合した
    ことで、行の最小幅は965px→887pxまで縮小できる
-   （965 - 72(列) - 6(gap 1つ分) = 887） */
+   （965 - 72(列) - 6(gap 1つ分) = 887）。
+   さらに、契約との過不足パネルを1人1行(氏名+時間/日数+差分)で
+   表示するための幅を確保するため、タイムライン本体(時間軸目盛り部分)
+   を127px分詰めて760pxまで縮小した（氏名・役割欄はテキストが
+   窮屈になるため触っていない。実測で「小永 98.0時間/7日
+   (+83.0/+4)」が172px、安全マージンを見て176px以上を確保） */
 .timeline-header {
 	display: flex;
 	align-items: center;
-	min-width: 887px;
+	min-width: 760px;
 	gap: 6px;
 	padding-bottom: 4px;
 	margin-bottom: 4px;
@@ -1499,7 +1504,7 @@ body {
 .timeline-row {
 	display: flex;
 	align-items: stretch;
-	min-width: 887px;
+	min-width: 760px;
 	min-height: 28px;
 	border-bottom: 1px solid #ccc;
 	gap: 6px;
@@ -2060,7 +2065,9 @@ select.role-input {
 }
 
 /* 常時表示の戻す/削除アイコン列(72px)をEditModalに統合して廃止した
-   ことで、ガントチャートの必要最小幅は965px→887pxに縮小されている。
+   ことで、ガントチャートの必要最小幅は965px→887pxまで縮小されていた。
+   さらに、契約との過不足パネルを1人1行で表示するための幅を確保する
+   ため、タイムライン本体を127px追加で詰めて760pxまで縮小した。
    実際に確保できる幅は、単純に「viewport - app-mainのpadding16px -
    confirmed-create-bodyのgap16px - サイドバー幅×2」ではなく、
    さらに以下も差し引く必要がある（実測して判明した見落とし分）：
@@ -2068,15 +2075,15 @@ select.role-input {
      (2px×2=4px) = 48px（カード自体の余白。PDFデザインの一部でもあり削らない）
    - 縦スクロールバー幅(実測15px。14日分のガントチャートで縦に長く
      なり常にスクロールバーが出るため必ず差し引く)
-   よって必要な式は: viewport - 15 - 32 - サイドバー幅×2 - 48 ≥ 887
-   → サイドバー幅 ≤ (viewport - 982) / 2
+   よって必要な式は: viewport - 15 - 32 - サイドバー幅×2 - 48 ≥ 760
+   → サイドバー幅 ≤ (viewport - 855) / 2
    各帯の下限値で計算し、数px分の安全マージンを持たせている。
-   例: 1280px時点 → (1280-982)/2=149 → 145pxを採用 */
+   例: 1280px時点 → (1280-855)/2=212.5 → 210pxを採用 */
 @media (min-width: 1280px) {
 	.comments-sidebar {
 		display: block;
 		flex-shrink: 0;
-		width: 145px;
+		width: 210px;
 		/* 固定ツールバーと同じ「上までスクロールしたら張り付く」動き。
 		   ツールバーの高さ＋少し余白ぶんだけ下にずらして重ならないようにする */
 		position: sticky;
@@ -2092,37 +2099,31 @@ select.role-input {
 	}
 }
 
-/* 1300px時点 → (1300-982)/2=159 → 155pxを採用（実測でぴったり887px
-   確保できることを確認済み。氏名は縦積みレイアウトのおかげでこの幅でも
-   1行に収まる） */
+/* 1300px時点 → (1300-855)/2=222.5 → 220pxを採用（実測でぴったり760px
+   確保できることを確認済み） */
 @media (min-width: 1300px) {
 	.comments-sidebar {
-		width: 155px;
+		width: 220px;
 	}
 }
 
-/* 1400px時点 → (1400-982)/2=209 → 205pxを採用 */
+/* 1400px時点 → (1400-855)/2=272.5 → 270pxを採用 */
 @media (min-width: 1400px) {
 	.comments-sidebar {
-		width: 205px;
+		width: 270px;
 	}
 }
 
-/* 1700px時点 → (1700-982)/2=359、余裕を見て340pxのまま維持 */
+/* 1700px時点 → (1700-855)/2=422.5、余裕を見て420pxを採用 */
 @media (min-width: 1700px) {
-	.comments-sidebar {
-		width: 340px;
-	}
-}
-
-/* 2200px以上はガントチャート側に十分な余裕があるため、
-   サイドバーを従来通り読みやすい幅に戻す
-   （2200px時点 → 2200 - 32 - 420*2 = 1328px ≥ 887px） */
-@media (min-width: 2200px) {
 	.comments-sidebar {
 		width: 420px;
 	}
 }
+
+/* 2200px以上も420pxで据え置き（1700px時点で計算上の上限に近づいており、
+   これ以上サイドバーだけ際限なく広げても読みやすさの向上につながらない
+   ため、420pxを読みやすさの上限として扱う） */
 
 .comments-sidebar-title {
 	font-size: 13px;
@@ -2133,6 +2134,8 @@ select.role-input {
 	border-bottom: 1px solid var(--gray-border);
 }
 
+/* 氏名とコメントを「氏名: コメント」のように同じ行にまとめる。
+   コメントが長い場合は無理に1行へ詰めず、自然に折り返してよい */
 .comments-sidebar-item {
 	margin-bottom: 10px;
 	padding-bottom: 10px;
@@ -2169,12 +2172,7 @@ select.role-input {
 .comments-sidebar-user-name {
 	font-size: 13px;
 	font-weight: bold;
-	color: #fff;
-	background: var(--brown);
-	padding: 3px 10px;
-	border-radius: 12px;
-	display: inline-block;
-	margin-bottom: 8px;
+	color: var(--brown);
 }
 
 /* ---- 契約との過不足パネル（前半／後半・表形式） ---- */
@@ -2195,11 +2193,14 @@ select.role-input {
 	margin-bottom: 8px;
 }
 
-/* 氏名・時間・日数を横並びの3列テーブルにしていると、狭いサイドバー幅
-   (190px程度)では氏名列に使える幅が少なく折り返されやすいため、
-   「1行目に氏名、2行目に時間と日数を横並び」の縦積みレイアウトにする */
+/* 1人1行で「氏名 98.0時間/7日 (+83.0/+4)」のように表示する。
+   サイドバー幅(210px〜)に収めるため、区切りを"時間/""日""(...)"に
+   詰めてスペースを減らしている。氏名が短い場合はほぼ全帯で1行に
+   収まるが、4〜5文字の長い氏名では狭い帯(210〜220px)で収まりきらない
+   ことがあるため、flexでの強制1行(nowrap)にはせず、通常のテキストの
+   折り返しに任せている（長い氏名の行だけ自然に2行目へ回る） */
 .hours-list {
-	font-size: 14px;
+	font-size: 13px;
 }
 
 .hours-row {
@@ -2214,25 +2215,20 @@ select.role-input {
 .hours-row-name {
 	font-weight: bold;
 	color: var(--brown);
-	margin-bottom: 2px;
-	overflow-wrap: anywhere;
+	margin-right: 6px;
 }
 
 .hours-row-stats {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 4px 10px;
 	color: var(--text-main);
 }
 
-.hours-row-stat {
-	overflow-wrap: anywhere;
+.hours-row-diffs {
+	color: var(--text-sub);
 }
 
 .hours-table-diff {
-	display: block;
 	color: var(--text-sub);
-	font-size: 13px;
+	font-size: 12px;
 }
 
 .hours-table-diff-over {
